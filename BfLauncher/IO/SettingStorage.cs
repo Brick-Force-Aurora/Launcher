@@ -93,8 +93,12 @@ namespace BfLauncher.IO
 
         public bool GetBool(string path)
         {
-            object value = Get(path);
-            return value == null || value.GetType() != typeof(bool) ? false : (bool)value;
+            return GetBoolOr(path, false);
+        }
+
+        public string GetString(string path)
+        {
+            return GetStringOr(path, null);
         }
 
         public object GetOr(string path, object fallback)
@@ -107,6 +111,12 @@ namespace BfLauncher.IO
         {
             object value = Get(path);
             return value == null || value.GetType() != typeof(bool) ? fallback : (bool)value;
+        }
+
+        public string GetStringOr(string path, string fallback)
+        {
+            object value = Get(path);
+            return value == null || value.GetType() != typeof(string) ? fallback : (string)value;
         }
 
     }

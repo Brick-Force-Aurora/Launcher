@@ -203,6 +203,7 @@ namespace BfLauncher
 			Controls.Add(panel);
 
 			resources.ApplyResources(progressBar, "patchProgressBar"); // Use old name because of resources
+			progressBar.Maximum = 1005;
 			progressBar.BackColor = Color.Gold;
 			progressBar.ForeColor = Color.Gold;
 			progressBar.Name = "progressBar";

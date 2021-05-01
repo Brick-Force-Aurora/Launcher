@@ -89,7 +89,10 @@ namespace BfLauncher.Threading
         {
             if (!active)
                 return;
-            queue.Clear();
+            if(queue.Count != 0)
+            {
+                queue.Clear();
+            }
             if (executors.Count != 0)
             {
                 foreach (Executor executor in executors)

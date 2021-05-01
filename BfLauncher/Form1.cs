@@ -18,23 +18,28 @@ namespace BfLauncher
 		}
 
 
-		private ExecutorService executor = new ExecutorService("Worker", 2);
-		private bool updateChecked = true;
+		private ExecutorService executor = new ExecutorService("Worker", 1);
+
 		private int aniTick = 0;
+		public string AniText { get; set; }
+
+		public bool Updated { get; set; }
+		public string Folder { get; private set; }
+
+		public int Progress { get { return progressBar.Value; } set { progressBar.Value = value; } }
 
 		private void SetReadyToPlay()
 		{
-			this.progressBar.Value = 100;
+			this.progressBar.Value = 1005;
 			this.labelMsg.Text = "Click start to play Brick-Force";
-			this.btnStart.Enabled = true;
 		}
 
 		private void Form_Load(object sender, EventArgs e)
 		{
-			updateChecked = !Storage.GetBoolOr("check-update", true);
-			string path = Directory.GetCurrentDirectory();
-			string programFullPath = Path.Combine(path, "BfLauncher.exe");
-			string programFullPath2 = Path.Combine(path, "BrickForce.exe");
+			Updated = !Storage.GetBoolOr("check-update", true);
+			Folder = Directory.GetCurrentDirectory();
+			string programFullPath = Path.Combine(Folder, "BfLauncher.exe");
+			string programFullPath2 = Path.Combine(Folder, "BrickForce.exe");
 			Firewall.UnauthorizeProgram("BFLauncher", programFullPath);
 			Firewall.UnauthorizeProgram("BrickForce", programFullPath2);
 			string text = "";
@@ -44,18 +49,18 @@ namespace BfLauncher
 			this.timer.Enabled = true;
 			executor.Execute(() =>
 			{
-				Updater.UpdateBrickForce(progressBar);
+				GithubUpdater.UpdateBrickForce(this);
 			});
 		}
 
 		private void Timer_Tick(object sender, EventArgs e)
 		{
-			if(updateChecked)
+			if(Updated)
 			{
 				this.SetReadyToPlay();
 				return;
 			} 
-			this.labelMsg.Text = "Checking for updates";
+			this.labelMsg.Text = AniText;
 			switch (aniTick)
             {
 				case 0:
@@ -93,7 +98,7 @@ namespace BfLauncher
 
 		private void btnStart_Click(object sender, EventArgs e)
 		{
-            if (!updateChecked)
+            if (!Updated)
 			{
 				MessageBox.Show(this, "Please wait for the updater to finish!", "Brick-Force Aurora");
 				return;
@@ -114,8 +119,7 @@ namespace BfLauncher
 		private void btnClose_Click(object sender, EventArgs e)
 		{
 			DialogResult dialogResult = MessageBox.Show("Are you sure you want to quit?", "Brick-Force Aurora", MessageBoxButtons.OKCancel);
-			bool flag = dialogResult == DialogResult.OK;
-			if (flag)
+			if (dialogResult == DialogResult.OK)
 			{
 				base.Close();
 			}

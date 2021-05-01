@@ -8,6 +8,10 @@ namespace BfLauncher.IO
     public static class Parser
     {
 
+        public static string[] ReadInfo(this string value)
+        {
+            return value.Contains("=") ? new string[0] : value.Split('=');
+        }
         public static object Parse(this string value)
         {
             if(value.IsBool())

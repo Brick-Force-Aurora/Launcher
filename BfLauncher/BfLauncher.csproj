@@ -11,6 +11,8 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>BfLauncher.Program</StartupObject>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,10 +25,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -51,6 +51,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>BrickForce.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
@@ -90,10 +96,11 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\UIExtensions.cs" />
-    <Compile Include="Updater.cs" />
+    <Compile Include="GithubUpdater.cs" />
     <Compile Include="Utils\Functions\Consumer.cs" />
     <Compile Include="Utils\Functions\Supplier.cs" />
     <Compile Include="Utils\Random.cs" />
+    <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="_Emulator\Resources\EmuResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -123,6 +130,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BrickForce.ico" />
     <Content Include="_Emulator\Resources\images\launchUi\background.png" />
     <Content Include="_Emulator\Resources\images\launchUi\check.png" />
     <Content Include="_Emulator\Resources\images\launchUi\quit.png" />
@@ -130,6 +138,12 @@
     <Content Include="_Emulator\Resources\images\launchUi\start.png" />
     <Content Include="_Emulator\Resources\images\settingThumbnail.png" />
     <Content Include="_Emulator\Resources\images\thumbnail.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
