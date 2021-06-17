@@ -10,7 +10,7 @@ namespace BfLauncher.IO
 
         public static string[] ReadInfo(this string value)
         {
-            return value.Contains("=") ? new string[0] : value.Split('=');
+            return value.Contains("=") ? value.Split('=') : new string[0];
         }
         public static object Parse(this string value)
         {

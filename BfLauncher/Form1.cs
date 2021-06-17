@@ -26,7 +26,10 @@ namespace BfLauncher
 		public bool Updated { get; set; }
 		public string Folder { get; private set; }
 
-		public int Progress { get { return progressBar.Value; } set { progressBar.Value = value; } }
+		public int Progress { get; set; }
+
+		public DialogResult UpdateResult { get; set; }
+		public string CheckUpdate { get; set; }
 
 		private void SetReadyToPlay()
 		{
@@ -60,7 +63,18 @@ namespace BfLauncher
 				this.SetReadyToPlay();
 				return;
 			} 
+			if(CheckUpdate != null)
+            {
+				string tmp = CheckUpdate;
+				CheckUpdate = null;
+				UpdateResult = MessageBox.Show(this, "Do you want to update your Brick-Force to version " + tmp + "?", "Brick-Force Aurora", MessageBoxButtons.YesNo);
+				return;
+			}
 			this.labelMsg.Text = AniText;
+			if (progressBar.Value != Progress)
+            {
+				progressBar.Value = Progress;
+            }
 			switch (aniTick)
             {
 				case 0:
@@ -113,6 +127,10 @@ namespace BfLauncher
 
 		private void btnSettings_Click(object sender, EventArgs e)
 		{
+			if(settingPanel.Visible)
+            {
+				Storage.Save();
+			}
 			settingPanel.Visible = !settingPanel.Visible;
 		}
 
