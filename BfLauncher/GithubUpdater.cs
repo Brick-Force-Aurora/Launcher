@@ -72,7 +72,16 @@ namespace BfLauncher
                             continue;
                         }
                         try {
-                            Version version = new Version(((string)var1["name"]).Substring(1));
+                            StringBuilder builder = new StringBuilder();
+                            foreach (char var in ((string)var1["name"]).ToCharArray())
+                            {
+                                if(!(char.IsDigit(var) || var == '.'))
+                                {
+                                    continue;
+                                }
+                                builder.Append(var);
+                            }
+                            Version version = new Version(builder.ToString());
                             if (version > currentVersion)
                             {
                                 updates.Add(version);
@@ -80,14 +89,16 @@ namespace BfLauncher
                                     githubVersion = version;
                                 }
                             }
-                        } catch(Exception)
+                        } catch(Exception exp2)
                         {
+                            Console.WriteLine(exp2);
                             continue;
                         }
                     }
                 }
-            } catch(Exception)
+            } catch(Exception exp)
             {
+                Console.WriteLine(exp);
                 form.Updated = true;
                 return;
             }
