@@ -30,6 +30,7 @@ namespace BfLauncher
 
 		public DialogResult UpdateResult { get; set; }
 		public string CheckUpdate { get; set; }
+		public Logger Logger { get; private set; }
 
 		private void SetReadyToPlay()
 		{
@@ -41,6 +42,7 @@ namespace BfLauncher
 		{
 			Updated = !Storage.GetBoolOr("check-update", true);
 			Folder = Directory.GetCurrentDirectory();
+			Logger = new Logger(Folder + "\\debug.log");
 			string programFullPath = Path.Combine(Folder, "BfLauncher.exe");
 			string programFullPath2 = Path.Combine(Folder, "BrickForce.exe");
 			Firewall.UnauthorizeProgram("BFLauncher", programFullPath);
@@ -50,10 +52,17 @@ namespace BfLauncher
 			Firewall.AuthorizeProgram("BFLauncher", programFullPath, ref text, ref text2);
 			Firewall.AuthorizeProgram("BrickForce", programFullPath2, ref text, ref text2);
 			this.timer.Enabled = true;
-			executor.Execute(() =>
+			if (!Updated)
 			{
-				GithubUpdater.UpdateBrickForce(this);
-			});
+				AniText = "Checking for updates";
+				executor.Execute(() =>
+				{
+					GithubUpdater.UpdateBrickForce(this);
+				});
+            } else
+            {
+				Logger.Log("Update check is disabled!");
+            }
 		}
 
 		private void Timer_Tick(object sender, EventArgs e)
@@ -114,21 +123,33 @@ namespace BfLauncher
 		{
             if (!Updated)
 			{
+				Logger.Log("INFO: User tried to start game while updating");
 				MessageBox.Show(this, "Please wait for the updater to finish!", "Brick-Force Aurora");
 				return;
 			}
+			Logger.Log("Starting BrickForce...");
 			bool flag5 = !BrickForce.Execute();
 			if (flag5)
 			{
+				Logger.Log("Failed to start BrickForce!");
 				MessageBox.Show(this, "Failed to launch Brick-Force. Please try again.", "Brick-Force Aurora");
+				return;
 			}
+			Logger.Log("BrickForce started successfully!");
 			base.Close();
 		}
 
 		private void btnSettings_Click(object sender, EventArgs e)
 		{
+			if(!Updated)
+			{
+				Logger.Log("INFO: User tried to open settings while updating");
+				MessageBox.Show(this, "Please wait for the updater to finish!", "Brick-Force Aurora");
+				return;
+            }
 			if(settingPanel.Visible)
-            {
+			{
+				Logger.Log("Saving settings!");
 				Storage.Save();
 			}
 			settingPanel.Visible = !settingPanel.Visible;
@@ -145,7 +166,8 @@ namespace BfLauncher
 
 		private void ExitLauncher(object sender, EventArgs e) {
 			executor.EnsureShutdown();
-			Storage.Save();
+			Logger.Log("Goodbye!");
+			Logger.Close();
 		}
 
 	}
