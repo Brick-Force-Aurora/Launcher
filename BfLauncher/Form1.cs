@@ -24,7 +24,9 @@ namespace BfLauncher
 		public string AniText { get; set; }
 
 		public bool Updated { get; set; }
-		public string Folder { get; private set; }
+        public bool CheckSteam { get; set; }
+        public bool SteamCheckFailed { get; set; }
+        public string Folder { get; private set; }
 
 		public int Progress { get; set; }
 
@@ -41,8 +43,10 @@ namespace BfLauncher
 		private void Form_Load(object sender, EventArgs e)
 		{
 			Updated = !Storage.GetBoolOr("check-update", true);
-			Folder = Directory.GetCurrentDirectory();
-			Logger = new Logger(Folder + "\\debug.log");
+            CheckSteam = Storage.GetBoolOr("check-steam", false);
+			SteamCheckFailed = false;
+            Folder = Directory.GetCurrentDirectory();
+			Logger = new Logger(Folder + "\\Launcher.log");
 			string programFullPath = Path.Combine(Folder, "BfLauncher.exe");
 			string programFullPath2 = Path.Combine(Folder, "BrickForce.exe");
 			Firewall.UnauthorizeProgram("BFLauncher", programFullPath);
@@ -63,7 +67,16 @@ namespace BfLauncher
             {
 				Logger.Log("Update check is disabled!");
             }
-		}
+
+			if (CheckSteam)
+			{
+                AniText = "Checking for Spacewar installation";
+				SteamConfigChecker.CheckSteamConfig(this);
+            }
+            {
+                Logger.Log("Steam check is disabled!");
+            }
+        }
 
 		private void Timer_Tick(object sender, EventArgs e)
 		{
@@ -71,15 +84,25 @@ namespace BfLauncher
 			{
 				this.SetReadyToPlay();
 				return;
-			} 
-			if(CheckUpdate != null)
+			}
+            if (CheckUpdate != null)
             {
 				string tmp = CheckUpdate;
 				CheckUpdate = null;
 				UpdateResult = MessageBox.Show(this, "Do you want to update your Brick-Force to version " + tmp + "?", "Brick-Force Aurora", MessageBoxButtons.YesNo);
 				return;
 			}
-			this.labelMsg.Text = AniText;
+            if (SteamCheckFailed)
+            {
+                SteamCheckFailed = false;
+                DialogResult result = MessageBox.Show(this, "Could not find Spacewar installation. Do you want to install it?", "Brick-Force Aurora", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    SteamConfigChecker.Install(Constants.STEAM_APP_ID);
+                }
+                return;
+            }
+            this.labelMsg.Text = AniText;
 			if (progressBar.Value != Progress)
             {
 				progressBar.Value = Progress;

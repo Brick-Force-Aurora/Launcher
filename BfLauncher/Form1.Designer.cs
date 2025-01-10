@@ -35,11 +35,13 @@ namespace BfLauncher
 		private BfCheckBox stnCheckUpdate;
 		private BfCheckBox stnAutoUpdate;
 		private BfCheckBox stnExperimental;
-		private Label stnCheckUpdateMsg;
+        private BfCheckBox stnSteam;
+        private Label stnCheckUpdateMsg;
 		private Label stnAutoUpdateMsg;
 		private Label stnExperimentalMsg;
+        private Label stnSteamMsg;
 
-		private void InitializeComponent()
+        private void InitializeComponent()
 		{
 			this.components = new Container();
 			this.timer = new Timer(components);
@@ -61,11 +63,13 @@ namespace BfLauncher
 			this.stnCheckUpdate = new BfCheckBox();
 			this.stnAutoUpdate = new BfCheckBox();
 			this.stnExperimental = new BfCheckBox();
-			this.stnCheckUpdateMsg = new Label();
+            this.stnSteam = new BfCheckBox();
+            this.stnCheckUpdateMsg = new Label();
 			this.stnAutoUpdateMsg = new Label();
 			this.stnExperimentalMsg = new Label();
+            this.stnSteamMsg = new Label();
 
-			timer.Tick += new EventHandler(Timer_Tick);
+            timer.Tick += new EventHandler(Timer_Tick);
 
 			btnStart.Click += new EventHandler(btnStart_Click);
 			btnSettings.Click += new EventHandler(btnSettings_Click);
@@ -159,7 +163,17 @@ namespace BfLauncher
 			stnExperimental.OnChecked += (state) => Storage.Update("experimental", state);
 			container.Add(stnExperimental);
 
-			container.BackColor = Color.Transparent;
+            stnSteam.ApplyStyle();
+            stnSteam.Name = "stnSteam";
+            stnSteam.Enabled = true;
+            stnSteam.CheckImage = EmuResources.check;
+            stnSteam.BackColor = Color.FromArgb(1, 10, 18);
+            stnSteam.ForeColor = Color.FromArgb(7, 69, 127);
+            stnSteam.Checked = Storage.GetBoolOr("check-steam", false);
+            stnSteam.OnChecked += (state) => Storage.Update("check-steam", state);
+            container.Add(stnSteam);
+
+            container.BackColor = Color.Transparent;
 			container.Location = new Point(26, 80);
 			container.Size = new Size(244, 360);
 		}
@@ -193,7 +207,16 @@ namespace BfLauncher
 			stnExperimentalMsg.Size = new Size(244, labelMsg.Font.Height);
 			container.Add(stnExperimentalMsg);
 
-			container.BackColor = Color.Transparent;
+            stnSteamMsg.Text = "Check Spacewar Steam installation";
+            stnSteamMsg.Name = "stnSteamMsg";
+            stnSteamMsg.Font = labelMsg.Font;
+            stnSteamMsg.BackColor = Color.Transparent;
+            stnSteamMsg.ForeColor = Color.White;
+            stnSteamMsg.TextAlign = ContentAlignment.MiddleRight;
+            stnSteamMsg.Size = new Size(244, labelMsg.Font.Height);
+            container.Add(stnSteamMsg);
+
+            container.BackColor = Color.Transparent;
 			container.Location = new Point(270, 80);
 			container.Size = new Size(244, 360);
 		}
