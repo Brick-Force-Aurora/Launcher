@@ -26,7 +26,7 @@
 
 ## Installation 📥
 
-1. **Download** the latest release of the launcher from [GitHub](https://github.com/your-repo-here).
+1. **Download** the latest release of the launcher from [GitHub](https://github.com/Brick-Force-Aurora/Launcher/releases/latest).
 2. **Run the Launcher** by double-clicking the executable file.
 3. Configure the settings in the **Options Panel** to suit your preferences.
 4. Press **Play** and enjoy **BrickForce Aurora**!
@@ -54,7 +54,7 @@ The launcher communicates with the **BrickForce Aurora update server** to:
 ## Contributing 🤝
 
 We welcome contributions to improve the **BrickForce Aurora Launcher**!  
-- Submit issues or feature requests on [GitHub](https://github.com/your-repo-here/issues).
+- Submit issues or feature requests on [GitHub](https://github.com/Brick-Force-Aurora/Launcher/issues).
 - Fork the repository and submit pull requests with your improvements.
 
 ## License 📜
