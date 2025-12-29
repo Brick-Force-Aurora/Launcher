@@ -1,7 +1,7 @@
 package de.brickforceaurora.launcher.data;
 
-import me.lauriichan.applicationbase.app.data.nbt.CompoundTag;
-import me.lauriichan.applicationbase.app.data.nbt.TagType;
+import me.lauriichan.snowframe.util.nbt.CompoundTag;
+import me.lauriichan.snowframe.util.nbt.TagType;
 
 public abstract class StorageHandler<T> {
 

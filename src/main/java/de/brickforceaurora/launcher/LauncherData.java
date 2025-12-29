@@ -10,13 +10,13 @@ public final class LauncherData {
         throw new UnsupportedOperationException();
     }
 
-    public static final DataStore STORE = LauncherApp.launcherData();
+    public static final DataStore STORE = LauncherApp.get().launcherData();
 
     static void init() {
         try {
             STORE.load();
         } catch (IOException e) {
-            LauncherApp.app().logger().error("Failed to initialize launcher data", e);
+            LauncherApp.logger().error("Failed to initialize launcher data", e);
         }
     }
 

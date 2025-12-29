@@ -1,11 +1,11 @@
 package de.brickforceaurora.launcher.updater;
 
-import me.lauriichan.applicationbase.app.config.Config;
-import me.lauriichan.applicationbase.app.config.ConfigValue;
-import me.lauriichan.applicationbase.app.config.IConfigHandler;
-import me.lauriichan.applicationbase.app.config.ISingleConfigExtension;
-import me.lauriichan.applicationbase.app.config.handler.JsonConfigHandler;
-import me.lauriichan.applicationbase.app.extension.Extension;
+import me.lauriichan.snowframe.config.Config;
+import me.lauriichan.snowframe.config.ConfigValue;
+import me.lauriichan.snowframe.config.IConfigHandler;
+import me.lauriichan.snowframe.config.ISingleConfigExtension;
+import me.lauriichan.snowframe.config.handler.JsonConfigHandler;
+import me.lauriichan.snowframe.extension.Extension;
 
 @Extension
 @Config(automatic = true)

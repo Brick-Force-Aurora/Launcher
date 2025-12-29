@@ -4,10 +4,10 @@ import java.util.Objects;
 
 import imgui.ImDrawList;
 import imgui.ImVec2;
-import me.lauriichan.applicationbase.app.extension.ExtensionPoint;
-import me.lauriichan.applicationbase.app.extension.IExtension;
 import me.lauriichan.clay4j.BoundingBox;
 import me.lauriichan.clay4j.Element;
+import me.lauriichan.snowframe.extension.ExtensionPoint;
+import me.lauriichan.snowframe.extension.IExtension;
 
 @ExtensionPoint
 public abstract class ElementRenderer<T> implements IExtension {

@@ -1,9 +1,9 @@
 package de.brickforceaurora.launcher;
 
 import de.brickforceaurora.launcher.data.StorageHandler;
-import me.lauriichan.applicationbase.app.data.nbt.CompoundTag;
-import me.lauriichan.applicationbase.app.data.nbt.TagType;
-import me.lauriichan.applicationbase.app.util.Version;
+import me.lauriichan.snowframe.util.Version;
+import me.lauriichan.snowframe.util.nbt.CompoundTag;
+import me.lauriichan.snowframe.util.nbt.TagType;
 
 public final class DataHandler {
     

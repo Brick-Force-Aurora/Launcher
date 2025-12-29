@@ -1,21 +1,11 @@
 package de.brickforceaurora.launcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
-
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.stb.STBImage;
-import org.lwjgl.system.MemoryStack;
+import java.util.Arrays;
 
 import de.brickforceaurora.launcher.data.DataStore;
-import de.brickforceaurora.launcher.helper.UIActionHelper;
+import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.ui.clay.RenderManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
 import de.brickforceaurora.launcher.updater.UpdateManager;
@@ -23,243 +13,129 @@ import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
 import de.brickforceaurora.launcher.util.IOUtil;
 import imgui.ImGui;
-import imgui.internal.ImGuiContext;
-import me.lauriichan.applicationbase.app.BaseApp;
-import me.lauriichan.applicationbase.app.resource.ISourceProvider;
-import me.lauriichan.applicationbase.app.resource.source.IDataSource;
-import me.lauriichan.applicationbase.app.resource.source.PathDataSource;
-import me.lauriichan.applicationbase.app.ui.BaseUIApp;
-import me.lauriichan.applicationbase.app.ui.ImGuiHandle;
-import me.lauriichan.applicationbase.app.ui.dock.DockNode;
-import me.lauriichan.applicationbase.app.ui.dock.DockNode.SplitDirection;
-import me.lauriichan.applicationbase.app.ui.util.AnimationTickTimer;
-import me.lauriichan.applicationbase.app.ui.util.ComponentTickTimer;
-import me.lauriichan.applicationbase.app.util.FileLogger;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import me.lauriichan.snowframe.ConfigModule;
+import me.lauriichan.snowframe.ISnowFrameApp;
+import me.lauriichan.snowframe.ImGUIModule;
+import me.lauriichan.snowframe.SignalModule;
+import me.lauriichan.snowframe.SnowFrame;
+import me.lauriichan.snowframe.lifecycle.Lifecycle;
+import me.lauriichan.snowframe.lifecycle.LifecyclePhase.Stage;
+import me.lauriichan.snowframe.signal.SignalManager;
+import me.lauriichan.snowframe.util.logger.SysOutSimpleLogger;
 
-public final class LauncherApp extends BaseUIApp {
+public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
-    private static LauncherApp app;
-    private static Path gameDirectory, tempDirectory;
-    private static DataStore launcherData, gameData;
+    private static SnowFrame<LauncherApp> snowFrame;
 
-    private static UpdateManager updateManager;
+    static SnowFrame<LauncherApp> init(String[] args) {
+        if (snowFrame != null) {
+            return snowFrame;
+        }
 
-    public static final ComponentTickTimer COMPONENT_TIMER = new ComponentTickTimer();
-    public static final AnimationTickTimer GENERIC_ANIMATION_TIMER = new AnimationTickTimer();
+        // TODO: Do actual command line parsing
+        ISimpleLogger logger = SysOutSimpleLogger.INSTANCE;
+        logger.setDebug(Arrays.stream(args).anyMatch(str -> str.equalsIgnoreCase("--debug")));
 
-    public static final long COMPONENT_TIMER_LENGTH = 16_666_667;
-    public static final long GENERIC_ANIMATION_TIMER_LENGTH = 16_666_667;
-
-    public static final float COMPONENT_TIMER_RATIO = ((float) COMPONENT_TIMER_LENGTH) / TimeUnit.SECONDS.toNanos(1L);
-    public static final float GENERIC_ANIMATION_TIMER_RATIO = ((float) GENERIC_ANIMATION_TIMER_LENGTH) / TimeUnit.SECONDS.toNanos(1L);
-
-    public static LauncherApp app() {
-        return app;
+        return snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
     }
 
-    public static Path gameDirectory() {
+    public static LauncherApp get() {
+        return snowFrame.app();
+    }
+
+    public static ISimpleLogger logger() {
+        return snowFrame.logger();
+    }
+
+    private Path gameDirectory, tempDirectory;
+    private DataStore launcherData, gameData;
+
+    private UpdateManager updateManager;
+    private RenderManager renderManager;
+
+    private SignalManager signalManager;
+
+    private UserInterface userInterface;
+
+    @Override
+    public void registerLifecycle(Lifecycle<LauncherApp> lifecycle) {
+        lifecycle.startupChain().register("load", Stage.PRE, (frame) -> {
+            frame.resourceManager().register("user", Paths.get("user"));
+            frame.resourceManager().register("data", Paths.get("data"));
+        }).register("ready", Stage.MAIN, (frame) -> {
+            gameDirectory = Paths.get(frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory());
+            tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
+
+            frame.resourceManager().register("game", gameDirectory);
+            frame.resourceManager().register("tmp", gameDirectory);
+
+            launcherData = new DataStore(frame.resource("data://launcher.dat"));
+            LauncherData.init();
+            gameData = new DataStore(frame.resource("game://launcher_data.dat"));
+            GameData.init();
+
+            updateManager = new UpdateManager(frame.logger(), new GithubUpdater());
+
+            renderManager = new RenderManager(frame);
+
+            signalManager = frame.module(SignalModule.class).signalManager();
+        });
+        lifecycle.chainOrThrow(ImGUIModule.STARTUP_CHAIN).register("setup", Stage.POST, frame -> {
+            frame.module(ImGUIModule.class)
+                .setWindowIcon(frame.externalResource("jar://image/logo.png", "data://resources/image/logo.png"));
+            FontAtlas.load(frame);
+            ImGui.getIO().setIniFilename(IOUtil.asPath(frame.resource("data://ui.ini")).toString());
+            ImGui.getIO().setFontDefault(FontAtlas.NOTO_SANS_NORMAL);
+            ImGuiStyler.apply();
+
+            Constant.updateVariables();
+        }).register("start", Stage.PRE, frame -> {
+            TextureAtlas.load(frame);
+
+            userInterface = new UserInterface(this);
+        }).register("start", Stage.POST, frame -> {
+            // We call Main.shutdown(), this will notify the GLFW to close.
+            // However we already know it should close since this lambda is called.
+            // So either the user requested to close, which means the application isn't aware yet, so we make it aware.
+            // Or Main.shutdown() was called already in which case this does nothing.
+            Main.shutdown();
+            frame.lifecycle().execute(SnowFrame.LIFECYCLE_CHAIN_SHUTDOWN);
+        });
+        lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> userInterface.render());
+    }
+
+    @Override
+    public SnowFrame<LauncherApp> snowFrame() {
+        return snowFrame;
+    }
+
+    public Path gameDirectory() {
         return gameDirectory;
     }
 
-    public static Path tempDirectory() {
+    public Path tempDirectory() {
         return tempDirectory;
     }
 
-    public static UpdateManager updateManager() {
+    public SignalManager signalManager() {
+        return signalManager;
+    }
+
+    public UpdateManager updateManager() {
         return updateManager;
     }
 
-    static DataStore launcherData() {
-        return launcherData;
-    }
-
-    static DataStore gameData() {
-        return gameData;
-    }
-    
-    private RenderManager renderManager;
-
-    public LauncherApp() throws URISyntaxException {
-        super(BaseApp.getJarFile(BaseApp.class));
-        app = this;
-        start();
-    }
-
-    @Override
-    protected ISimpleLogger createLogger() {
-        return new FileLogger(new File("logs"));
-    }
-
-    @Override
-    protected Path createDataRoot() {
-        return Paths.get("data");
-    }
-
-    public Path resourcePath(String path) {
-        return IOUtil.asPath(resource(path));
-    }
-
-    @Override
-    protected void onAppPreLoad() throws Throwable {
-        resourceManager().register("user", new ISourceProvider() {
-            private final Path basePath = Paths.get("user");
-
-            @Override
-            public IDataSource provide(BaseApp app, String path) {
-                return new PathDataSource(basePath.resolve(path));
-            }
-        });
-    }
-    
-    @Override
-    protected void onAppLoad() throws Throwable {
-        renderManager = new RenderManager(this);
-    }
-
-    @Override
-    protected void onAppReady() throws Throwable {
-        gameDirectory = Paths.get(configManager().config(UpdaterConfig.class).directory());
-        tempDirectory = resourcePath("data://temp");
-
-        resourceManager().register("game", (app, path) -> new PathDataSource(gameDirectory.resolve(path)));
-
-        launcherData = new DataStore(resource("data://launcher.dat"));
-        LauncherData.init();
-        gameData = new DataStore(resource("game://launcher_data.dat"));
-        GameData.init();
-
-        updateManager = new UpdateManager(logger(), new GithubUpdater());
-        
-        renderManager = new RenderManager(this);
-    }
-
-    @Override
-    protected void createDock(DockNode node) {
-        node.direction(SplitDirection.VERTICAL);
-
-        node.newChild().id("titlebar").weight(0.05f);
-        node.newChild().id("panorama").weight(0.775f);
-
-        DockNode bottombar = node.newChild().id("bottombar").weight(0.175f).direction(SplitDirection.VERTICAL);
-
-        DockNode control = bottombar.newChild().id("controlbar").weight(0.75f).direction(SplitDirection.HORIZONTAL);
-        control.newChild().id("progress").weight(0.6f);
-        control.newChild().id("start").weight(0.2f);
-        control.newChild().id("settings").weight(0.2f);
-
-        bottombar.newChild().id("footer").weight(0.25f);
-    }
-
-    @Override
-    protected void onAppImGuiConfigure(ImGuiHandle.Config config) throws Throwable {
-        config.title = "BrickForce Aurora";
-        config.height = 580;
-        config.width = 800;
-        config.borderless = true;
-        config.transparent = true;
-    }
-
-    @Override
-    protected void onAppImGuiSetup(ImGuiContext context, ImGuiHandle.Config config) throws Throwable {
-        setWindowIcon("logo.png");
-        FontAtlas.load(this);
-        ImGui.getIO().setIniFilename(resourcePath("data://ui.ini").toString());
-        ImGui.getIO().setFontDefault(FontAtlas.NOTO_SANS_NORMAL);
-        ImGuiStyler.apply();
-
-        Constant.updateVariables();
-    }
-
-    @Override
-    protected void onAppImGuiStart(long windowHandle) throws Throwable {
-        TextureAtlas.load(this);
-    }
-
-    @Override
-    protected void onAppImGuiPostStart(long windowHandle) throws Throwable {
-        // 16.666667 ms
-        COMPONENT_TIMER.setLength(COMPONENT_TIMER_LENGTH, TimeUnit.NANOSECONDS);
-        COMPONENT_TIMER.setPauseLength(50, TimeUnit.MILLISECONDS);
-        COMPONENT_TIMER.start();
-        // 16.666667 ms
-        GENERIC_ANIMATION_TIMER.setLength(GENERIC_ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
-        GENERIC_ANIMATION_TIMER.setPauseLength(50, TimeUnit.MILLISECONDS);
-        GENERIC_ANIMATION_TIMER.start();
-    }
-
-    @Override
-    protected void onAppPostDock() throws Throwable {
-        Thread thread = new Thread(() -> UIActionHelper.runUpdate(true), "UpdateThread");
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    @Override
-    protected void onAppPreUpdate() throws Throwable {
-    }
-
-    @Override
-    protected void onAppShutdown() throws Throwable {
-        configManager().save();
-        dataManager().save();
-        try {
-            logger().info("Saving launcher data");
-            launcherData.save();
-        } catch (IOException exp) {
-            logger().error("Failed to save launcher data", exp);
-        }
-        try {
-            logger().info("Saving game data");
-            gameData.save();
-        } catch (IOException exp) {
-            logger().error("Failed to save game data", exp);
-        }
-
-        ((FileLogger) logger()).close();
-    }
-
-    @Override
-    protected void onAppDispose() throws Throwable {
-        COMPONENT_TIMER.stop();
-        GENERIC_ANIMATION_TIMER.stop();
-    }
-    
-    /*
-     * Getter
-     */
-    
-    public final RenderManager renderManager() {
+    public RenderManager renderManager() {
         return renderManager;
     }
 
-    /*
-     * Helper
-     */
+    DataStore launcherData() {
+        return launcherData;
+    }
 
-    private void setWindowIcon(String path) {
-        ByteBuffer image;
-        int width, height;
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            String filePath = IOUtil.asPath(externalResource("jar://image/%s".formatted(path), "data://resources/image/%s".formatted(path)))
-                .toAbsolutePath().toString();
-            IntBuffer channelsBuf = stack.mallocInt(1);
-            IntBuffer widthBuf = stack.mallocInt(1);
-            IntBuffer heightBuf = stack.mallocInt(1);
-            image = STBImage.stbi_load(filePath, widthBuf, heightBuf, channelsBuf, 4);
-            if (image == null) {
-                throw new IOException("Unable to load image from resource");
-            }
-            width = widthBuf.get();
-            height = heightBuf.get();
-        } catch (IOException e) {
-            logger().warning("Failed to set window icon", e);
-            return;
-        }
-        try (GLFWImage.Buffer imgBuf = GLFWImage.create(1)) {
-            imgBuf.get(0).set(width, height, image);
-            GLFW.glfwSetWindowIcon(handle().handle(), imgBuf);
-        }
+    DataStore gameData() {
+        return gameData;
     }
 
 }

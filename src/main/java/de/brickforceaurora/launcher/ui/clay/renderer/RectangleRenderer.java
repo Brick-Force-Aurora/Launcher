@@ -1,14 +1,14 @@
 package de.brickforceaurora.launcher.ui.clay.renderer;
 
-import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.ui.clay.ElementRenderer;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
+import de.brickforceaurora.launcher.Constant;
 import imgui.ImDrawList;
 import imgui.ImVec2;
-import me.lauriichan.applicationbase.app.extension.Extension;
 import me.lauriichan.clay4j.BoundingBox;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.RenderCommand;
+import me.lauriichan.snowframe.extension.Extension;
 
 @Extension
 public class RectangleRenderer extends ElementRenderer<Object> {

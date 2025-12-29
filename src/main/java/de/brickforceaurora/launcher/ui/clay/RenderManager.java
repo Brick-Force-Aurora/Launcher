@@ -8,15 +8,16 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import me.lauriichan.clay4j.LayoutContext;
 import me.lauriichan.clay4j.RenderCommand;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import me.lauriichan.snowframe.SnowFrame;
 
 public final class RenderManager {
 
     private final ISimpleLogger logger;
     private final Object2ObjectArrayMap<String, ElementRenderer<?>> renderers = new Object2ObjectArrayMap<>();
 
-    public RenderManager(LauncherApp app) {
-        this.logger = app.logger();
-        app.extension(ElementRenderer.class, true).callInstances(renderer -> {
+    public RenderManager(SnowFrame<LauncherApp> frame) {
+        this.logger = frame.logger();
+        frame.extension(ElementRenderer.class, true).callInstances(renderer -> {
             if (renderers.containsKey(renderer.id())) {
                 logger.error("Renderer id '{0}' is already taken.", renderer.id());
                 return;

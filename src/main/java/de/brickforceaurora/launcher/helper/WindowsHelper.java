@@ -64,7 +64,7 @@ public final class WindowsHelper {
             }
             return enabled && action && path;
         } catch (Throwable thr) {
-            LauncherApp.app().logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
+            LauncherApp.logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
             return false;
         }
     }
@@ -86,7 +86,7 @@ public final class WindowsHelper {
             String error = process.errorReader().lines().collect(Collectors.joining("\n"));
             return new ProgramResult(true, result, error);
         } catch (Throwable thr) {
-            LauncherApp.app().logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
+            LauncherApp.logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
             return new ProgramResult(false, "", "");
         }
     }
@@ -103,7 +103,7 @@ public final class WindowsHelper {
             String error = process.errorReader().lines().collect(Collectors.joining());
             return new ProgramResult(true, result, error);
         } catch (Throwable thr) {
-            LauncherApp.app().logger().warning("Failed to apply registry language fix", thr);
+            LauncherApp.logger().warning("Failed to apply registry language fix", thr);
             return new ProgramResult(false, "", "");
         }
     }

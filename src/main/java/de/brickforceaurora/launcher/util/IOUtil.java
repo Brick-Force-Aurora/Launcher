@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Objects;
 
-import me.lauriichan.applicationbase.app.resource.source.FileDataSource;
-import me.lauriichan.applicationbase.app.resource.source.IDataSource;
-import me.lauriichan.applicationbase.app.resource.source.PathDataSource;
 import me.lauriichan.laylib.json.IJson;
 import me.lauriichan.laylib.json.io.JsonWriter;
+import me.lauriichan.snowframe.resource.source.FileDataSource;
+import me.lauriichan.snowframe.resource.source.IDataSource;
+import me.lauriichan.snowframe.resource.source.PathDataSource;
 
 public final class IOUtil {
 

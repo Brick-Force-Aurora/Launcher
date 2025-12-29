@@ -1,17 +1,17 @@
 package de.brickforceaurora.launcher.ui.clay.renderer;
 
-import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.ui.clay.ElementRenderer;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
+import de.brickforceaurora.launcher.Constant;
 import imgui.ImDrawList;
 import imgui.ImVec2;
-import me.lauriichan.applicationbase.app.extension.Extension;
-import me.lauriichan.applicationbase.app.util.color.SimpleColor;
 import me.lauriichan.clay4j.BoundingBox;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig.Text;
 import me.lauriichan.clay4j.RenderCommand;
+import me.lauriichan.snowframe.extension.Extension;
+import me.lauriichan.snowframe.util.color.SimpleColor;
 
 @Extension
 public final class TextRenderer extends ElementRenderer<String> {

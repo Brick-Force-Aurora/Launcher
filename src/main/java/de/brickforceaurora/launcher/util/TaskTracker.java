@@ -2,8 +2,8 @@ package de.brickforceaurora.launcher.util;
 
 import java.util.Objects;
 
-import me.lauriichan.applicationbase.app.ui.component.property.PropFloat;
-import me.lauriichan.applicationbase.app.ui.component.property.PropString;
+import de.brickforceaurora.launcher.animation.property.PropFloat;
+import de.brickforceaurora.launcher.animation.property.PropString;
 
 public class TaskTracker {
 

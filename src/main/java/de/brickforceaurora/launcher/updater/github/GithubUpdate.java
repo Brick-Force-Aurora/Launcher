@@ -14,12 +14,12 @@ import de.brickforceaurora.launcher.util.IOUtil;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import me.lauriichan.applicationbase.app.util.Version;
-import me.lauriichan.applicationbase.app.util.http.HttpCode;
-import me.lauriichan.applicationbase.app.util.http.HttpRequest;
-import me.lauriichan.applicationbase.app.util.http.HttpResponse;
-import me.lauriichan.applicationbase.app.util.http.type.HttpContentType;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import me.lauriichan.snowframe.util.Version;
+import me.lauriichan.snowframe.util.http.HttpCode;
+import me.lauriichan.snowframe.util.http.HttpRequest;
+import me.lauriichan.snowframe.util.http.HttpResponse;
+import me.lauriichan.snowframe.util.http.type.HttpContentType;
 
 final class GithubUpdate implements IUpdate {
 

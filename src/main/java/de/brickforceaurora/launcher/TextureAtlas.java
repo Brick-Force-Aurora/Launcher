@@ -15,7 +15,8 @@ import de.brickforceaurora.launcher.util.IOUtil;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
 import it.unimi.dsi.fastutil.objects.ReferenceLists;
-import me.lauriichan.applicationbase.app.resource.source.IDataSource;
+import me.lauriichan.snowframe.SnowFrame;
+import me.lauriichan.snowframe.resource.source.IDataSource;
 
 public final class TextureAtlas {
 
@@ -30,12 +31,14 @@ public final class TextureAtlas {
 
         public final String name;
         public final int id, width, height;
+        public final float aspect;
 
         private ImTexture(String name, int id, int width, int height) {
             this.name = name;
             this.id = id;
             this.width = width;
             this.height = height;
+            this.aspect = width / (float) height;
         }
 
         @Override
@@ -61,7 +64,7 @@ public final class TextureAtlas {
         throw new UnsupportedOperationException();
     }
 
-    static void load(LauncherApp app) {
+    static void load(SnowFrame<LauncherApp> frame) {
         for (Field field : TextureAtlas.class.getDeclaredFields()) {
             Texture textureInfo = field.getDeclaredAnnotation(Texture.class);
             if (textureInfo == null) {
@@ -70,14 +73,14 @@ public final class TextureAtlas {
             Class<?> type = field.getType();
             boolean bundle = false;
             if (!type.equals(ImTexture.class) && !(bundle = type.equals(ImTextureBundle.class))) {
-                app.logger().error("Invalid field type for texture '{0}'", textureInfo.path());
+                frame.logger().error("Invalid field type for texture '{0}'", textureInfo.path());
                 continue;
             }
             try {
-                IDataSource source = app.externalResource("jar://image/%s".formatted(textureInfo.path()),
+                IDataSource source = frame.externalResource("jar://image/%s".formatted(textureInfo.path()),
                     "data://resources/image/%s".formatted(textureInfo.path()), true);
                 if (!source.exists()) {
-                    app.logger().error("Couldn't find texture '{0}'", textureInfo.path());
+                    frame.logger().error("Couldn't find texture '{0}'", textureInfo.path());
                     continue;
                 }
                 if (bundle) {
@@ -90,7 +93,7 @@ public final class TextureAtlas {
                         try (MemoryStack stack = MemoryStack.stackPush()) {
                             textures.add(loadTexture(stack, source.name() + '/' + content.name(), content));
                         } catch (Throwable thr) {
-                            app.logger().error("Failed to load texture '{0}'", thr, textureInfo.path() + '/' + content.name());
+                            frame.logger().error("Failed to load texture '{0}'", thr, textureInfo.path() + '/' + content.name());
                         }
                     }
                     field.set(null, new ImTextureBundle(source.name(),
@@ -101,7 +104,7 @@ public final class TextureAtlas {
                     field.set(null, loadTexture(stack, source.name(), source));
                 }
             } catch (Throwable thr) {
-                app.logger().error("Failed to load texture '{0}'", thr, textureInfo.path());
+                frame.logger().error("Failed to load texture '{0}'", thr, textureInfo.path());
             }
         }
     }

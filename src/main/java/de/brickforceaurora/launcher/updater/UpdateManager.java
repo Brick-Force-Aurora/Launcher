@@ -8,8 +8,8 @@ import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import de.brickforceaurora.launcher.util.TaskTracker.Task;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import me.lauriichan.applicationbase.app.util.Version;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import me.lauriichan.snowframe.util.Version;
 
 public final class UpdateManager {
 
@@ -44,8 +44,9 @@ public final class UpdateManager {
             return null;
         }
         Task task = tracker.allocate("Applying updates...", updates.size());
-        Path gameDirectory = LauncherApp.gameDirectory();
-        Path temporaryDirectory = LauncherApp.tempDirectory();
+        LauncherApp app = LauncherApp.get();
+        Path gameDirectory = app.gameDirectory();
+        Path temporaryDirectory = app.tempDirectory();
         Version lastUpdate = null;
         task.task(null);
         for (IUpdate update : updates) {

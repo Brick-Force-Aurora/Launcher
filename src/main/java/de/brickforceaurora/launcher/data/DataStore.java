@@ -7,9 +7,9 @@ import java.io.IOException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
-import me.lauriichan.applicationbase.app.data.nbt.CompoundTag;
-import me.lauriichan.applicationbase.app.resource.source.IDataSource;
-import me.lauriichan.applicationbase.app.util.Tuple;
+import me.lauriichan.snowframe.resource.source.IDataSource;
+import me.lauriichan.snowframe.util.Tuple;
+import me.lauriichan.snowframe.util.nbt.CompoundTag;
 
 public final class DataStore {
 

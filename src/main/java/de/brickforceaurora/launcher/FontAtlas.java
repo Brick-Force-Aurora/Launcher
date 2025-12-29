@@ -9,7 +9,8 @@ import imgui.ImFont;
 import imgui.ImFontAtlas;
 import imgui.ImFontConfig;
 import imgui.ImGui;
-import me.lauriichan.applicationbase.app.resource.source.IDataSource;
+import me.lauriichan.snowframe.SnowFrame;
+import me.lauriichan.snowframe.resource.source.IDataSource;
 
 public final class FontAtlas {
 
@@ -26,7 +27,7 @@ public final class FontAtlas {
         throw new UnsupportedOperationException();
     }
 
-    static void load(LauncherApp app) {
+    static void load(SnowFrame<LauncherApp> frame) {
         ImFontAtlas atlas = ImGui.getIO().getFonts();
         for (Field field : FontAtlas.class.getDeclaredFields()) {
             Font fontInfo = field.getDeclaredAnnotation(Font.class);
@@ -34,10 +35,10 @@ public final class FontAtlas {
                 continue;
             }
             try {
-                IDataSource source = app.externalResource("jar://fonts/%s".formatted(fontInfo.path()),
+                IDataSource source = frame.externalResource("jar://fonts/%s".formatted(fontInfo.path()),
                     "data://resources/fonts/%s".formatted(fontInfo.path()));
                 if (!source.exists()) {
-                    app.logger().error("Couldn't find font '{0}'", fontInfo.path());
+                    frame.logger().error("Couldn't find font '{0}'", fontInfo.path());
                     continue;
                 }
                 ImFontConfig config = new ImFontConfig();
@@ -45,7 +46,7 @@ public final class FontAtlas {
                 ImFont font = atlas.addFontFromFileTTF(IOUtil.asPath(source).toString(), fontInfo.defaultSize(), config);
                 field.set(null, font);
             } catch (Throwable thr) {
-                app.logger().error("Failed to load font '{0}'", thr, fontInfo.path());
+                frame.logger().error("Failed to load font '{0}'", thr, fontInfo.path());
             }
         }
     }

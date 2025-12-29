@@ -3,7 +3,7 @@ package de.brickforceaurora.launcher.data;
 import java.util.Objects;
 
 import de.brickforceaurora.launcher.LauncherApp;
-import me.lauriichan.applicationbase.app.data.nbt.CompoundTag;
+import me.lauriichan.snowframe.util.nbt.CompoundTag;
 
 public final class StoredData<T> {
 
@@ -59,7 +59,7 @@ public final class StoredData<T> {
             value = handler.read(root, key);
         } catch (Exception exp) {
             value = null;
-            LauncherApp.app().logger().warning("Failed to read value '{0}'", exp, key);
+            LauncherApp.logger().warning("Failed to read value '{0}'", exp, key);
         }
     }
 
@@ -71,7 +71,7 @@ public final class StoredData<T> {
         try {
             handler.write(root, key, value);
         } catch (Exception exp) {
-            LauncherApp.app().logger().warning("Failed to write value '{0}'", exp, key);
+            LauncherApp.logger().warning("Failed to write value '{0}'", exp, key);
         }
     }
 

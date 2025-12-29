@@ -1,0 +1,54 @@
+package de.brickforceaurora.launcher.ui.clay;
+
+import java.util.concurrent.TimeUnit;
+
+import de.brickforceaurora.launcher.LauncherApp;
+import imgui.ImGui;
+import imgui.ImGuiViewport;
+import imgui.ImVec2;
+import me.lauriichan.clay4j.LayoutContext;
+import me.lauriichan.snowframe.ImGUIModule;
+
+public abstract class AbstractUserInterface {
+
+    public static final float SECOND_IN_NANOS = TimeUnit.SECONDS.toNanos(1);
+
+    private final LayoutContext layout = new LayoutContext();
+    private final RenderManager renderManager;
+
+    private final ImVec2 cursorPos = new ImVec2(), windowPos = new ImVec2(), windowSize = new ImVec2();
+
+    private final ImGUIModule guiModule;
+
+    public AbstractUserInterface(LauncherApp app) {
+        this.renderManager = app.renderManager();
+        this.guiModule = app.snowFrame().module(ImGUIModule.class);
+    }
+
+    public void render() {
+        float deltaTime = ImGUIModule.DELTA_TIME.get() / SECOND_IN_NANOS;
+        
+        ImGuiViewport viewport = ImGui.getMainViewport();
+
+        ImGui.getCursorPos(cursorPos);
+        viewport.getWorkPos(windowPos);
+        viewport.getWorkSize(windowSize);
+
+        updateState(layout, deltaTime);
+
+        layout.setDimensions(windowSize.x, windowSize.y);
+
+        layout.reset();
+        createLayout(layout, deltaTime);
+        layout.calculateLayout();
+        layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseClicked(0));
+        layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
+
+        renderManager.render(layout, windowPos, ImGui.getForegroundDrawList());
+    }
+
+    protected abstract void updateState(LayoutContext layout, float deltaTime);
+
+    protected abstract void createLayout(LayoutContext layout, float deltaTime);
+
+}

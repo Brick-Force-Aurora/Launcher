@@ -8,22 +8,71 @@
 	<name>BFLauncher</name>
 
 	<properties>
+		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.finalName>${project.name}-${project.version}.jar</project.build.finalName>
 		<project.sourceDir>${project.build.directory}/project-sources</project.sourceDir>
+		
+		<!-- Dependency versions -->
+		<dep.netty.version>4.1.104.Final</dep.netty.version>
+		<dep.snowframe.version>1.0.0</dep.snowframe.version>
+		<dep.laylib.version>0.4.2-SNAPSHOT</dep.laylib.version>
+		<dep.fastutil.version>8.5.18</dep.fastutil.version>
 	</properties>
 
 	<dependencies>
+        <!-- Utilities -->
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${dep.fastutil.version}</version>
+        </dependency>
+
+		<!-- LayLib -->
 		<dependency>
-			<groupId>me.lauriichan.applicationbase</groupId>
-			<artifactId>applicationbase-ui</artifactId>
-			<version>1.0.0-R1</version>
+            <groupId>me.lauriichan.laylib</groupId>
+            <artifactId>command</artifactId>
+            <version>${dep.laylib.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>me.lauriichan.applicationbase</groupId>
-			<artifactId>applicationbase-core</artifactId>
-			<version>1.0.0</version>
+            <groupId>me.lauriichan.laylib</groupId>
+            <artifactId>json</artifactId>
+            <version>${dep.laylib.version}</version>
 		</dependency>
+
+		<!-- SnowFrame -->
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-core</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-signal</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-config</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-imgui</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-util-nbt</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>me.lauriichan.snowframe</groupId>
+            <artifactId>snowframe-util-http</artifactId>
+            <version>${dep.snowframe.version}</version>
+		</dependency>
+	
+		<!-- clay4j -->
 		<dependency>
 			<groupId>me.lauriichan</groupId>
 			<artifactId>clay4j</artifactId>
@@ -47,14 +96,14 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.14.0</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<compilerArgs>
 						<arg>-parameters</arg>
 					</compilerArgs>
 					<annotationProcessors>
 						<annotationProcessor>
-							me.lauriichan.applicationbase.app.extension.processor.ExtensionProcessor</annotationProcessor>
+							me.lauriichan.snowframe.extension.processor.ExtensionProcessor</annotationProcessor>
 					</annotationProcessors>
 				</configuration>
 				<executions>
@@ -91,11 +140,11 @@
 							<transformers>
 								<transformer>
 									<className>
-										me.lauriichan.applicationbase.maven.ConfigSourceTransformer</className>
+										me.lauriichan.snowframe.maven.ConfigSourceTransformer</className>
 								</transformer>
 								<transformer>
 									<className>
-										me.lauriichan.applicationbase.maven.SignalHandlerTransformer</className>
+										me.lauriichan.snowframe.maven.SignalHandlerTransformer</className>
 								</transformer>
 							</transformers>
 							<includes>

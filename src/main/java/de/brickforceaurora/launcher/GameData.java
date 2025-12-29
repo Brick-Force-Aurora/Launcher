@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import de.brickforceaurora.launcher.data.DataStore;
 import de.brickforceaurora.launcher.data.StoredData;
-import me.lauriichan.applicationbase.app.util.Version;
+import me.lauriichan.snowframe.util.Version;
 
 public final class GameData {
 
@@ -12,7 +12,7 @@ public final class GameData {
         throw new UnsupportedOperationException();
     }
 
-    public static final DataStore STORE = LauncherApp.gameData();
+    public static final DataStore STORE = LauncherApp.get().gameData();
 
     public static final StoredData<Version> GAME_VERSION = STORE.register("version", DataHandler.VERSION, new Version(0, 0, 0));
 
@@ -20,7 +20,7 @@ public final class GameData {
         try {
             STORE.load();
         } catch (IOException e) {
-            LauncherApp.app().logger().error("Failed to initialize game data", e);
+            LauncherApp.logger().error("Failed to initialize game data", e);
         }
     }
 

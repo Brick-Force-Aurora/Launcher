@@ -4,6 +4,8 @@ target
 
 test/
 test/*
+test*/
+test*/*
 
 .m2/
 .m2/*
