@@ -30,7 +30,7 @@ import me.lauriichan.applicationbase.app.ui.dock.DockUIExtension;
 import me.lauriichan.applicationbase.app.util.instance.Shared;
 
 @Shared
-@Extension
+//@Extension
 public class PanoramaUI extends DockUIExtension {
 
     public final PropBool showSettings = new PropBool(false);
@@ -150,22 +150,22 @@ public class PanoramaUI extends DockUIExtension {
         //        ImGui.image(TextureAtlas.BANNER_WHITEBG.id, imageWidth, height * 0.225f);
         //        ImGui.popStyleVar();
 
-        if (settingsVisibility.get() > 0f) {
-            float ratio = 2.5f;
-            float contentWidth = width / ratio;
-            float xOffset = width - contentWidth;
-            
-            drawList.channelsSplit(settingsBackground.layerAmount());
-            settingsBackground.render(drawList, ImGui.getWindowPosX() + xOffset, ImGui.getWindowPosY(), width, height, 0);
-            drawList.channelsMerge();
-
-            ImGui.setCursorPos(xOffset, 0f);
-            ImGui.setNextItemWidth(width);
-            ImGui.beginChild("SettingsPanel");
-            settingsContext.addToContext(checkUpdates);
-            settingsContext.render(xOffset + 4f, 4f, width - 8f, height - 8f);
-            ImGui.endChild();
-        }
+//        if (settingsVisibility.get() > 0f) {
+//            float ratio = 2.5f;
+//            float contentWidth = width / ratio;
+//            float xOffset = width - contentWidth;
+//            
+//            drawList.channelsSplit(settingsBackground.layerAmount());
+//            settingsBackground.render(drawList, ImGui.getWindowPosX() + xOffset, ImGui.getWindowPosY(), width, height, 0);
+//            drawList.channelsMerge();
+//
+//            ImGui.setCursorPos(xOffset, 0f);
+//            ImGui.setNextItemWidth(width);
+//            ImGui.beginChild("SettingsPanel");
+//            settingsContext.addToContext(checkUpdates);
+//            settingsContext.render(xOffset + 4f, 4f, width - 8f, height - 8f);
+//            ImGui.endChild();
+//        }
     }
 
     private void showPanorama(ImTexture texture, float width, float height, float alpha) {

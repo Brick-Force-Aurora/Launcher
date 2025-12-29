@@ -16,6 +16,7 @@ import org.lwjgl.system.MemoryStack;
 
 import de.brickforceaurora.launcher.data.DataStore;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
+import de.brickforceaurora.launcher.ui.clay.RenderManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.UpdaterConfig;
@@ -76,6 +77,8 @@ public final class LauncherApp extends BaseUIApp {
     static DataStore gameData() {
         return gameData;
     }
+    
+    private RenderManager renderManager;
 
     public LauncherApp() throws URISyntaxException {
         super(BaseApp.getJarFile(BaseApp.class));
@@ -108,6 +111,11 @@ public final class LauncherApp extends BaseUIApp {
             }
         });
     }
+    
+    @Override
+    protected void onAppLoad() throws Throwable {
+        renderManager = new RenderManager(this);
+    }
 
     @Override
     protected void onAppReady() throws Throwable {
@@ -122,6 +130,8 @@ public final class LauncherApp extends BaseUIApp {
         GameData.init();
 
         updateManager = new UpdateManager(logger(), new GithubUpdater());
+        
+        renderManager = new RenderManager(this);
     }
 
     @Override
@@ -213,6 +223,14 @@ public final class LauncherApp extends BaseUIApp {
     protected void onAppDispose() throws Throwable {
         COMPONENT_TIMER.stop();
         GENERIC_ANIMATION_TIMER.stop();
+    }
+    
+    /*
+     * Getter
+     */
+    
+    public final RenderManager renderManager() {
+        return renderManager;
     }
 
     /*
