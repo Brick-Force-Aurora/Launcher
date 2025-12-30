@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher.ui.clay.renderer;
 
 import de.brickforceaurora.launcher.ui.clay.ElementRenderer;
 import de.brickforceaurora.launcher.ui.clay.config.Panorama;
+import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
 import de.brickforceaurora.launcher.TextureAtlas.ImTexture;
 import imgui.ImDrawList;
 import imgui.ImVec2;

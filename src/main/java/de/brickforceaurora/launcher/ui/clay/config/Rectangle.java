@@ -8,6 +8,11 @@ import me.lauriichan.snowframe.util.color.SimpleColor;
 public record Rectangle(float cornerRadius, SimpleColor color) implements IElementConfig {
     
     @Override
+    public int priority() {
+        return -1;
+    }
+    
+    @Override
     public void buildCommands(ElementContext context, Element element, IElementConfig elementConfig) {
         context.emitRectangle(true);
     }

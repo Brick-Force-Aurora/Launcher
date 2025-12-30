@@ -36,6 +36,7 @@ public class UserInterface extends AbstractUserInterface {
     }
 
     private static final Padding NO_PADDING = new Padding(0);
+    private static final Rectangle WINDOW_BG = new Rectangle(0, Constant.WINDOW_BACKGROUND_COLOR);
 
     public final PropBool switchPanorama = new PropBool(true);
 
@@ -89,12 +90,13 @@ public class UserInterface extends AbstractUserInterface {
             .height(ISizing.fixed(layout.height())).childGap(0);
         try (Element root = builder.elementId("root").build()) {
             builder = root.newElement();
-            builder.layout().width(ISizing.percentage(1f)).height(ISizing.fit(32f, 48f)).padding(NO_PADDING).addConfigs(new Rectangle(0, Constant.WINDOW_BACKGROUND_COLOR));
+            builder.layout().width(ISizing.percentage(1f)).height(ISizing.fit(32f, 48f)).padding(NO_PADDING).addConfigs(WINDOW_BG);
             try (Element titleBar = builder.elementId("titleBar").build()) {
 
             }
             builder = root.newElement();
             builder.layout().width(ISizing.percentage(1f)).height(ISizing.grow()).padding(NO_PADDING)
+                .addConfigs(WINDOW_BG)
                 .addConfigs(new Panorama(TextureAtlas.PANORAMA, previousPanoramaTexture, currentPanoramaTexture, transition.get()))
                 .layoutDirection(LayoutDirection.TOP_TO_BOTTOM).childGap(0);
             try (Element panorama = builder.elementId("panorama").build()) {
