@@ -16,7 +16,8 @@ public final class Constant {
     public static final SimpleColor PROGRESS_BACKGROUND_COLOR = SimpleColor.sRGB("#0A2133");
     public static final SimpleColor BUTTON_PANEL_BACKGROUND_COLOR = SimpleColor.sRGB("#091E2F");
 
-    public static final SimpleColor TEXT_COLOR = SimpleColor.sRGB("#3c3c3c");
+    public static final SimpleColor TEXT_COLOR = WHITE.duplicate();
+    public static final SimpleColor BUTTON_TEXT_COLOR = SimpleColor.sRGB("#3c3c3c");
     public static final SimpleColor BUTTON_COLOR = SimpleColor.sRGB("#F49719");
     public static final SimpleColor BUTTON_SHADOW_COLOR = BUTTON_COLOR.duplicate().multiply(0.7).add(BLACK.duplicate().multiply(0.3));
     public static final SimpleColor BUTTON_HIGHLIGHT_COLOR = BUTTON_COLOR.duplicate().multiply(0.85).add(WHITE.duplicate().multiply(0.15));

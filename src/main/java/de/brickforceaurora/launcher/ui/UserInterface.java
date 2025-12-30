@@ -15,8 +15,11 @@ import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.trigger.DelegateTrigger;
 import de.brickforceaurora.launcher.ui.clay.AbstractUserInterface;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
+import de.brickforceaurora.launcher.ui.clay.config.Image;
 import de.brickforceaurora.launcher.ui.clay.config.Panorama;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
+import de.brickforceaurora.launcher.ui.clay.config.Symbol;
+import de.brickforceaurora.launcher.ui.clay.config.Symbol.SymbolType;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import imgui.ImGui;
 import de.brickforceaurora.launcher.TextureAtlas;
@@ -25,7 +28,11 @@ import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.util.StringUtil;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig;
+import me.lauriichan.clay4j.IElementConfig.AspectRatio;
+import me.lauriichan.clay4j.IElementConfig.Text;
+import me.lauriichan.clay4j.IElementConfig.Text.WrapMode;
 import me.lauriichan.clay4j.ISizing;
+import me.lauriichan.clay4j.Layout.HAlignment;
 import me.lauriichan.clay4j.Layout.LayoutDirection;
 import me.lauriichan.clay4j.Layout.Padding;
 
@@ -45,6 +52,8 @@ public class UserInterface extends AbstractUserInterface {
     private static final Padding NO_PADDING = new Padding(0);
     private static final Rectangle WINDOW_BG = new Rectangle(0, Constant.WINDOW_BACKGROUND_COLOR);
     private static final TextColor TEXT_WHITE = new TextColor(Constant.WHITE);
+
+    private static final AspectRatio ONE_TO_ONE = new AspectRatio(1f);
 
     public final PropBool switchPanorama = new PropBool(true);
 
@@ -101,8 +110,30 @@ public class UserInterface extends AbstractUserInterface {
             .height(ISizing.fixed(layout.height())).childGap(0);
         try (Element root = builder.elementId("root").build()) {
             builder = root.newElement();
-            builder.layout().width(ISizing.percentage(1f)).height(ISizing.fit(32f, 48f)).padding(NO_PADDING).addConfigs(WINDOW_BG);
+            builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING).addConfigs(WINDOW_BG);
             try (Element titleBar = builder.elementId("titleBar").build()) {
+
+                builder = titleBar.newElement();
+                builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f));
+                try (Element leftBar = builder.elementId("titleBar_left").build()) {
+                    builder = leftBar.newElement();
+                    builder.layout().height(ISizing.percentage(1f)).addConfigs(ONE_TO_ONE).addConfigs(new Image(TextureAtlas.LOGO)).build();
+                    builder.build().close();
+                    
+                    builder = leftBar.newElement();
+                    builder.layout().height(ISizing.percentage(1f)).addConfigs(Text.builder().text("BrickForce").fontSize(28)
+                        .wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD)).build());
+                    builder.build().close();
+
+                }
+                builder = titleBar.newElement();
+                builder.layout().height(ISizing.percentage(1f));
+                try (Element rightBar = builder.elementId("titleBar_right").build()) {
+                    builder = rightBar.newElement();
+                    builder.layout().width(ISizing.fixed(32)).height(ISizing.percentage(1f)).addConfigs(ONE_TO_ONE)
+                        .addConfigs(new Symbol(SymbolType.CROSS, Constant.WHITE, 2f));
+                    builder.build().close();
+                }
 
             }
             builder = root.newElement();
@@ -114,6 +145,7 @@ public class UserInterface extends AbstractUserInterface {
                 builder = panorama.newElement();
                 builder.layout().height(ISizing.fit(16f)).renderBackground(false);
                 try (Element panoramaProgress = builder.elementId("nextImage").build()) {
+
                 }
 
                 builder = panorama.newElement();
@@ -172,7 +204,7 @@ public class UserInterface extends AbstractUserInterface {
             }
         }
     }
-    
+
     private String debugText() {
         return StringUtil.format("FPS: {0}, FPM: {1}", new Object[] {
             guiModule.renderTicker().getTicksPerSecond(),

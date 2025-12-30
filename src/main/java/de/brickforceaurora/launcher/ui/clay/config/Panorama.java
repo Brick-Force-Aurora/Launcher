@@ -10,7 +10,7 @@ public record Panorama(ImTextureBundle bundle, int previous, int current, float 
 
     @Override
     public void buildCommands(ElementContext context, Element element, IElementConfig elementConfig) {
-        context.push(new RenderCommand("panorama", element, context.boundingBox(), (Panorama) elementConfig));
+        context.push(new RenderCommand("panorama", element, context.boundingBox(), this));
     }
 
 }
