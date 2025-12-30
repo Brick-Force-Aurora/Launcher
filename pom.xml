@@ -19,6 +19,24 @@
 		<dep.laylib.version>0.4.2-SNAPSHOT</dep.laylib.version>
 		<dep.fastutil.version>8.5.18</dep.fastutil.version>
 	</properties>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>lauriichan-release</id>
+			<url>https://maven.lauriichan.me/release/</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<repositories>
+		<repository>
+			<id>lauriichan-snapshot</id>
+			<url>https://maven.lauriichan.me/snapshot/</url>
+		</repository>
+		<repository>
+			<id>lauriichan-release</id>
+			<url>https://maven.lauriichan.me/release/</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
         <!-- Utilities -->

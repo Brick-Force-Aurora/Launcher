@@ -6,6 +6,8 @@ import de.brickforceaurora.launcher.LauncherApp;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.ImVec2;
+import imgui.flag.ImGuiStyleVar;
+import imgui.flag.ImGuiWindowFlags;
 import me.lauriichan.clay4j.LayoutContext;
 import me.lauriichan.snowframe.ImGUIModule;
 
@@ -18,7 +20,7 @@ public abstract class AbstractUserInterface {
 
     private final ImVec2 cursorPos = new ImVec2(), windowPos = new ImVec2(), windowSize = new ImVec2();
 
-    private final ImGUIModule guiModule;
+    protected final ImGUIModule guiModule;
 
     public AbstractUserInterface(LauncherApp app) {
         this.renderManager = app.renderManager();
@@ -27,24 +29,32 @@ public abstract class AbstractUserInterface {
 
     public void render() {
         float deltaTime = ImGUIModule.DELTA_TIME.get() / SECOND_IN_NANOS;
-        
+
         ImGuiViewport viewport = ImGui.getMainViewport();
 
         ImGui.getCursorPos(cursorPos);
         viewport.getWorkPos(windowPos);
         viewport.getWorkSize(windowSize);
 
-        updateState(layout, deltaTime);
+        ImGui.setNextWindowPos(0, 0);
+        ImGui.setNextWindowBgAlpha(0f);
+        ImGui.setNextWindowSize(windowSize);
+        ImGui.begin("Launcher", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoSavedSettings);
+        try {
+            updateState(layout, deltaTime);
 
-        layout.setDimensions(windowSize.x, windowSize.y);
+            layout.setDimensions(windowSize.x, windowSize.y);
 
-        layout.reset();
-        createLayout(layout, deltaTime);
-        layout.calculateLayout();
-        layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseClicked(0));
-        layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
+            layout.reset();
+            createLayout(layout, deltaTime);
+            layout.calculateLayout();
+            layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseClicked(0));
+            layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
 
-        renderManager.render(layout, windowPos, ImGui.getForegroundDrawList());
+            renderManager.render(layout, windowPos, ImGui.getWindowDrawList());
+        } finally {
+            ImGui.end();
+        }
     }
 
     protected abstract void updateState(LayoutContext layout, float deltaTime);

@@ -27,6 +27,7 @@ dependency-reduced-pom.xml
 .project
 
 start.bat
+start_debug.bat
 start admin.lnk
 *.jar
 *.ini
