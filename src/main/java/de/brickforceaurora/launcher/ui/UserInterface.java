@@ -26,7 +26,6 @@ import imgui.ImGui;
 import imgui.flag.ImGuiKey;
 import de.brickforceaurora.launcher.TextureAtlas;
 import me.lauriichan.clay4j.LayoutContext;
-import me.lauriichan.clay4j.PointerState;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.util.StringUtil;
 import me.lauriichan.snowframe.util.color.SimpleColor;
@@ -120,7 +119,7 @@ public class UserInterface extends AbstractUserInterface {
 
         exitHovered.set(layout.elementById("exit").isHovered());
         exitAnimation.trigger();
-        if (layout.pointerState() == PointerState.RELEASED_THIS_FRAME && exitHovered.get()) {
+        if (ImGui.isMouseReleased(0) && exitHovered.get()) {
             Main.shutdown();
         }
         
