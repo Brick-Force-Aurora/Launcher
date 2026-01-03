@@ -32,7 +32,7 @@ public abstract class AbstractUserInterface {
 
         ImGuiViewport viewport = ImGui.getMainViewport();
 
-        ImGui.getCursorPos(cursorPos);
+        ImGui.getMousePos(cursorPos);
         viewport.getWorkPos(windowPos);
         viewport.getWorkSize(windowSize);
 
@@ -48,7 +48,7 @@ public abstract class AbstractUserInterface {
             layout.reset();
             createLayout(layout, deltaTime);
             layout.calculateLayout();
-            layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseClicked(0));
+            layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseDown(0));
             layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
 
             renderManager.render(layout, windowPos, ImGui.getWindowDrawList());

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
+import de.brickforceaurora.launcher.Main;
 import de.brickforceaurora.launcher.animation.Animation;
 import de.brickforceaurora.launcher.animation.AnimationTickTimer;
 import de.brickforceaurora.launcher.animation.animator.IAnimationAnimator;
@@ -22,17 +23,20 @@ import de.brickforceaurora.launcher.ui.clay.config.Symbol;
 import de.brickforceaurora.launcher.ui.clay.config.Symbol.SymbolType;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import imgui.ImGui;
+import imgui.flag.ImGuiKey;
 import de.brickforceaurora.launcher.TextureAtlas;
 import me.lauriichan.clay4j.LayoutContext;
+import me.lauriichan.clay4j.PointerState;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.util.StringUtil;
+import me.lauriichan.snowframe.util.color.SimpleColor;
+import me.lauriichan.snowframe.util.tick.TimeSync;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig;
 import me.lauriichan.clay4j.IElementConfig.AspectRatio;
 import me.lauriichan.clay4j.IElementConfig.Text;
 import me.lauriichan.clay4j.IElementConfig.Text.WrapMode;
 import me.lauriichan.clay4j.ISizing;
-import me.lauriichan.clay4j.Layout.HAlignment;
 import me.lauriichan.clay4j.Layout.LayoutDirection;
 import me.lauriichan.clay4j.Layout.Padding;
 
@@ -44,8 +48,9 @@ public class UserInterface extends AbstractUserInterface {
 
     static {
         // 16.666667 ms
-        ANIMATION_TIMER.setLength(ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
-        ANIMATION_TIMER.setPauseLength(50, TimeUnit.MILLISECONDS);
+        TimeSync sync = ANIMATION_TIMER.sync();
+        sync.length(ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
+        sync.pauseLength(50, TimeUnit.MILLISECONDS);
         ANIMATION_TIMER.start();
     }
 
@@ -61,7 +66,12 @@ public class UserInterface extends AbstractUserInterface {
 
     private final Animation panoramaAnimation;
     private final Animation transitionAnimation;
+    private final Animation exitAnimation;
 
+    private final SimpleColor exitColor = Constant.WHITE.duplicate();
+    private final PropBool exitHovered = new PropBool(false);
+    private final PropBool showFps = new PropBool(false);
+    
     private final PropBool transitionActive = new PropBool(false);
     private final PropFloat transition = new PropFloat(0f);
     private volatile int currentPanoramaTexture, previousPanoramaTexture;
@@ -92,6 +102,12 @@ public class UserInterface extends AbstractUserInterface {
                 previousPanoramaTexture = currentPanoramaTexture;
                 transition.set(0f);
             }).build());
+
+        ANIMATION_TIMER.add(exitAnimation = Animation.builder().trigger(new DelegateTrigger(exitHovered))
+            .function(IAnimationFunction.fade().fadeIn(100, TimeUnit.MILLISECONDS).fadeOut(150, TimeUnit.MILLISECONDS))
+            .animator(IAnimationAnimator.<SimpleColor>interpolation().interpolator(IAnimationInterpolator.of(exitColor))
+                .start(Constant.WHITE).end(Constant.RED).build())
+            .build());
     }
 
     @Override
@@ -101,6 +117,16 @@ public class UserInterface extends AbstractUserInterface {
         }
         transitionAnimation.trigger();
         panoramaAnimation.trigger();
+
+        exitHovered.set(layout.elementById("exit").isHovered());
+        exitAnimation.trigger();
+        if (layout.pointerState() == PointerState.RELEASED_THIS_FRAME && exitHovered.get()) {
+            Main.shutdown();
+        }
+        
+        if (ImGui.isKeyPressed(ImGuiKey.Enter, false)) {
+            showFps.set(!showFps.get());
+        }
     }
 
     @Override
@@ -119,7 +145,7 @@ public class UserInterface extends AbstractUserInterface {
                     builder = leftBar.newElement();
                     builder.layout().height(ISizing.percentage(1f)).addConfigs(ONE_TO_ONE).addConfigs(new Image(TextureAtlas.LOGO)).build();
                     builder.build().close();
-                    
+
                     builder = leftBar.newElement();
                     builder.layout().height(ISizing.percentage(1f)).addConfigs(Text.builder().text("BrickForce").fontSize(28)
                         .wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD)).build());
@@ -131,8 +157,8 @@ public class UserInterface extends AbstractUserInterface {
                 try (Element rightBar = builder.elementId("titleBar_right").build()) {
                     builder = rightBar.newElement();
                     builder.layout().width(ISizing.fixed(32)).height(ISizing.percentage(1f)).addConfigs(ONE_TO_ONE)
-                        .addConfigs(new Symbol(SymbolType.CROSS, Constant.WHITE, 2f));
-                    builder.build().close();
+                        .addConfigs(new Symbol(SymbolType.CROSS, exitColor, 2f));
+                    builder.elementId("exit").build().close();
                 }
 
             }
@@ -183,7 +209,7 @@ public class UserInterface extends AbstractUserInterface {
             }
         }
 
-        if (logger.isDebug()) {
+        if (showFps.get()) {
             builder = layout.newRoot();
             builder.layout().childGap(4).layoutDirection(LayoutDirection.TOP_TO_BOTTOM).padding(NO_PADDING)
                 .width(ISizing.fixed(layout.width())).height(ISizing.fixed(layout.height())).childGap(0);
@@ -207,8 +233,8 @@ public class UserInterface extends AbstractUserInterface {
 
     private String debugText() {
         return StringUtil.format("FPS: {0}, FPM: {1}", new Object[] {
-            guiModule.renderTicker().getTicksPerSecond(),
-            guiModule.renderTicker().getTicksPerMinute()
+            guiModule.renderTicker().sync().tps(),
+            guiModule.renderTicker().sync().tpm()
         });
     }
 
