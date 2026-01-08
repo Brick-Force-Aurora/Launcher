@@ -3,11 +3,11 @@ package de.brickforceaurora.launcher;
 import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public final class Constant {
-
+    
     private Constant() {
         throw new UnsupportedOperationException();
     }
-
+    
     public static final SimpleColor BLACK = SimpleColor.sRGB("#0");
     public static final SimpleColor WHITE = SimpleColor.sRGB("#f");
     public static final SimpleColor RED = SimpleColor.sRGB("#eb4b18");

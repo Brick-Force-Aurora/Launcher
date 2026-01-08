@@ -15,7 +15,7 @@
 		
 		<!-- Dependency versions -->
 		<dep.netty.version>4.1.104.Final</dep.netty.version>
-		<dep.snowframe.version>1.0.0</dep.snowframe.version>
+		<dep.snowframe.version>0.1.0</dep.snowframe.version>
 		<dep.laylib.version>0.4.2-SNAPSHOT</dep.laylib.version>
 		<dep.fastutil.version>8.5.18</dep.fastutil.version>
 	</properties>

@@ -37,7 +37,7 @@ final class GithubUpdate implements IUpdate {
     @Override
     public void applyUpdate(ISimpleLogger logger, Path gameDirectory, Path tempDirectory) throws IOException {
         HttpResponse<byte[]> response = GithubUpdater.callGithub(
-            new HttpRequest().url(url).authenticator(authenticator).readTimeout(10000).param(url, authenticator), HttpContentType.BINARY);
+            new HttpRequest().url(url).authenticator(authenticator).readTimeout(10000), HttpContentType.BINARY);
         if (response == null || response.code() != HttpCode.OK) {
             throw new IOException("Couldn't download update");
         }
