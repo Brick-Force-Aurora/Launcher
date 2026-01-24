@@ -27,7 +27,7 @@ public final class Main {
     }
 
     public static void shutdown() {
-        if (SHUT_DOWN.compareAndSet(false, true)) {
+        if (!SHUT_DOWN.compareAndSet(false, true)) {
             return;
         }
         GLFW.glfwSetWindowShouldClose(snowFrame.module(ImGUIModule.class).windowPointer(), true);

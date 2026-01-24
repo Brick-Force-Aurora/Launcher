@@ -1,13 +1,15 @@
 package de.brickforceaurora.launcher.ui;
 
+import java.nio.IntBuffer;
 import java.util.concurrent.TimeUnit;
+
+import org.lwjgl.glfw.GLFW;
 
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.Main;
 import de.brickforceaurora.launcher.animation.Animation;
-import de.brickforceaurora.launcher.animation.AnimationTickTimer;
 import de.brickforceaurora.launcher.animation.animator.IAnimationAnimator;
 import de.brickforceaurora.launcher.animation.function.IAnimationFunction;
 import de.brickforceaurora.launcher.animation.interpolator.IAnimationInterpolator;
@@ -28,8 +30,8 @@ import de.brickforceaurora.launcher.TextureAtlas;
 import me.lauriichan.clay4j.LayoutContext;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.util.StringUtil;
+import me.lauriichan.snowframe.ImGUIModule;
 import me.lauriichan.snowframe.util.color.SimpleColor;
-import me.lauriichan.snowframe.util.tick.TimeSync;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig;
 import me.lauriichan.clay4j.IElementConfig.AspectRatio;
@@ -41,18 +43,6 @@ import me.lauriichan.clay4j.Layout.Padding;
 
 public class UserInterface extends AbstractUserInterface {
 
-    public static final AnimationTickTimer ANIMATION_TIMER = new AnimationTickTimer();
-    public static final long ANIMATION_TIMER_LENGTH = 16_666_667;
-    public static final float ANIMATION_TIMER_RATIO = ANIMATION_TIMER_LENGTH / SECOND_IN_NANOS;
-
-    static {
-        // 16.666667 ms
-        TimeSync sync = ANIMATION_TIMER.sync();
-        sync.length(ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
-        sync.pauseLength(50, TimeUnit.MILLISECONDS);
-        ANIMATION_TIMER.start();
-    }
-
     private static final Padding NO_PADDING = new Padding(0);
     private static final Rectangle WINDOW_BG = new Rectangle(0, Constant.WINDOW_BACKGROUND_COLOR);
     private static final TextColor TEXT_WHITE = new TextColor(Constant.WHITE);
@@ -62,23 +52,26 @@ public class UserInterface extends AbstractUserInterface {
     public final PropBool switchPanorama = new PropBool(true);
 
     private final ISimpleLogger logger;
-
-    private final Animation panoramaAnimation;
-    private final Animation transitionAnimation;
-    private final Animation exitAnimation;
+    private final ImGUIModule guiModule;
+    private final RenderContext renderContext = new RenderContext();
 
     private final SimpleColor exitColor = Constant.WHITE.duplicate();
     private final PropBool exitHovered = new PropBool(false);
+
     private final PropBool showFps = new PropBool(false);
-    
+
     private final PropBool transitionActive = new PropBool(false);
     private final PropFloat transition = new PropFloat(0f);
     private volatile int currentPanoramaTexture, previousPanoramaTexture;
 
+    private volatile float dragX, dragY;
+    private volatile boolean dragging = false;
+
     public UserInterface(LauncherApp app) {
         super(app);
         this.logger = app.snowFrame().logger();
-        ANIMATION_TIMER.add(panoramaAnimation = Animation.builder().trigger(new DelegateTrigger(switchPanorama)).repeating(true)
+        this.guiModule = app.snowFrame().module(ImGUIModule.class);
+        renderContext.add(Animation.builder().trigger(new DelegateTrigger(switchPanorama)).repeating(true)
             .function(IAnimationFunction.fade().fadeIn(8, TimeUnit.SECONDS).fadeOut(125, TimeUnit.MILLISECONDS))
             .onRestart((_, regressing) -> {
                 if (regressing) {
@@ -92,8 +85,8 @@ public class UserInterface extends AbstractUserInterface {
                 }
                 transitionActive.set(true);
             }).build());
-        ANIMATION_TIMER.add(transitionAnimation = Animation.builder().trigger(new DelegateTrigger(transitionActive))
-            .regressionEnabled(false).function(IAnimationFunction.fade().fadeIn(125, TimeUnit.MILLISECONDS))
+        renderContext.add(Animation.builder().trigger(new DelegateTrigger(transitionActive)).regressionEnabled(false)
+            .function(IAnimationFunction.fade().fadeIn(125, TimeUnit.MILLISECONDS))
             .animator(
                 IAnimationAnimator.<Float>interpolation().interpolator(IAnimationInterpolator.of(transition)).start(0f).end(1f).build())
             .onDone((_, _) -> {
@@ -102,7 +95,7 @@ public class UserInterface extends AbstractUserInterface {
                 transition.set(0f);
             }).build());
 
-        ANIMATION_TIMER.add(exitAnimation = Animation.builder().trigger(new DelegateTrigger(exitHovered))
+        renderContext.add(Animation.builder().trigger(new DelegateTrigger(exitHovered))
             .function(IAnimationFunction.fade().fadeIn(100, TimeUnit.MILLISECONDS).fadeOut(150, TimeUnit.MILLISECONDS))
             .animator(IAnimationAnimator.<SimpleColor>interpolation().interpolator(IAnimationInterpolator.of(exitColor))
                 .start(Constant.WHITE).end(Constant.RED).build())
@@ -112,20 +105,15 @@ public class UserInterface extends AbstractUserInterface {
     @Override
     protected void updateState(LayoutContext layout, float deltaTime) {
         if (layout.rootAmount() == 0) {
+            renderContext.update(layout, deltaTime);
             return;
         }
-        transitionAnimation.trigger();
-        panoramaAnimation.trigger();
 
-        exitHovered.set(layout.elementById("exit").isHovered());
-        exitAnimation.trigger();
-        if (ImGui.isMouseReleased(0) && exitHovered.get()) {
-            Main.shutdown();
-        }
-        
         if (ImGui.isKeyPressed(ImGuiKey.Enter, false)) {
             showFps.set(!showFps.get());
         }
+
+        renderContext.update(layout, deltaTime);
     }
 
     @Override
@@ -137,6 +125,28 @@ public class UserInterface extends AbstractUserInterface {
             builder = root.newElement();
             builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING).addConfigs(WINDOW_BG);
             try (Element titleBar = builder.elementId("titleBar").build()) {
+
+                renderContext.actions(titleBar).action((ctx, element, _) -> {
+                    if (dragging) {
+                        if (ctx.pointerState().hasJustReleased()) {
+                            dragging = false;
+                            return;
+                        }
+                    } else if (!element.isHovered() || !ctx.pointerState().hasPressed()) {
+                        return;
+                    }
+                    dragging = true;
+                    double[] cursorX = new double[1], cursorY = new double[1];
+                    GLFW.glfwGetCursorPos(guiModule.windowPointer(), cursorX, cursorY);
+                    if (ctx.pointerState().hasJustHappened()) {
+                        dragX = (float) cursorX[0];
+                        dragY = (float) cursorY[0];
+                        return;
+                    }
+                    int[] x = new int[1], y = new int[1];
+                    GLFW.glfwGetWindowPos(guiModule.windowPointer(), x, y);
+                    GLFW.glfwSetWindowPos(guiModule.windowPointer(), x[0] - (int) (dragX - cursorX[0]), y[0] - (int) (dragY - cursorY[0]));
+                });
 
                 builder = titleBar.newElement();
                 builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f));
@@ -157,7 +167,7 @@ public class UserInterface extends AbstractUserInterface {
                     builder = rightBar.newElement();
                     builder.layout().width(ISizing.fixed(32)).height(ISizing.percentage(1f)).addConfigs(ONE_TO_ONE)
                         .addConfigs(new Symbol(SymbolType.CROSS, exitColor, 2f));
-                    builder.elementId("exit").build().close();
+                    renderContext.actions(builder).click(Main::shutdown).hovered(exitHovered::set).close();
                 }
 
             }

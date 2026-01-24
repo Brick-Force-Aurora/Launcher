@@ -2,7 +2,7 @@ package de.brickforceaurora.launcher;
 
 import java.util.concurrent.TimeUnit;
 
-import de.brickforceaurora.launcher.ui.UserInterface;
+import de.brickforceaurora.launcher.ui.RenderContext;
 import me.lauriichan.snowframe.SetupRenderSignal;
 import me.lauriichan.snowframe.SnowFrame;
 import me.lauriichan.snowframe.WindowConfiguration;
@@ -36,7 +36,7 @@ public final class AppSignalHandlerTemplate implements ISignalHandler {
         var signal = context.signal();
         // Set FPS to target 60
         TimeSync sync = signal.ticker().sync();
-        sync.length(UserInterface.ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
+        sync.length(RenderContext.ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
         sync.pauseLength(50, TimeUnit.MILLISECONDS);
     }
 

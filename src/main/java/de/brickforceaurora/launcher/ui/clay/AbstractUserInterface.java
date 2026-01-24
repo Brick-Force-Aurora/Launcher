@@ -6,7 +6,6 @@ import de.brickforceaurora.launcher.LauncherApp;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.ImVec2;
-import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import me.lauriichan.clay4j.LayoutContext;
 import me.lauriichan.snowframe.ImGUIModule;
