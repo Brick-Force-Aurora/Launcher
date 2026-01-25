@@ -15,7 +15,7 @@ public record Image(ImTexture texture, SimpleColor color) implements IElementCon
     }
     
     @Override
-    public void buildCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
         context.push(new RenderCommand("image", element, context.boundingBox(), this));
     }
 

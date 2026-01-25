@@ -1,6 +1,5 @@
 package de.brickforceaurora.launcher.ui;
 
-import java.nio.IntBuffer;
 import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.glfw.GLFW;
@@ -121,6 +120,7 @@ public class UserInterface extends AbstractUserInterface {
         Element.Builder builder = layout.newRoot();
         builder.layout().childGap(4).layoutDirection(LayoutDirection.TOP_TO_BOTTOM).padding(NO_PADDING).width(ISizing.fixed(layout.width()))
             .height(ISizing.fixed(layout.height())).childGap(0);
+
         try (Element root = builder.elementId("root").build()) {
             builder = root.newElement();
             builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING).addConfigs(WINDOW_BG);

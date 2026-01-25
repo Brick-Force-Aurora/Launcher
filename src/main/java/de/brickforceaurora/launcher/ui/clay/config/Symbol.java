@@ -20,7 +20,7 @@ public record Symbol(SymbolType type, SimpleColor color, float thickness) implem
     }
     
     @Override
-    public void buildCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
         context.push(new RenderCommand("symbol", element, context.boundingBox(), this));
     }
     

@@ -13,7 +13,7 @@ public record Rectangle(float cornerRadius, SimpleColor color) implements IEleme
     }
     
     @Override
-    public void buildCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
         context.emitRectangle(true);
     }
     
