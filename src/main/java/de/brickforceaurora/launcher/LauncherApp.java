@@ -1,10 +1,15 @@
 package de.brickforceaurora.launcher;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import de.brickforceaurora.launcher.data.DataStore;
+import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.ui.clay.RenderManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
@@ -22,9 +27,11 @@ import me.lauriichan.snowframe.SnowFrame;
 import me.lauriichan.snowframe.lifecycle.Lifecycle;
 import me.lauriichan.snowframe.lifecycle.LifecyclePhase.Stage;
 import me.lauriichan.snowframe.signal.SignalManager;
-import me.lauriichan.snowframe.util.logger.SysOutSimpleLogger;
+import me.lauriichan.snowframe.util.logger.FileLogger;
 
 public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
+    
+    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1, Thread.ofVirtual().name("Scheduler").factory());
 
     private static SnowFrame<LauncherApp> snowFrame;
 
@@ -34,7 +41,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }
 
         // TODO: Do actual command line parsing
-        ISimpleLogger logger = SysOutSimpleLogger.INSTANCE;
+        ISimpleLogger logger = new FileLogger(new File("data/logs"));
         logger.setDebug(Arrays.stream(args).anyMatch(str -> str.equalsIgnoreCase("--debug")));
 
         return snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
@@ -68,7 +75,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
 
             frame.resourceManager().register("game", gameDirectory);
-            frame.resourceManager().register("tmp", gameDirectory);
+            frame.resourceManager().register("tmp", tempDirectory);
 
             launcherData = new DataStore(frame.resource("data://launcher.dat"));
             LauncherData.init();
@@ -80,6 +87,14 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             renderManager = new RenderManager(frame);
 
             signalManager = frame.module(SignalModule.class).signalManager();
+        });
+        lifecycle.shutdownChain().register("shutdown", Stage.MAIN, (_) -> {
+            launcherData.save();
+            gameData.save();
+        }).register("shutdown", Stage.POST, (frame) -> {
+            if (frame.logger() instanceof FileLogger logger) {
+                logger.close();
+            }
         });
         lifecycle.chainOrThrow(ImGUIModule.STARTUP_CHAIN).register("setup", Stage.POST, frame -> {
             frame.module(ImGUIModule.class)
@@ -94,6 +109,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             TextureAtlas.load(frame);
 
             userInterface = new UserInterface(this);
+            SCHEDULER.schedule(() -> UIActionHelper.runUpdate(true), 1, TimeUnit.SECONDS);
         }).register("start", Stage.POST, frame -> {
             // We call Main.shutdown(), this will notify the GLFW to close.
             // However we already know it should close since this lambda is called.
@@ -128,6 +144,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     public RenderManager renderManager() {
         return renderManager;
+    }
+
+    public UserInterface userInterface() {
+        return userInterface;
     }
 
     DataStore launcherData() {

@@ -39,11 +39,10 @@ public final class GithubUpdater implements IUpdater {
         loop:
         while (true) {
             HttpResponse<IJson<?>> response = callGithub(
-                request.clearParameters().readTimeout(7500).param("per_page", 40).param("page", page++), HttpContentType.JSON);
+                request.clearParameters().readTimeout(5000).param("per_page", 40).param("page", page++), HttpContentType.JSON);
             if (response == null || response.code() == HttpCode.NOT_FOUND) {
                 break;
             }
-            logger.debug("Code: {0} ({1})", response.code().name(), response.code().code());
             if (logger.isDebug()) {
                 logger.debug(IOUtil.asString(response.data().value()));
             }
@@ -61,7 +60,7 @@ public final class GithubUpdater implements IUpdater {
                     continue;
                 }
                 Version version = Version.parse(tagName);
-                if (current.isHigher(version)) {
+                if (current.compareTo(version) >= 0) {
                     break loop;
                 }
                 HttpResponse<IJson<?>> assetResponse = callGithub(assetRequest.url(releaseUrl.formatted(tagName)), HttpContentType.JSON);

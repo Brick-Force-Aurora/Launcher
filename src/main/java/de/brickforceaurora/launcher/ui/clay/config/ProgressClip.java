@@ -42,7 +42,7 @@ public record ProgressClip(float horizontalProgress, float verticalProgress) imp
     public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
         ProgressClipData clipData = element.data(ProgressClipData.class).get();
         BoundingBox bb = context.boundingBox();
-        clipData.clippingBox = new BoundingBox(0, 0, Math.min(bb.width() * horizontalProgress, bb.width()),
+        clipData.clippingBox = new BoundingBox(bb.x(), bb.y(), Math.min(bb.width() * horizontalProgress, bb.width()),
             Math.min(bb.height() * verticalProgress, bb.height()));
         context.push(new RenderCommand(RenderCommand.CLIPPING_START_ID, element, clipData.clippingBox));
     }

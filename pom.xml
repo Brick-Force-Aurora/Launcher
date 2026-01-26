@@ -15,10 +15,10 @@
 		
 		<!-- Dependency versions -->
 		<dep.netty.version>4.1.104.Final</dep.netty.version>
-		<dep.snowframe.version>0.1.1</dep.snowframe.version>
+		<dep.snowframe.version>0.1.2</dep.snowframe.version>
 		<dep.laylib.version>0.4.2-SNAPSHOT</dep.laylib.version>
 		<dep.fastutil.version>8.5.18</dep.fastutil.version>
-		<dep.clay4j.version>0.1.1</dep.clay4j.version>
+		<dep.clay4j.version>0.1.2</dep.clay4j.version>
 	</properties>
 	
 	<pluginRepositories>

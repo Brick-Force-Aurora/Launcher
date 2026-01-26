@@ -12,7 +12,7 @@ import me.lauriichan.snowframe.ImGUIModule;
 
 public abstract class AbstractUserInterface {
 
-    public static final float SECOND_IN_NANOS = TimeUnit.SECONDS.toNanos(1);
+    public static final double SECOND_RATIO = TimeUnit.SECONDS.toNanos(1);
 
     private final LayoutContext layout = new LayoutContext();
     private final RenderManager renderManager;
@@ -27,7 +27,7 @@ public abstract class AbstractUserInterface {
     }
 
     public void render() {
-        float deltaTime = ImGUIModule.DELTA_TIME.get() / SECOND_IN_NANOS;
+        float deltaTime = ImGUIModule.DELTA_TIME.get() / ((float) SECOND_RATIO);
 
         ImGuiViewport viewport = ImGui.getMainViewport();
 

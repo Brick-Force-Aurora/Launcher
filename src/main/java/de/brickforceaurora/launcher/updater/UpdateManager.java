@@ -43,22 +43,22 @@ public final class UpdateManager {
         if (updates.isEmpty()) {
             return null;
         }
-        Task task = tracker.allocate("Applying updates...", updates.size());
         LauncherApp app = LauncherApp.get();
         Path gameDirectory = app.gameDirectory();
         Path temporaryDirectory = app.tempDirectory();
         Version lastUpdate = null;
-        task.task(null);
+        int updateCount = updates.size(), updateNum = 0;
+        tracker.budget(updateCount * 100);
         for (IUpdate update : updates) {
+            Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, updateCount), 100);
             try {
-                update.applyUpdate(logger, gameDirectory, temporaryDirectory);
+                update.applyUpdate(logger, task, gameDirectory, temporaryDirectory);
                 lastUpdate = update.getVersion();
             } catch (Throwable exp) {
                 logger.error("Failed to apply update '{0}'", exp, update.getVersion());
                 return lastUpdate;
             }
-            task.work(1);
-            task.task(null);
+            task.done();
         }
         return lastUpdate;
     }

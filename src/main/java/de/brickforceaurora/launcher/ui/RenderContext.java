@@ -1,10 +1,8 @@
 package de.brickforceaurora.launcher.ui;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import de.brickforceaurora.launcher.animation.Animation;
-import de.brickforceaurora.launcher.animation.AnimationTickTimer;
 import de.brickforceaurora.launcher.ui.clay.AbstractUserInterface;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -13,21 +11,9 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.LayoutContext;
-import me.lauriichan.snowframe.util.tick.TimeSync;
+import me.lauriichan.snowframe.ImGUIModule;
 
 public final class RenderContext {
-
-    public static final AnimationTickTimer ANIMATION_TIMER = new AnimationTickTimer();
-    public static final long ANIMATION_TIMER_LENGTH = 16_666_667;
-    public static final float ANIMATION_TIMER_RATIO = ANIMATION_TIMER_LENGTH / AbstractUserInterface.SECOND_IN_NANOS;
-    
-    static {
-        // 16.666667 ms
-        TimeSync sync = ANIMATION_TIMER.sync();
-        sync.length(ANIMATION_TIMER_LENGTH, TimeUnit.NANOSECONDS);
-        sync.pauseLength(50, TimeUnit.MILLISECONDS);
-        ANIMATION_TIMER.start();
-    }
 
     @FunctionalInterface
     public static interface IAction {
@@ -57,6 +43,9 @@ public final class RenderContext {
         }
 
         public Actions click(Runnable runnable) {
+            if (runnable == null) {
+                return this;
+            }
             list.add((layout, element, _) -> {
                 if (element.isHovered() && layout.pointerState().hasJustReleased()) {
                     runnable.run();
@@ -66,7 +55,18 @@ public final class RenderContext {
         }
 
         public Actions hovered(BooleanConsumer consumer) {
+            if (consumer == null) {
+                return this;
+            }
             list.add((_, elem, _) -> consumer.accept(elem.isHovered()));
+            return this;
+        }
+
+        public Actions hoveredDown(BooleanConsumer consumer) {
+            if (consumer == null) {
+                return this;
+            }
+            list.add((layout, elem, _) -> consumer.accept(elem.isHovered() && layout.pointerState().hasPressed()));
             return this;
         }
 
@@ -82,6 +82,13 @@ public final class RenderContext {
 
     private final Object2ObjectArrayMap<Element, ObjectArrayList<IAction>> actions = new Object2ObjectArrayMap<>();
     private final ObjectList<Animation> animations = ObjectLists.synchronize(new ObjectArrayList<>());
+    
+    public void tickAnimations() {
+        double deltaSecond = ImGUIModule.DELTA_TIME.get() / AbstractUserInterface.SECOND_RATIO;
+        for (Animation animation : animations) {
+            animation.update(deltaSecond);
+        }
+    }
 
     public void update(LayoutContext layout, float deltaTime) {
         if (layout.rootAmount() == 0) {
@@ -101,15 +108,12 @@ public final class RenderContext {
     public Animation add(Animation animation) {
         if (!animations.contains(animation)) {
             animations.add(animation);
-            ANIMATION_TIMER.add(animation);
         }
         return animation;
     }
-    
+
     public void remove(Animation animation) {
-        if (animations.remove(animation)) {
-            ANIMATION_TIMER.remove(animation);
-        }
+        animations.remove(animation);
     }
 
     public Actions actions(Element element) {

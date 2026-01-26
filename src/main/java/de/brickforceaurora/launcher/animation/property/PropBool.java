@@ -17,5 +17,9 @@ public final class PropBool {
     public void set(boolean value) {
         this.value = value;
     }
+    
+    public void toggle() {
+        this.value = !this.value;
+    }
 
 }

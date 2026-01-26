@@ -84,6 +84,13 @@ public class TaskTracker {
         this.allocated = allocated;
         this.workBudget = workBudget;
     }
+    
+    public void budget(int budget) {
+        if (workBudget != 0) {
+            return;
+        }
+        workBudget = budget;
+    }
 
     public Task allocate(String title, int work) {
         if (work <= 0) {
