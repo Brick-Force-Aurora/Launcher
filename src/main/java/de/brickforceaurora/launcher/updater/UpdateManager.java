@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher.updater;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
@@ -25,6 +26,17 @@ public final class UpdateManager {
 
     public boolean hasUpdates() {
         return !updates.isEmpty();
+    }
+    
+    public int updateCount() {
+        return updates.size();
+    }
+    
+    public Optional<Version> latestUpdate() {
+        if (updates.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(updates.get(updates.size() - 1).getVersion());
     }
 
     public boolean checkForUpdates(UpdaterConfig config) {

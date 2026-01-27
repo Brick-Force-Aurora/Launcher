@@ -10,7 +10,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.finalName>${project.name}-${project.version}.jar</project.build.finalName>
+		<project.build.finalName>launcher</project.build.finalName>
 		<project.sourceDir>${project.build.directory}/project-sources</project.sourceDir>
 		
 		<!-- Dependency versions -->
@@ -100,6 +100,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.build.finalName}</finalName>
 		<resources>
 			<resource>
 				<filtering>true</filtering>
@@ -108,6 +109,22 @@
 			<resource>
 				<filtering>false</filtering>
 				<directory>src/main/resources/unfiltered</directory>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>setup.iss</exclude>
+				</excludes>
+				<directory>src/installer/resources</directory>
+				<targetPath>${project.build.outputDirectory}/installer</targetPath>
+			</resource>
+			<resource>
+				<filtering>true</filtering>
+				<includes>
+					<include>setup.iss</include>
+				</includes>
+				<directory>src/installer/resources</directory>
+				<targetPath>${project.build.outputDirectory}/installer</targetPath>
 			</resource>
 		</resources>
 		<plugins>
@@ -228,6 +245,7 @@
 								<exclude>META-INF/*.SF</exclude>
 								<exclude>META-INF/*.DSA</exclude>
 								<exclude>META-INF/*.RSA</exclude>
+								<exclude>installer/*</exclude>
 							</excludes>
 						</filter>
 					</filters>
@@ -262,7 +280,6 @@
 						<configuration>
 							<sources>
 								<source>${project.sourceDir}</source>
-								<source>src/installer/resources</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -270,7 +287,7 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -287,54 +304,9 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${java.home}/bin/jpackage</executable>
-									<environmentVariables>
-										<PATH>${java.home};${env.PATH}</PATH>
-										<JAVA_HOME>${java.home}</JAVA_HOME>
-									</environmentVariables>
+									<executable>${env.INNO_SETUP_CLI}</executable>
 									<arguments>
-										<argument>--module-path</argument>
-										<argument>${java.home}/jmods</argument>
-										<argument>--type</argument>
-										<argument>msi</argument>
-										<argument>--app-version</argument>
-										<argument>${project.version}</argument>
-										<argument>--name</argument>
-										<argument>BrickForce Aurora</argument>
-										<argument>--vendor</argument>
-										<argument>BrickForce Aurora</argument>
-										<argument>--temp</argument>
-										<argument>
-											${project.build.directory}/temp</argument>
-										<argument>--input</argument>
-										<argument>${project.build.directory}/jar</argument>
-										<argument>--dest</argument>
-										<argument>
-											${project.build.directory}/installer</argument>
-										<argument>--resource-dir</argument>
-										<argument>src/installer/resources</argument>
-										<argument>--about-url</argument>
-										<argument>
-											https://brick-force-aurora.github.io/Website/</argument>
-										<argument>--main-jar</argument>
-										<argument>${project.build.finalName}.jar</argument>
-										<argument>--main-class</argument>
-										<argument>
-											${project.groupId}.${project.artifactId}.Main</argument>
-										<argument>--jlink-options</argument>
-										<argument>--compress=zip-9
-											--strip-native-commands
-											--strip-debug --no-man-pages
-											--no-header-files</argument>
-										<argument>--win-shortcut</argument>
-										<argument>--win-shortcut-prompt</argument>
-										<argument>--win-menu</argument>
-										<argument>--win-menu-group</argument>
-										<argument>BrickForce</argument>
-										<argument>--win-per-user-install</argument>
-										<argument>--win-upgrade-uuid</argument>
-										<argument>
-											F17AD33C-0193-43C0-B1D6-0A3CEFB1C6A0</argument>
+										<argument>${project.build.directory}/classes/installer/setup.iss</argument>
 									</arguments>
 								</configuration>
 							</execution>

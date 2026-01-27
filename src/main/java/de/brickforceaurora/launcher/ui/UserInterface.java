@@ -71,11 +71,14 @@ public class UserInterface extends AbstractUserInterface {
     private final PropFloat transition = new PropFloat(0f);
     private volatile int currentPanoramaTexture, previousPanoramaTexture;
 
+    public final PropBool newVersionAvailable = new PropBool(false);
+    public final PropString newVersionText = new PropString("");
     public final PropFloat mainProgress = new PropFloat(0f);
     public final PropString mainText = new PropString("Checking for updates...");
 
     private final Button startButton = Button.builder().padding(Padding.builder().top(4).right(4).left(28).bottom(8).build())
         .action(UIActionHelper::startGame).build();
+    private final Button updateButton = Button.builder().width(ISizing.percentage(0.185f)).padding(NO_PADDING).action(() -> UIActionHelper.runUpdate(false, true)).build();
     private final Button settingsButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(showSettings::toggle).build();
     private final Button quitButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(Main::shutdown).build();
 
@@ -119,6 +122,7 @@ public class UserInterface extends AbstractUserInterface {
             .build());
 
         startButton.setup(renderContext);
+        updateButton.setup(renderContext);
         settingsButton.setup(renderContext);
         quitButton.setup(renderContext);
     }
@@ -213,12 +217,35 @@ public class UserInterface extends AbstractUserInterface {
                         builder.build().close();
 
                     }
-
                 }
 
                 builder = panorama.newElement();
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.grow());
                 builder.build().close();
+
+                if (newVersionAvailable.get() && !showSettings.get()) {
+                    builder = panorama.newElement();
+                    builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).childGap(8)
+                        .padding(Padding.builder().left(8).right(8).top(4).bottom(4).build())
+                        .childHorizontalAlignment(HAlignment.LEFT).childVerticalAlignment(VAlignment.CENTER)
+                        .addConfigs(Rectangle.bg(Constant.WINDOW_BACKGROUND_COLOR.duplicate().alpha(0.6f), 0f));
+                    try (Element updateInfo = builder.build()) {
+                        builder = updateInfo.newElement();
+                        builder.layout().width(ISizing.percentage(0.815f)).height(ISizing.fixed(28f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                            .addConfigs(Text.builder().text(newVersionText.get()).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD))
+                                .alignment(HAlignment.LEFT).wrapMode(WrapMode.WRAP_NONE).fontSize(18).lineHeight(24).build());
+                        builder.build().close();
+                        
+                        try (Element updateBtn = updateButton.build(renderContext, updateInfo)) {
+                            builder = updateBtn.newElement();
+                            builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                                .addConfigs(Text.builder().text("UPDATE").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
+                                    .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
+                                .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                            builder.build().close();
+                        }
+                    }
+                }
 
                 builder = panorama.newElement();
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.fit(80f)).padding(NO_PADDING).childGap(0);

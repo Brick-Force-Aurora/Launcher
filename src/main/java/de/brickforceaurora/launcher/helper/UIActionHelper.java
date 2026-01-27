@@ -57,11 +57,14 @@ public final class UIActionHelper {
         }
     }
 
-    public static void runUpdate(boolean startup) {
+    public static void runUpdate(boolean startup, boolean confirmed) {
         LauncherApp app = LauncherApp.get();
 
         UpdaterConfig config = app.snowFrame().module(ConfigModule.class).manager().config(UpdaterConfig.class);
         UserInterface userInterface = app.userInterface();
+
+        userInterface.newVersionAvailable.set(false);
+        userInterface.newVersionText.set("");
 
         Path gameDirectory = app.gameDirectory();
         if (!Files.exists(gameDirectory) || !Files.isDirectory(gameDirectory)) {
@@ -102,13 +105,12 @@ public final class UIActionHelper {
         }
 
         userInterface.mainProgress.set(0.1f);
-        if (!forceInstall && !config.automaticUpdate()) {
-            userInterface.mainText.set("Waiting for user response...");
-            // TODO: Add dialog
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
+        if (!confirmed && !forceInstall && !config.automaticUpdate()) {
+            userInterface.newVersionText.set("There is %s new update(s) available, please update to %s.".formatted(updateManager.updateCount(), updateManager.latestUpdate().get()));
+            userInterface.newVersionAvailable.set(true);
+            userInterface.mainText.set("Ready to play (%s)".formatted(currentVersion));
+            userInterface.mainProgress.set(1);
+            return;
         }
 
         Version newVersion = updateManager.applyUpdates(new TaskTracker(userInterface.mainText, userInterface.mainProgress, 0.9f));

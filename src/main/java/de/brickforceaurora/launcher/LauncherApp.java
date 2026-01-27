@@ -68,10 +68,17 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     @Override
     public void registerLifecycle(Lifecycle<LauncherApp> lifecycle) {
         lifecycle.startupChain().register("load", Stage.PRE, (frame) -> {
-            frame.resourceManager().register("user", Paths.get("user"));
-            frame.resourceManager().register("data", Paths.get("data"));
+            File dir = new File("").getAbsoluteFile();
+            String path = "";
+            if (dir.getName().equals("bin")) {
+                path = "../";
+            }
+
+            frame.resourceManager().register("app", Paths.get(path));
+            frame.resourceManager().register("user", Paths.get(path + "user"));
+            frame.resourceManager().register("data", Paths.get(path + "data"));
         }).register("ready", Stage.MAIN, (frame) -> {
-            gameDirectory = Paths.get(frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory());
+            gameDirectory = IOUtil.asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory()));
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
 
             frame.resourceManager().register("game", gameDirectory);
@@ -109,7 +116,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             TextureAtlas.load(frame);
 
             userInterface = new UserInterface(this);
-            SCHEDULER.schedule(() -> UIActionHelper.runUpdate(true), 1, TimeUnit.SECONDS);
+            SCHEDULER.schedule(() -> UIActionHelper.runUpdate(true, false), 1, TimeUnit.SECONDS);
         }).register("start", Stage.POST, frame -> {
             // We call Main.shutdown(), this will notify the GLFW to close.
             // However we already know it should close since this lambda is called.

@@ -2,6 +2,8 @@
 .settings/
 target
 
+jdk/
+jdk/*
 test/
 test/*
 test*/
