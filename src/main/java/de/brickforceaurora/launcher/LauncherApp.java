@@ -2,7 +2,6 @@ package de.brickforceaurora.launcher;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,8 +29,9 @@ import me.lauriichan.snowframe.signal.SignalManager;
 import me.lauriichan.snowframe.util.logger.FileLogger;
 
 public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
-    
-    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1, Thread.ofVirtual().name("Scheduler").factory());
+
+    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1,
+        Thread.ofPlatform().daemon(true).name("Scheduler").factory());
 
     private static SnowFrame<LauncherApp> snowFrame;
 
@@ -55,7 +55,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         return snowFrame.logger();
     }
 
-    private Path gameDirectory, tempDirectory;
+    private Path appDirectory, gameDirectory, tempDirectory;
     private DataStore launcherData, gameData;
 
     private UpdateManager updateManager;
@@ -69,16 +69,19 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     public void registerLifecycle(Lifecycle<LauncherApp> lifecycle) {
         lifecycle.startupChain().register("load", Stage.PRE, (frame) -> {
             File dir = new File("").getAbsoluteFile();
-            String path = "";
+            Path appPath;
             if (dir.getName().equals("bin")) {
-                path = "../";
+                appPath = dir.getParentFile().toPath();
+            } else {
+                appPath = dir.toPath();
             }
-
-            frame.resourceManager().register("app", Paths.get(path));
-            frame.resourceManager().register("user", Paths.get(path + "user"));
-            frame.resourceManager().register("data", Paths.get(path + "data"));
+            this.appDirectory = appPath;
+            frame.resourceManager().register("app", appPath);
+            frame.resourceManager().register("user", appPath.resolve("user"));
+            frame.resourceManager().register("data", appPath.resolve("data"));
         }).register("ready", Stage.MAIN, (frame) -> {
-            gameDirectory = IOUtil.asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory()));
+            gameDirectory = IOUtil
+                .asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory()));
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
 
             frame.resourceManager().register("game", gameDirectory);
@@ -131,6 +134,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     @Override
     public SnowFrame<LauncherApp> snowFrame() {
         return snowFrame;
+    }
+
+    public Path appDirectory() {
+        return appDirectory;
     }
 
     public Path gameDirectory() {

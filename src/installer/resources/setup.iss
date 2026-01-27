@@ -8,6 +8,7 @@
 #define MyAppURL "https://brickforce-aurora.de/"
 #define MyAppExeName "launcher.exe"
 #define JDK "OpenJDK25U-jdk_x64_windows_hotspot_25.0.1_8.zip"
+#define JDK_PATH "..\jdk-25.0.1+8"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -52,26 +53,25 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#MyAppExeName}"; DestDir: "{app}/bin"; Flags: ignoreversion
 Source: "launcher.jrc"; DestDir: "{app}/bin"; Flags: ignoreversion
 Source: "..\..\jar\launcher.jar"; DestDir: "{app}/bin"; Flags: ignoreversion
-Source: "..\..\..\jdk\{#JDK}"; DestDir: "{app}"
+Source: "..\..\..\jdk\{#JDK}"; DestDir: "{app}"; Flags: ignoreversion dontcopy
 ; Flags: ignoreversion dontcopy; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{app}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: """--java.home"" ""..\jdk""";
-Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: """--java.home"" ""..\jdk""";
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: """--java-home"" ""..\jdk"""; Tasks: desktopicon
+Name: "{app}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}""";
+Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}""";
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}"""; Tasks: desktopicon
 
 [Code]
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then begin
-    ExtractTemporaryFile(ExpandConstant('{#JDK}'));
-    ExtractArchive(ExpandConstant('{tmp}\{#JDK}'), ExpandConstant('{app}\jdk'), '', False, nil);
-    DeleteFile('{#JDK}');
+  	ExtractTemporaryFile('{#JDK}');
+    ExtractArchive(ExpandConstant('{tmp}\{#JDK}'), ExpandConstant('{app}'), '', True, nil);
   end;
 end;
 
 [Run]
-Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Parameters: """--java-home"" ""..\jdk"""; Flags: nowait postinstall skipifsilent
+Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Parameters: "--java-home=""{#JDK_PATH}"""; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}";

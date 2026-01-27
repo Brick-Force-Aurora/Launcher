@@ -16,7 +16,7 @@ import me.lauriichan.snowframe.ConfigModule;
 import me.lauriichan.snowframe.util.Version;
 
 public final class UIActionHelper {
- 
+
     private UIActionHelper() {
         throw new UnsupportedOperationException();
     }
@@ -30,18 +30,18 @@ public final class UIActionHelper {
         if (userInterface.mainProgress.get() != 1f) {
             return;
         }
-        String gamePath = app.gameDirectory().resolve("BrickForce.exe").toAbsolutePath().toString();
+        String gamePath = app.gameDirectory().resolve("BrickForce.exe").toString();
         ISimpleLogger logger = app.snowFrame().logger();
         logger.info("Launching game '{0}'", gamePath);
         ProgramResult result;
         if (!WindowsHelper.isAuthorized("BrickForce", gamePath)) {
             result = WindowsHelper.authorizeProgram("BrickForce", gamePath);
-            if (result.success() && logger.isDebug()) {
+            if (!result.success() || (result.success() && logger.isDebug())) {
                 logger.debug("Firewall Result: \n{0}\nFirewall Error: \n{1}", result.result(), result.error());
             }
         }
         result = WindowsHelper.applyRegistryLanguageFix();
-        if (result.success() && logger.isDebug()) {
+        if (!result.success() || (result.success() && logger.isDebug())) {
             logger.debug("Registry Result: \n{0}\nRegistry Error: \n{1}", result.result(), result.error());
         }
 
@@ -50,7 +50,7 @@ public final class UIActionHelper {
                 "cmd.exe",
                 "/c",
                 "start",
-                gamePath
+                "BrickForce.exe"
             }).directory(app.gameDirectory().toFile()).start();
         } catch (IOException e) {
             logger.error("Failed to launch game", e);
@@ -106,7 +106,8 @@ public final class UIActionHelper {
 
         userInterface.mainProgress.set(0.1f);
         if (!confirmed && !forceInstall && !config.automaticUpdate()) {
-            userInterface.newVersionText.set("There is %s new update(s) available, please update to %s.".formatted(updateManager.updateCount(), updateManager.latestUpdate().get()));
+            userInterface.newVersionText.set("There is %s new update(s) available, please update to %s."
+                .formatted(updateManager.updateCount(), updateManager.latestUpdate().get()));
             userInterface.newVersionAvailable.set(true);
             userInterface.mainText.set("Ready to play (%s)".formatted(currentVersion));
             userInterface.mainProgress.set(1);

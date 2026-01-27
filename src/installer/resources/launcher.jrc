@@ -1,3 +1,3 @@
 vm.args=-Xmx512m -Xms128m
 java.args=-jar launcher.jar
-aot=false
+aot=true

@@ -15,7 +15,7 @@
 		
 		<!-- Dependency versions -->
 		<dep.netty.version>4.1.104.Final</dep.netty.version>
-		<dep.snowframe.version>0.1.2</dep.snowframe.version>
+		<dep.snowframe.version>0.1.3</dep.snowframe.version>
 		<dep.laylib.version>0.4.2-SNAPSHOT</dep.laylib.version>
 		<dep.fastutil.version>8.5.18</dep.fastutil.version>
 		<dep.clay4j.version>0.1.2</dep.clay4j.version>
@@ -250,8 +250,8 @@
 						</filter>
 					</filters>
 					<minimizeJar>false</minimizeJar>
+					<outputDirectory>${project.build.directory}/jar</outputDirectory>
 					<createDependencyReducedPom>false</createDependencyReducedPom>
-					<outputFile>test/launcher.jar</outputFile>
 					<transformers>
 						<transformer
 							implementation="me.lauriichan.maven.shade.transformers.AppendingTransformer">

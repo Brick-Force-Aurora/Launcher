@@ -71,7 +71,7 @@ public final class WindowsHelper {
 
     public static ProgramResult authorizeProgram(String name, String filePath) {
         String authorizeCommand = StringUtil
-            .format("netsh advfirewall firewall add rule name=\"{0}\" dir=in action=allow program=\"{1}\" enable=yes", new Object[] {
+            .format("netsh advfirewall firewall add rule name=\\\"{0}\\\" dir=in action=allow program=\\\"{1}\\\" enable=yes", new Object[] {
                 name,
                 filePath
             });
@@ -79,7 +79,7 @@ public final class WindowsHelper {
             Process process = Runtime.getRuntime().exec(new String[] {
                 "powershell.exe",
                 "-Command",
-                "Start-Process -FilePath $Env:ComSpec -Verb runAs -Wait -PassThru -ArgumentList /c,'%s'".formatted(authorizeCommand)
+                "Start-Process -FilePath $Env:ComSpec -Verb runAs -Wait -PassThru -ArgumentList '/c','\"%s\"'".formatted(authorizeCommand)
             });
             process.waitFor();
             String result = process.inputReader().lines().collect(Collectors.joining("\n"));
