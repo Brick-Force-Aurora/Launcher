@@ -40,13 +40,13 @@ This is the game launcher for the BrickForce Aurora mod. It was designed to look
 
 <!-- FEATURES -->
 ### Features 🎮
-- [x] **Automatic updates** 🛠️
+- [x] **Automatic updates** 🛠️<br/>
     The launcher checks for updates for itself and automatically installs them once it sees that there is one available. You will never need to manually update your launcher ever again!
-- [x] **Keeps your game up2date** ⚙️
+- [x] **Keeps your game up2date** ⚙️<br/>
     The launcher checks for game updates and notifies you about them! (if you didn't disable `Check for Updates?` in the settings.) You can also have it automatically install the updates by enabling `Automatically install updates` in the settings.
-- [x] **Experimental game updates** 🌟
+- [x] **Experimental game updates** 🌟<br/>
     The launcher can also detect experimental updates. If you want the launcher to do that you have to enable `Get experimental updates` in the settings.
-- [x] **Install forks of the Aurora mod** 🎯
+- [x] **Install forks of the Aurora mod** 🎯<br/>
     The launcher is also able to download the Aurora mod from other repositories if they are set up correctly. This however can not be configured in the UI and has to be done in the config of the launcher.
 
 
