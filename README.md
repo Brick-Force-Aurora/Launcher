@@ -1,5 +1,9 @@
 ![](https://i.imgur.com/fThs88a.png)
 
+# !!IMPORTANT!!
+
+This is the old launcher, for our current launcher please checkout the [master branch](https://github.com/Brick-Force-Aurora/Launcher/tree/master)
+
 <div align="center">
   <a href="https://discord.gg/qktjAYsKwH">Join The Discord</a> |
   <a href="https://github.com/Brick-Force-Aurora/Brick-Force/releases/latest">Latest Release</a> |
