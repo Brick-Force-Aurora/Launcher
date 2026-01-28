@@ -8,9 +8,7 @@
     <a href="https://brickforce-aurora.de/">
         <img src="https://raw.githubusercontent.com/Brick-Force-Aurora/Launcher/master/.github/assets/logo.png"/>
     </a>
-
     <h3 align="center">BrickForce Aurora Launcher</h3>
-
     <p align="center">
         <a href="https://github.com/Brick-Force-Aurora/Launcher/issues/new">Report Bug</a>
         ·
