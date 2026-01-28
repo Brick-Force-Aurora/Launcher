@@ -19,7 +19,7 @@
 </p>
 
 <details open="open">
-    <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
+    <summary><h3 style="display: inline-block">Table of Contents</h3></summary>
     <ol>
         <li><a href="#what-is-the-birckforce-aurora-launcher-">What is the BrickForce Aurora Launcher?</a></li>
         <li>
@@ -34,12 +34,12 @@
     </ol>
 </details>
 
-## What is the BrickForce Aurora Launcher?
+### What is the BrickForce Aurora Launcher?
 
 This is the game launcher for the BrickForce Aurora mod. It was designed to look similar to the old BrickForce game launcher. It is simple to use and does everything required to make sure the game runs!
 
 <!-- FEATURES -->
-## Features 🎮
+### Features 🎮
 - [x] **Automatic updates** 🛠️
     The launcher checks for updates for itself and automatically installs them once it sees that there is one available. You will never need to manually update your launcher ever again!
 - [x] **Keeps your game up2date** ⚙️
@@ -51,7 +51,7 @@ This is the game launcher for the BrickForce Aurora mod. It was designed to look
 
 
 <!-- INSTALLATION -->
-## Installation 📥
+### Installation 📥
 1. **Download** the launcher from our **[Website](https://brickforce-aurora.de/download/)**
 2. **Install** the launcher and run it
 3. Once run the launcher will **automatically download the game**
@@ -61,7 +61,7 @@ This is the game launcher for the BrickForce Aurora mod. It was designed to look
 
 
 <!-- CONTRIBUTING -->
-## Contributing  🤝
+### Contributing  🤝
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -74,7 +74,7 @@ Contributions are what make the open source community such an amazing place to b
 
 
 <!-- LICENSE -->
-## License 📜
+### License 📜
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
