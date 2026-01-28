@@ -8,31 +8,31 @@ import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public record Rectangle(SimpleColor color, float cornerRadius, boolean hollow, float brushSize) implements IElementConfig {
 
-    public static BackgroundRectangle bg(SimpleColor color) {
+    public static BackgroundRectangle bg(final SimpleColor color) {
         return new BackgroundRectangle(color, 0f);
     }
 
-    public static BackgroundRectangle bg(SimpleColor color, float cornerRadius) {
+    public static BackgroundRectangle bg(final SimpleColor color, final float cornerRadius) {
         return new BackgroundRectangle(color, cornerRadius);
     }
 
-    public static Rectangle filled(SimpleColor color) {
+    public static Rectangle filled(final SimpleColor color) {
         return new Rectangle(color, 0f, false, 1f);
     }
 
-    public static Rectangle filled(SimpleColor color, float cornerRadius) {
+    public static Rectangle filled(final SimpleColor color, final float cornerRadius) {
         return new Rectangle(color, cornerRadius, false, 1f);
     }
 
-    public static Rectangle hollow(SimpleColor color) {
+    public static Rectangle hollow(final SimpleColor color) {
         return new Rectangle(color, 0f, true, 1f);
     }
 
-    public static Rectangle hollow(SimpleColor color, float cornerRadius) {
+    public static Rectangle hollow(final SimpleColor color, final float cornerRadius) {
         return new Rectangle(color, cornerRadius, true, 1f);
     }
 
-    public static Rectangle hollow(SimpleColor color, float cornerRadius, float borderSize) {
+    public static Rectangle hollow(final SimpleColor color, final float cornerRadius, final float borderSize) {
         return new Rectangle(color, cornerRadius, true, borderSize);
     }
 
@@ -42,7 +42,7 @@ public record Rectangle(SimpleColor color, float cornerRadius, boolean hollow, f
     }
 
     @Override
-    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(final ElementContext context, final Element element, final IElementConfig elementConfig) {
         context.push(new RenderCommand("rectangle", element, context.boundingBox(), this));
     }
 

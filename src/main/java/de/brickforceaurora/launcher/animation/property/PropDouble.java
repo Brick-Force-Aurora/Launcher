@@ -1,7 +1,7 @@
 package de.brickforceaurora.launcher.animation.property;
 
 public final class PropDouble {
-    
+
     private final double min, max;
 
     private volatile double value;
@@ -10,15 +10,15 @@ public final class PropDouble {
         this(0);
     }
 
-    public PropDouble(double value) {
+    public PropDouble(final double value) {
         this(value, Double.MIN_VALUE, Double.MAX_VALUE);
     }
 
-    public PropDouble(double min, double max) {
+    public PropDouble(final double min, final double max) {
         this(0, min, max);
     }
 
-    public PropDouble(double value, double min, double max) {
+    public PropDouble(final double value, final double min, final double max) {
         this.min = min;
         this.max = max;
         this.value = clamp(value);
@@ -28,14 +28,15 @@ public final class PropDouble {
         return value;
     }
 
-    public void set(double value) {
+    public void set(final double value) {
         this.value = clamp(value);
     }
 
-    public double clamp(double value) {
+    public double clamp(final double value) {
         if (value < min) {
             return min;
-        } else if (value > max) {
+        }
+        if (value > max) {
             return max;
         }
         return value;

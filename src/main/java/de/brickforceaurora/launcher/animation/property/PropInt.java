@@ -10,21 +10,21 @@ public final class PropInt {
         this(0);
     }
 
-    public PropInt(int value) {
+    public PropInt(final int value) {
         this(value, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
-    public PropInt(int min, int max) {
+    public PropInt(final int min, final int max) {
         this(0, min, max);
     }
 
-    public PropInt(int value, int min, int max) {
+    public PropInt(final int value, final int min, final int max) {
         this.min = min;
         this.max = max;
         this.value = clamp(value);
     }
 
-    public void flag(int flag, boolean state) {
+    public void flag(final int flag, final boolean state) {
         if (state) {
             value |= flag;
             return;
@@ -32,7 +32,7 @@ public final class PropInt {
         value &= ~flag;
     }
 
-    public boolean flag(int flag) {
+    public boolean flag(final int flag) {
         return (value & flag) == flag;
     }
 
@@ -40,14 +40,15 @@ public final class PropInt {
         return value;
     }
 
-    public void set(int value) {
+    public void set(final int value) {
         this.value = clamp(value);
     }
 
-    public int clamp(int value) {
+    public int clamp(final int value) {
         if (value < min) {
             return min;
-        } else if (value > max) {
+        }
+        if (value > max) {
             return max;
         }
         return value;

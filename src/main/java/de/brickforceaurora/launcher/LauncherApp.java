@@ -35,14 +35,14 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     private static SnowFrame<LauncherApp> snowFrame;
 
-    static SnowFrame<LauncherApp> init(String[] args) {
+    static SnowFrame<LauncherApp> init(final String[] args) {
         if (snowFrame != null) {
             return snowFrame;
         }
 
         // TODO: Do actual command line parsing
-        ISimpleLogger logger = new FileLogger(new File("data/logs"));
-        logger.setDebug(Arrays.stream(args).anyMatch(str -> str.equalsIgnoreCase("--debug")));
+        final ISimpleLogger logger = new FileLogger(new File("../logs"));
+        logger.setDebug(Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase));
 
         return snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
     }
@@ -66,11 +66,11 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     private UserInterface userInterface;
 
     @Override
-    public void registerLifecycle(Lifecycle<LauncherApp> lifecycle) {
-        lifecycle.startupChain().register("load", Stage.PRE, (frame) -> {
-            File dir = new File("").getAbsoluteFile();
+    public void registerLifecycle(final Lifecycle<LauncherApp> lifecycle) {
+        lifecycle.startupChain().register("load", Stage.PRE, frame -> {
+            final File dir = new File("").getAbsoluteFile();
             Path appPath;
-            if (dir.getName().equals("bin")) {
+            if ("bin".equals(dir.getName())) {
                 appPath = dir.getParentFile().toPath();
             } else {
                 appPath = dir.toPath();
@@ -79,7 +79,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             frame.resourceManager().register("app", appPath);
             frame.resourceManager().register("user", appPath.resolve("user"));
             frame.resourceManager().register("data", appPath.resolve("data"));
-        }).register("ready", Stage.MAIN, (frame) -> {
+        }).register("ready", Stage.MAIN, frame -> {
             gameDirectory = IOUtil
                 .asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory()));
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
@@ -98,11 +98,11 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
             signalManager = frame.module(SignalModule.class).signalManager();
         });
-        lifecycle.shutdownChain().register("shutdown", Stage.MAIN, (_) -> {
+        lifecycle.shutdownChain().register("shutdown", Stage.MAIN, _ -> {
             launcherData.save();
             gameData.save();
-        }).register("shutdown", Stage.POST, (frame) -> {
-            if (frame.logger() instanceof FileLogger logger) {
+        }).register("shutdown", Stage.POST, frame -> {
+            if (frame.logger() instanceof final FileLogger logger) {
                 logger.close();
             }
         });
@@ -119,7 +119,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             TextureAtlas.load(frame);
 
             userInterface = new UserInterface(this);
-            SCHEDULER.schedule(() -> UIActionHelper.runUpdate(true, false), 1, TimeUnit.SECONDS);
+            SCHEDULER.schedule((Runnable) this::updateLauncherOrCheckForGameUpdates, 1, TimeUnit.SECONDS);
         }).register("start", Stage.POST, frame -> {
             // We call Main.shutdown(), this will notify the GLFW to close.
             // However we already know it should close since this lambda is called.
@@ -129,6 +129,13 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             frame.lifecycle().execute(SnowFrame.LIFECYCLE_CHAIN_SHUTDOWN);
         });
         lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> userInterface.render());
+    }
+
+    private void updateLauncherOrCheckForGameUpdates() {
+        if (UIActionHelper.updateLauncher()) {
+            return;
+        }
+        UIActionHelper.runUpdate(true, false);
     }
 
     @Override

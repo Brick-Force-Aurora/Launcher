@@ -13,7 +13,7 @@ public final class HoverTrigger implements IAnimationTrigger {
     }
 
     @Override
-    public boolean isTriggered(float gx, float gy, float width, float height) {
+    public boolean isTriggered(final float gx, final float gy, final float width, final float height) {
         return ImGui.isMouseHoveringRect(gx, gy, gx + width, gy + height);
     }
 

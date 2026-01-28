@@ -19,7 +19,7 @@ public final class InterpolationAnimator<T> implements IAnimationAnimator {
             return interpolator;
         }
 
-        public Builder<C> interpolator(IAnimationInterpolator<C> interpolator) {
+        public Builder<C> interpolator(final IAnimationInterpolator<C> interpolator) {
             this.interpolator = interpolator;
             return this;
         }
@@ -28,7 +28,7 @@ public final class InterpolationAnimator<T> implements IAnimationAnimator {
             return start;
         }
 
-        public Builder<C> start(C start) {
+        public Builder<C> start(final C start) {
             this.start = start;
             return this;
         }
@@ -37,7 +37,7 @@ public final class InterpolationAnimator<T> implements IAnimationAnimator {
             return end;
         }
 
-        public Builder<C> end(C end) {
+        public Builder<C> end(final C end) {
             this.end = end;
             return this;
         }
@@ -45,20 +45,20 @@ public final class InterpolationAnimator<T> implements IAnimationAnimator {
         public InterpolationAnimator<C> build() {
             return new InterpolationAnimator<>(interpolator, start, end);
         }
-        
+
     }
 
     private final IAnimationInterpolator<T> interpolator;
     private final T start, end;
 
-    private InterpolationAnimator(IAnimationInterpolator<T> interpolator, T start, T end) {
+    private InterpolationAnimator(final IAnimationInterpolator<T> interpolator, final T start, final T end) {
         this.interpolator = Objects.requireNonNull(interpolator);
         this.start = Objects.requireNonNull(start);
         this.end = Objects.requireNonNull(end);
     }
-    
+
     @Override
-    public void animate(boolean regressing, double progress) {
+    public void animate(final boolean regressing, final double progress) {
         interpolator.manipulate(start, end, progress);
     }
 

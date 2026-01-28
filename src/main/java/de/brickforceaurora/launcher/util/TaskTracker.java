@@ -17,7 +17,7 @@ public class TaskTracker {
         private volatile String task;
         private volatile int currentWork;
 
-        private Task(TaskTracker tracker, String title, int allocatedWork) {
+        private Task(final TaskTracker tracker, final String title, final int allocatedWork) {
             this.tracker = tracker;
             this.title = title;
             this.allocatedWork = allocatedWork;
@@ -27,7 +27,7 @@ public class TaskTracker {
             return title;
         }
 
-        public void task(String task) {
+        public void task(final String task) {
             if (task == null) {
                 this.task = new StringBuilder().append(currentWork).append(" / ").append(allocatedWork).toString();
                 tracker.text.set(new StringBuilder(title).append(" (").append(this.task).append(')').toString());
@@ -40,7 +40,7 @@ public class TaskTracker {
             return task;
         }
 
-        public void work(int work) {
+        public void work(final int work) {
             if (work <= 0) {
                 throw new IllegalArgumentException("Work can't be less than or equal to zero");
             }
@@ -68,11 +68,11 @@ public class TaskTracker {
 
     private volatile int currentWork;
 
-    public TaskTracker(PropString text, PropFloat progress, float allocated) {
+    public TaskTracker(final PropString text, final PropFloat progress, final float allocated) {
         this(text, progress, allocated, 0);
     }
 
-    public TaskTracker(PropString text, PropFloat progress, float allocated, int workBudget) {
+    public TaskTracker(final PropString text, final PropFloat progress, final float allocated, final int workBudget) {
         if (allocated <= 0) {
             throw new IllegalArgumentException("Progress allocation can't be less than or equal to zero");
         }
@@ -84,15 +84,15 @@ public class TaskTracker {
         this.allocated = allocated;
         this.workBudget = workBudget;
     }
-    
-    public void budget(int budget) {
+
+    public void budget(final int budget) {
         if (workBudget != 0) {
             return;
         }
         workBudget = budget;
     }
 
-    public Task allocate(String title, int work) {
+    public Task allocate(final String title, final int work) {
         if (work <= 0) {
             throw new IllegalArgumentException("Work can't be less than or equal to zero");
         }
@@ -106,10 +106,10 @@ public class TaskTracker {
         return new Task(this, title, work);
     }
 
-    private void updateWork(int work) {
-        float previousProgress = (currentWork / (float) workBudget) * allocated;
+    private void updateWork(final int work) {
+        final float previousProgress = currentWork / (float) workBudget * allocated;
         currentWork += work;
-        float newProgress = (currentWork / (float) workBudget) * allocated;
+        final float newProgress = currentWork / (float) workBudget * allocated;
         progress.set(progress.get() + (newProgress - previousProgress));
     }
 

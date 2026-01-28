@@ -13,7 +13,7 @@ public record BackgroundRectangle(SimpleColor color, float cornerRadius) impleme
     }
 
     @Override
-    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(final ElementContext context, final Element element, final IElementConfig elementConfig) {
         context.emitRectangle(true);
     }
 

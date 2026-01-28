@@ -11,7 +11,7 @@ public final class LongInterpolator implements IAnimationInterpolator<Long> {
     }
 
     @Override
-    public void manipulate(Long start, Long end, double progress) {
+    public void manipulate(final Long start, final Long end, final double progress) {
         value.set((long) (start.longValue() * (1 - progress) + end.longValue() * progress));
     }
 

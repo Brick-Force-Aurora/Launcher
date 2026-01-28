@@ -13,7 +13,7 @@ public final class StoredData<T> {
     private final T defaultValue;
     private volatile T value;
 
-    StoredData(String key, StorageHandler<T> handler, T defaultValue) {
+    StoredData(final String key, final StorageHandler<T> handler, final T defaultValue) {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Invalid key");
         }
@@ -45,32 +45,32 @@ public final class StoredData<T> {
         }
         return value;
     }
-    
-    public void value(T value) {
+
+    public void value(final T value) {
         this.value = value;
     }
 
-    void read(CompoundTag root) {
+    void read(final CompoundTag root) {
         if (!root.has(key, handler.expectedType)) {
             value = null;
             return;
         }
         try {
             value = handler.read(root, key);
-        } catch (Exception exp) {
+        } catch (final Exception exp) {
             value = null;
             LauncherApp.logger().warning("Failed to read value '{0}'", exp, key);
         }
     }
 
-    void write(CompoundTag root) {
+    void write(final CompoundTag root) {
         if (value == null) {
             root.remove(key);
             return;
         }
         try {
             handler.write(root, key, value);
-        } catch (Exception exp) {
+        } catch (final Exception exp) {
             LauncherApp.logger().warning("Failed to write value '{0}'", exp, key);
         }
     }

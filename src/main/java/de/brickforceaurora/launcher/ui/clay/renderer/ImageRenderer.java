@@ -16,7 +16,8 @@ public class ImageRenderer extends ElementRenderer<Image> {
     }
 
     @Override
-    public void render(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Image data) {
+    public void render(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Image data) {
         RenderUtil.renderImage(drawList, offset.x + boundingBox.x(), offset.y + boundingBox.y(), boundingBox.width(), boundingBox.height(),
             boundingBox.width() / boundingBox.height(), data.texture(), data.color());
     }

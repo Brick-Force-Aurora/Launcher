@@ -15,7 +15,7 @@ public abstract class ElementRenderer<T> implements IExtension {
     private final String id;
     private final Class<T> dataType;
 
-    public ElementRenderer(String id, Class<T> dataType) {
+    public ElementRenderer(final String id, final Class<T> dataType) {
         this.id = id;
         Objects.requireNonNull(dataType);
         this.dataType = dataType == Object.class ? null : dataType;
@@ -26,7 +26,8 @@ public abstract class ElementRenderer<T> implements IExtension {
     }
 
     @SuppressWarnings("unchecked")
-    final void renderInternal(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Object data) {
+    final void renderInternal(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Object data) {
         if (dataType == null) {
             render(drawList, offset, element, boundingBox, (T) data);
             return;

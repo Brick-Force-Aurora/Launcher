@@ -16,8 +16,9 @@ public class ClippingStartRenderer extends ElementRenderer<Object> {
     }
 
     @Override
-    public void render(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Object data) {
-        float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
+    public void render(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Object data) {
+        final float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
         drawList.pushClipRect(x, y, x + boundingBox.width(), y + boundingBox.height());
     }
 

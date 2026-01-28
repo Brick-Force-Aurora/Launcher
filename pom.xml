@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.brickforce-aurora</groupId>
 	<artifactId>launcher</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>BFLauncher</name>
 
 	<properties>
@@ -113,7 +113,8 @@
 			<resource>
 				<filtering>false</filtering>
 				<excludes>
-					<exclude>setup.iss</exclude>
+					<exclude>*.iss</exclude>
+					<exclude>latest_launcher.json</exclude>
 				</excludes>
 				<directory>src/installer/resources</directory>
 				<targetPath>${project.build.outputDirectory}/installer</targetPath>
@@ -121,7 +122,8 @@
 			<resource>
 				<filtering>true</filtering>
 				<includes>
-					<include>setup.iss</include>
+					<include>*.iss</include>
+					<include>latest_launcher.json</include>
 				</includes>
 				<directory>src/installer/resources</directory>
 				<targetPath>${project.build.outputDirectory}/installer</targetPath>
@@ -299,6 +301,7 @@
 						<version>3.5.0</version>
 						<executions>
 							<execution>
+								<id>create-installer</id>
 								<phase>verify</phase>
 								<goals>
 									<goal>exec</goal>
@@ -307,6 +310,19 @@
 									<executable>${env.INNO_SETUP_CLI}</executable>
 									<arguments>
 										<argument>${project.build.directory}/classes/installer/setup.iss</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>create-updater</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${env.INNO_SETUP_CLI}</executable>
+									<arguments>
+										<argument>${project.build.directory}/classes/installer/update.iss</argument>
 									</arguments>
 								</configuration>
 							</execution>

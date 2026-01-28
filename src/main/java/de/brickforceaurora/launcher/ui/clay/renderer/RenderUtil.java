@@ -10,8 +10,8 @@ final class RenderUtil {
         throw new UnsupportedOperationException();
     }
 
-    public static void renderImage(ImDrawList drawList, float x, float y, float width, float height, float aspect, ImTexture texture,
-        SimpleColor color) {
+    public static void renderImage(final ImDrawList drawList, final float x, final float y, final float width, final float height,
+        final float aspect, final ImTexture texture, final SimpleColor color) {
         float scale;
         if (texture.aspect > aspect) {
             scale = height / texture.height;
@@ -19,9 +19,9 @@ final class RenderUtil {
             scale = width / texture.width;
         }
         float resized = texture.width * scale;
-        float uvX = ((resized - width) / 2f) / resized;
+        final float uvX = (resized - width) / 2f / resized;
         resized = texture.height * scale;
-        float uvY = ((resized - height) / 2f) / resized;
+        final float uvY = (resized - height) / 2f / resized;
         drawList.addImage(texture.id, x, y, x + width, y + height, uvX, uvY, 1f - uvX, 1f - uvY, color.asABGR());
     }
 

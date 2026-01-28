@@ -19,7 +19,7 @@ public class UpdateDownloadListener implements IHttpProgressListener {
     private volatile int currentWork, allocatedWork;
     private volatile int lastCurrent = 0;
 
-    public UpdateDownloadListener(Task task, int totalWork) {
+    public UpdateDownloadListener(final Task task, final int totalWork) {
         this.task = task;
         this.taskName = task.task();
         this.totalWork = totalWork;
@@ -30,10 +30,10 @@ public class UpdateDownloadListener implements IHttpProgressListener {
     }
 
     @Override
-    public void progress(int current, int total) {
+    public void progress(final int current, final int total) {
         metrics.push(current - lastCurrent);
         lastCurrent = current;
-        currentWork = (int) ((current / (float) total) * totalWork);
+        currentWork = (int) (current / (float) total * totalWork);
         if (currentWork != allocatedWork) {
             task.work(currentWork - allocatedWork);
             task.task(taskName + " - " + formatMetrics());
@@ -42,9 +42,9 @@ public class UpdateDownloadListener implements IHttpProgressListener {
     }
 
     private String formatMetrics() {
-        int bytes = Math.round(metrics.averageFor(1, TimeUnit.SECONDS));
-        float kBytes = bytes / 1024f;
-        float mBytes = kBytes / 1024f;
+        final int bytes = Math.round(metrics.averageFor(1, TimeUnit.SECONDS));
+        final float kBytes = bytes / 1024f;
+        final float mBytes = kBytes / 1024f;
         if (mBytes > 1) {
             return FORMAT.format(mBytes) + " MB/s";
         }

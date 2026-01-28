@@ -7,7 +7,7 @@ public abstract class StorageHandler<T> {
 
     public final TagType<?> expectedType;
 
-    public StorageHandler(TagType<?> expectedType) {
+    public StorageHandler(final TagType<?> expectedType) {
         this.expectedType = expectedType;
     }
 

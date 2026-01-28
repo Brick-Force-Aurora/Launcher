@@ -13,26 +13,27 @@ public final class WindowsHelper {
         throw new UnsupportedOperationException();
     }
 
-    public static boolean isAuthorized(String name, String filePath) {
-        String checkAuthorizationCommand = StringUtil.format("netsh advfirewall firewall show rule name=\"{0}\" verbose", new Object[] {
-            name
-        });
+    public static boolean isAuthorized(final String name, final String filePath) {
+        final String checkAuthorizationCommand = StringUtil.format("netsh advfirewall firewall show rule name=\"{0}\" verbose",
+            new Object[] {
+                name
+            });
         try {
-            String windowsFilePath = filePath.replace('/', '\\');
-            Process process = Runtime.getRuntime().exec(new String[] {
+            final String windowsFilePath = filePath.replace('/', '\\');
+            final Process process = Runtime.getRuntime().exec(new String[] {
                 "cmd.exe",
                 "/c",
                 checkAuthorizationCommand
             });
             process.waitFor();
-            String result = process.inputReader().lines().collect(Collectors.joining("\n"));
-            String error = process.errorReader().lines().collect(Collectors.joining("\n"));
+            final String result = process.inputReader().lines().collect(Collectors.joining("\n"));
+            final String error = process.errorReader().lines().collect(Collectors.joining("\n"));
             if (!error.isBlank()) {
                 return false;
             }
             boolean enabled = false, action = false, path = false;
-            String[] parts = result.split("\n");
-            for (String part : parts) {
+            final String[] parts = result.split("\n");
+            for (final String part : parts) {
                 if (part.contains("-----")) {
                     if (enabled && action && path) {
                         return true;
@@ -45,11 +46,11 @@ public final class WindowsHelper {
                 if (part.isBlank() || !part.contains(":")) {
                     continue;
                 }
-                String[] entry = part.split(":", 2);
-                String key = entry[0].trim();
+                final String[] entry = part.split(":", 2);
+                final String key = entry[0].trim();
                 switch (key) {
                 case "Action": {
-                    action = entry[1].trim().equals("Allow");
+                    action = "Allow".equals(entry[1].trim());
                     continue;
                 }
                 case "Program": {
@@ -57,35 +58,36 @@ public final class WindowsHelper {
                     continue;
                 }
                 case "Enabled": {
-                    enabled = entry[1].trim().equals("Yes");
+                    enabled = "Yes".equals(entry[1].trim());
                     continue;
                 }
                 }
             }
             return enabled && action && path;
-        } catch (Throwable thr) {
+        } catch (final Throwable thr) {
             LauncherApp.logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
             return false;
         }
     }
 
-    public static ProgramResult authorizeProgram(String name, String filePath) {
-        String authorizeCommand = StringUtil
-            .format("netsh advfirewall firewall add rule name=\\\"{0}\\\" dir=in action=allow program=\\\"{1}\\\" enable=yes", new Object[] {
-                name,
-                filePath
-            });
+    public static ProgramResult authorizeProgram(final String name, final String filePath) {
+        final String authorizeCommand = StringUtil
+            .format("netsh advfirewall firewall add rule name=\\\"{0}\\\" dir=in action=allow program=\\\"{1}\\\" enable=yes",
+                new Object[] {
+                    name,
+                    filePath
+                });
         try {
-            Process process = Runtime.getRuntime().exec(new String[] {
+            final Process process = Runtime.getRuntime().exec(new String[] {
                 "powershell.exe",
                 "-Command",
                 "Start-Process -FilePath $Env:ComSpec -Verb runAs -Wait -PassThru -ArgumentList '/c','\"%s\"'".formatted(authorizeCommand)
             });
             process.waitFor();
-            String result = process.inputReader().lines().collect(Collectors.joining("\n"));
-            String error = process.errorReader().lines().collect(Collectors.joining("\n"));
+            final String result = process.inputReader().lines().collect(Collectors.joining("\n"));
+            final String error = process.errorReader().lines().collect(Collectors.joining("\n"));
             return new ProgramResult(true, result, error);
-        } catch (Throwable thr) {
+        } catch (final Throwable thr) {
             LauncherApp.logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
             return new ProgramResult(false, "", "");
         }
@@ -93,16 +95,16 @@ public final class WindowsHelper {
 
     public static ProgramResult applyRegistryLanguageFix() {
         try {
-            Process process = Runtime.getRuntime().exec(new String[] {
+            final Process process = Runtime.getRuntime().exec(new String[] {
                 "cmd.exe",
                 "/c",
                 "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfVoice_h2155129175 /t REG_DWORD /d 00000001 /f"
             });
             process.waitFor();
-            String result = process.inputReader().lines().collect(Collectors.joining());
-            String error = process.errorReader().lines().collect(Collectors.joining());
+            final String result = process.inputReader().lines().collect(Collectors.joining());
+            final String error = process.errorReader().lines().collect(Collectors.joining());
             return new ProgramResult(true, result, error);
-        } catch (Throwable thr) {
+        } catch (final Throwable thr) {
             LauncherApp.logger().warning("Failed to apply registry language fix", thr);
             return new ProgramResult(false, "", "");
         }

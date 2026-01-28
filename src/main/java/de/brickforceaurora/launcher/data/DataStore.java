@@ -18,22 +18,22 @@ public final class DataStore {
 
     private volatile CompoundTag root;
 
-    public DataStore(IDataSource source) {
+    public DataStore(final IDataSource source) {
         this.source = source;
     }
 
-    public <T> StoredData<T> register(String key, StorageHandler<T> handler) {
+    public <T> StoredData<T> register(final String key, final StorageHandler<T> handler) {
         return register(key, handler, null);
     }
 
-    public <T> StoredData<T> register(String key, StorageHandler<T> handler, T defaultValue) {
+    public <T> StoredData<T> register(final String key, final StorageHandler<T> handler, final T defaultValue) {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Invalid key '%s'".formatted(key));
         }
         if (stored.containsKey(key)) {
             throw new IllegalStateException("Already registered key '%s'".formatted(key));
         }
-        StoredData<T> data = new StoredData<>(key, handler, defaultValue);
+        final StoredData<T> data = new StoredData<>(key, handler, defaultValue);
         stored.put(key, data);
         if (root != null) {
             data.read(root);
@@ -48,18 +48,18 @@ public final class DataStore {
                 return;
             }
             try (DataInputStream data = new DataInputStream(source.openReadableStream())) {
-                Tuple<String, CompoundTag> tuple = CompoundTag.readNamed(data);
+                final Tuple<String, CompoundTag> tuple = CompoundTag.readNamed(data);
                 if (tuple == null) {
                     clearInternal();
                     return;
                 }
                 root = tuple.second();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             clearInternal();
             throw e;
         } finally {
-            for (StoredData<?> data : stored.values()) {
+            for (final StoredData<?> data : stored.values()) {
                 data.read(root);
             }
         }
@@ -69,7 +69,7 @@ public final class DataStore {
         if (root == null) {
             root = new CompoundTag();
         }
-        for (StoredData<?> data : stored.values()) {
+        for (final StoredData<?> data : stored.values()) {
             data.write(root);
         }
         try (DataOutputStream data = new DataOutputStream(source.openWritableStream())) {
@@ -79,7 +79,7 @@ public final class DataStore {
 
     public void clear() {
         clearInternal();
-        for (StoredData<?> data : stored.values()) {
+        for (final StoredData<?> data : stored.values()) {
             data.read(root);
         }
     }

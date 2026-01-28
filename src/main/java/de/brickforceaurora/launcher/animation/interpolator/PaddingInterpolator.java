@@ -11,7 +11,7 @@ public final class PaddingInterpolator implements IAnimationInterpolator<Integer
     }
 
     @Override
-    public void manipulate(Integer start, Integer end, double progress) {
+    public void manipulate(final Integer start, final Integer end, final double progress) {
         value.set((int) Math.round(start.floatValue() * (1 - progress) + end.floatValue() * progress));
     }
 

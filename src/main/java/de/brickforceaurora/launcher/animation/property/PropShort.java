@@ -10,21 +10,21 @@ public final class PropShort {
         this((short) 0);
     }
 
-    public PropShort(short value) {
+    public PropShort(final short value) {
         this(value, Short.MIN_VALUE, Short.MAX_VALUE);
     }
 
-    public PropShort(short min, short max) {
+    public PropShort(final short min, final short max) {
         this((short) 0, min, max);
     }
 
-    public PropShort(short value, short min, short max) {
+    public PropShort(final short value, final short min, final short max) {
         this.min = min;
         this.max = max;
         this.value = clamp(value);
     }
 
-    public void flag(short flag, boolean state) {
+    public void flag(final short flag, final boolean state) {
         if (state) {
             value |= flag;
             return;
@@ -32,7 +32,7 @@ public final class PropShort {
         value &= ~flag;
     }
 
-    public boolean flag(short flag) {
+    public boolean flag(final short flag) {
         return (value & flag) == flag;
     }
 
@@ -40,14 +40,15 @@ public final class PropShort {
         return value;
     }
 
-    public void set(short value) {
+    public void set(final short value) {
         this.value = clamp(value);
     }
 
-    public short clamp(short value) {
+    public short clamp(final short value) {
         if (value < min) {
             return min;
-        } else if (value > max) {
+        }
+        if (value > max) {
             return max;
         }
         return value;

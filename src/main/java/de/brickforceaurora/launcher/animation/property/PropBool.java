@@ -6,7 +6,7 @@ public final class PropBool {
 
     public PropBool() {}
 
-    public PropBool(boolean value) {
+    public PropBool(final boolean value) {
         this.value = value;
     }
 
@@ -14,10 +14,10 @@ public final class PropBool {
         return value;
     }
 
-    public void set(boolean value) {
+    public void set(final boolean value) {
         this.value = value;
     }
-    
+
     public void toggle() {
         this.value = !this.value;
     }

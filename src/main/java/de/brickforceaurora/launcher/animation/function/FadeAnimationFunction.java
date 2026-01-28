@@ -11,12 +11,12 @@ public final class FadeAnimationFunction implements IAnimationFunction {
         return fadeIn;
     }
 
-    public FadeAnimationFunction fadeIn(double fadeIn) {
+    public FadeAnimationFunction fadeIn(final double fadeIn) {
         this.fadeIn = fadeIn;
         return this;
     }
 
-    public FadeAnimationFunction fadeIn(long fadeIn, TimeUnit unit) {
+    public FadeAnimationFunction fadeIn(final long fadeIn, final TimeUnit unit) {
         this.fadeIn = fadeIn / (double) unit.convert(1, TimeUnit.SECONDS);
         return this;
     }
@@ -25,18 +25,18 @@ public final class FadeAnimationFunction implements IAnimationFunction {
         return fadeOut;
     }
 
-    public FadeAnimationFunction fadeOut(double fadeOut) {
+    public FadeAnimationFunction fadeOut(final double fadeOut) {
         this.fadeOut = fadeOut;
         return this;
     }
 
-    public FadeAnimationFunction fadeOut(long fadeOut, TimeUnit unit) {
+    public FadeAnimationFunction fadeOut(final long fadeOut, final TimeUnit unit) {
         this.fadeOut = fadeOut / (double) unit.convert(1, TimeUnit.SECONDS);
         return this;
     }
 
     @Override
-    public double animate(boolean regressing, double elapsed) {
+    public double animate(final boolean regressing, final double elapsed) {
         if (regressing) {
             if (fadeOut == 0d) {
                 return 0d;

@@ -1,8 +1,8 @@
 package de.brickforceaurora.launcher.ui.clay.renderer;
 
+import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.ui.clay.ElementRenderer;
 import de.brickforceaurora.launcher.ui.clay.config.BackgroundRectangle;
-import de.brickforceaurora.launcher.Constant;
 import imgui.ImDrawList;
 import imgui.ImVec2;
 import me.lauriichan.clay4j.BoundingBox;
@@ -20,9 +20,10 @@ public class BackgroundRectangleRenderer extends ElementRenderer<Object> {
     }
 
     @Override
-    public void render(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Object data) {
-        BackgroundRectangle config = element.layout.config(BackgroundRectangle.class).orElse(DEFAULT_CONFIG);
-        float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
+    public void render(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Object data) {
+        final BackgroundRectangle config = element.layout.config(BackgroundRectangle.class).orElse(DEFAULT_CONFIG);
+        final float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
         drawList.addRectFilled(x, y, x + boundingBox.width(), y + boundingBox.height(), config.color().asABGR(), config.cornerRadius());
     }
 

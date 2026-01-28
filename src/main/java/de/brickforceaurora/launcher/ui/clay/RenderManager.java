@@ -15,7 +15,7 @@ public final class RenderManager {
     private final ISimpleLogger logger;
     private final Object2ObjectArrayMap<String, ElementRenderer<?>> renderers = new Object2ObjectArrayMap<>();
 
-    public RenderManager(SnowFrame<LauncherApp> frame) {
+    public RenderManager(final SnowFrame<LauncherApp> frame) {
         this.logger = frame.logger();
         frame.extension(ElementRenderer.class, true).callInstances(renderer -> {
             if (renderers.containsKey(renderer.id())) {
@@ -26,8 +26,8 @@ public final class RenderManager {
         });
     }
 
-    public void render(LayoutContext context, ImVec2 windowPos, ImDrawList drawList) {
-        ObjectIterator<RenderCommand> iterator = context.renderCommands().iterator();
+    public void render(final LayoutContext context, final ImVec2 windowPos, final ImDrawList drawList) {
+        final ObjectIterator<RenderCommand> iterator = context.renderCommands().iterator();
         RenderCommand command;
         ElementRenderer<?> renderer;
         while (iterator.hasNext()) {

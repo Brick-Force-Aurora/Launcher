@@ -2,23 +2,23 @@ package de.brickforceaurora.launcher.animation.trigger;
 
 public interface IAnimationTrigger {
 
-    public static HoverTrigger hover() {
+    static HoverTrigger hover() {
         return HoverTrigger.INSTANCE;
     }
 
-    public static MouseDownTrigger mouseDownLeft() {
+    static MouseDownTrigger mouseDownLeft() {
         return MouseDownTrigger.LEFT;
     }
 
-    public static MouseDownTrigger mouseDownMiddle() {
+    static MouseDownTrigger mouseDownMiddle() {
         return MouseDownTrigger.MIDDLE;
     }
 
-    public static MouseDownTrigger mouseDownRight() {
+    static MouseDownTrigger mouseDownRight() {
         return MouseDownTrigger.RIGHT;
     }
 
-    public static DelegateTrigger delegate() {
+    static DelegateTrigger delegate() {
         return new DelegateTrigger();
     }
 

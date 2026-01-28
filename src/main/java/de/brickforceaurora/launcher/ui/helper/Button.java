@@ -42,8 +42,8 @@ public class Button {
 
     private final Runnable action;
 
-    private Button(String elementId, Runnable action, ISizing width, ISizing height, float rounding, float shadowSize, Padding padding,
-        SimpleColor normal, SimpleColor shadow, SimpleColor highlight) {
+    private Button(final String elementId, final Runnable action, final ISizing width, final ISizing height, final float rounding,
+        final float shadowSize, final Padding padding, final SimpleColor normal, final SimpleColor shadow, final SimpleColor highlight) {
         this.elementId = elementId;
         this.action = action;
         this.width = width;
@@ -57,7 +57,7 @@ public class Button {
         this.highlight = highlight;
     }
 
-    public Button setup(RenderContext context) {
+    public Button setup(final RenderContext context) {
         context.add(Animation.builder().trigger(new DelegateTrigger(hovered))
             .function(IAnimationFunction.ease().easeIn(50, TimeUnit.MILLISECONDS).easeOut(150, TimeUnit.MILLISECONDS))
             .animators(new IAnimationAnimator[] {
@@ -73,26 +73,25 @@ public class Button {
         return this;
     }
 
-    public Element build(RenderContext context, Element parent) {
+    public Element build(final RenderContext context, final Element parent) {
         return build(context, parent, null);
     }
 
-    public Element build(RenderContext context, Element parent, Consumer<Element.Builder> styler) {
-        Element.Builder builder = parent.newElement();
+    public Element build(final RenderContext context, final Element parent, final Consumer<Element.Builder> styler) {
+        final Element.Builder builder = parent.newElement();
         if (elementId != null) {
             builder.elementId(elementId);
         }
         builder.layout().width(width).height(height)
             .padding(Padding.builder().left(padding.left() + (int) paddingTopLeft.get()).top(padding.top() + (int) paddingTopLeft.get())
                 .right(padding.right() - (int) paddingTopLeft.get()).bottom(padding.bottom() - (int) paddingTopLeft.get()).build())
-            .layoutDirection(LayoutDirection.LEFT_TO_RIGHT)
-            .childVerticalAlignment(VAlignment.TOP)
+            .layoutDirection(LayoutDirection.LEFT_TO_RIGHT).childVerticalAlignment(VAlignment.TOP)
             .childHorizontalAlignment(HAlignment.CENTER)
             .addConfigs(new BFButton(paddingTopLeft.get(), shadowSize, rounding, buttonColor, shadow));
         if (styler != null) {
             styler.accept(builder);
         }
-        Element element = builder.build();
+        final Element element = builder.build();
         context.actions(element).hoveredDown(hovered::set).click(action);
         return element;
     }
@@ -120,7 +119,7 @@ public class Button {
             return width;
         }
 
-        public Builder width(ISizing width) {
+        public Builder width(final ISizing width) {
             this.width = Objects.requireNonNull(width);
             return this;
         }
@@ -129,7 +128,7 @@ public class Button {
             return height;
         }
 
-        public Builder height(ISizing height) {
+        public Builder height(final ISizing height) {
             this.height = Objects.requireNonNull(height);
             return this;
         }
@@ -138,7 +137,7 @@ public class Button {
             return rounding;
         }
 
-        public Builder rounding(float rounding) {
+        public Builder rounding(final float rounding) {
             this.rounding = Math.max(rounding, 0f);
             return this;
         }
@@ -147,7 +146,7 @@ public class Button {
             return shadowSize;
         }
 
-        public Builder shadowSize(float shadowSize) {
+        public Builder shadowSize(final float shadowSize) {
             this.shadowSize = Math.max(shadowSize, 0f);
             return this;
         }
@@ -156,7 +155,7 @@ public class Button {
             return padding;
         }
 
-        public Builder padding(Padding padding) {
+        public Builder padding(final Padding padding) {
             this.padding = Objects.requireNonNull(padding);
             return this;
         }
@@ -165,7 +164,7 @@ public class Button {
             return normal;
         }
 
-        public Builder normal(SimpleColor normal) {
+        public Builder normal(final SimpleColor normal) {
             this.normal = Objects.requireNonNull(normal);
             return this;
         }
@@ -174,7 +173,7 @@ public class Button {
             return shadow;
         }
 
-        public Builder shadow(SimpleColor shadow) {
+        public Builder shadow(final SimpleColor shadow) {
             this.shadow = Objects.requireNonNull(shadow);
             return this;
         }
@@ -183,7 +182,7 @@ public class Button {
             return highlight;
         }
 
-        public Builder highlight(SimpleColor highlight) {
+        public Builder highlight(final SimpleColor highlight) {
             this.highlight = Objects.requireNonNull(highlight);
             return this;
         }
@@ -192,7 +191,7 @@ public class Button {
             return action;
         }
 
-        public Builder action(Runnable action) {
+        public Builder action(final Runnable action) {
             this.action = Objects.requireNonNull(action);
             return this;
         }
@@ -201,7 +200,7 @@ public class Button {
             return elementId;
         }
 
-        public Builder elementId(String elementId) {
+        public Builder elementId(final String elementId) {
             this.elementId = Objects.requireNonNull(elementId);
             return this;
         }

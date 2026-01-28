@@ -8,24 +8,24 @@ public final class PropPadding {
     public final PropInt right = new PropInt(0, 0, Integer.MAX_VALUE);
     public final PropInt top = new PropInt(0, 0, Integer.MAX_VALUE);
     public final PropInt bottom = new PropInt(0, 0, Integer.MAX_VALUE);
-    
+
     public PropPadding() {}
-    
-    public PropPadding(int value) {
+
+    public PropPadding(final int value) {
         left.set(value);
         right.set(value);
         top.set(value);
         bottom.set(value);
     }
-    
-    public PropPadding(int left, int right, int top, int bottom) {
+
+    public PropPadding(final int left, final int right, final int top, final int bottom) {
         this.left.set(left);
         this.right.set(right);
         this.top.set(top);
         this.bottom.set(bottom);
     }
 
-    public PropPadding set(int value) {
+    public PropPadding set(final int value) {
         left.set(value);
         right.set(value);
         top.set(value);
@@ -37,7 +37,7 @@ public final class PropPadding {
         return left.get();
     }
 
-    public PropPadding left(int value) {
+    public PropPadding left(final int value) {
         left.set(value);
         return this;
     }
@@ -46,7 +46,7 @@ public final class PropPadding {
         return right.get();
     }
 
-    public PropPadding right(int value) {
+    public PropPadding right(final int value) {
         right.set(value);
         return this;
     }
@@ -55,7 +55,7 @@ public final class PropPadding {
         return top.get();
     }
 
-    public PropPadding top(int value) {
+    public PropPadding top(final int value) {
         top.set(value);
         return this;
     }
@@ -64,11 +64,11 @@ public final class PropPadding {
         return bottom.get();
     }
 
-    public PropPadding bottom(int value) {
+    public PropPadding bottom(final int value) {
         bottom.set(value);
         return this;
     }
-    
+
     public Padding asLayoutPadding() {
         return new Padding(left.get(), right.get(), top.get(), bottom.get());
     }

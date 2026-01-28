@@ -7,16 +7,16 @@ public abstract class Setting {
 
     private final int size;
 
-    public Setting(int size) {
+    public Setting(final int size) {
         this.size = size;
     }
 
     public final int size() {
         return size;
     }
-    
+
     public abstract void update();
-    
+
     public abstract void apply();
 
     protected abstract void create(RenderContext context, Element parent);

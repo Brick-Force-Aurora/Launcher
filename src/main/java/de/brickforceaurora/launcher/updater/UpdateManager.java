@@ -2,9 +2,9 @@ package de.brickforceaurora.launcher.updater;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Optional;
 
-import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import de.brickforceaurora.launcher.util.TaskTracker.Task;
@@ -19,7 +19,7 @@ public final class UpdateManager {
     private final IUpdater updater;
     private final ObjectArrayList<IUpdate> updates = new ObjectArrayList<>();
 
-    public UpdateManager(ISimpleLogger logger, IUpdater updater) {
+    public UpdateManager(final ISimpleLogger logger, final IUpdater updater) {
         this.logger = logger;
         this.updater = updater;
     }
@@ -27,11 +27,11 @@ public final class UpdateManager {
     public boolean hasUpdates() {
         return !updates.isEmpty();
     }
-    
+
     public int updateCount() {
         return updates.size();
     }
-    
+
     public Optional<Version> latestUpdate() {
         if (updates.isEmpty()) {
             return Optional.empty();
@@ -39,34 +39,35 @@ public final class UpdateManager {
         return Optional.of(updates.get(updates.size() - 1).getVersion());
     }
 
-    public boolean checkForUpdates(UpdaterConfig config) {
+    public boolean checkForUpdates(final UpdaterConfig config, final Version version) {
         try {
             updates.clear();
-            updater.checkForUpdate(config, logger, GameData.GAME_VERSION.value(), updates);
-            updates.sort((u1, u2) -> u1.getVersion().compareTo(u2.getVersion()));
+            updater.checkForUpdate(config, logger, version, updates);
+            updates.sort(Comparator.comparing(IUpdate::getVersion));
             return true;
-        } catch (IOException exp) {
+        } catch (final IOException exp) {
             logger.error("Failed to check for updates", exp);
             return false;
         }
     }
 
-    public Version applyUpdates(TaskTracker tracker) {
+    public Version applyUpdates(final TaskTracker tracker, final Path updateTargetDir) {
         if (updates.isEmpty()) {
             return null;
         }
-        LauncherApp app = LauncherApp.get();
-        Path gameDirectory = app.gameDirectory();
-        Path temporaryDirectory = app.tempDirectory();
+        final LauncherApp app = LauncherApp.get();
+        final Path temporaryDirectory = app.tempDirectory();
         Version lastUpdate = null;
-        int updateCount = updates.size(), updateNum = 0;
+        final int updateCount = updates.size();
+        int updateNum = 0;
         tracker.budget(updateCount * 100);
-        for (IUpdate update : updates) {
-            Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, updateCount), 100);
+        for (final IUpdate update : updates) {
+            final Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, updateCount),
+                100);
             try {
-                update.applyUpdate(logger, task, gameDirectory, temporaryDirectory);
+                update.applyUpdate(logger, task, updateTargetDir, temporaryDirectory);
                 lastUpdate = update.getVersion();
-            } catch (Throwable exp) {
+            } catch (final Throwable exp) {
                 logger.error("Failed to apply update '{0}'", exp, update.getVersion());
                 return lastUpdate;
             }

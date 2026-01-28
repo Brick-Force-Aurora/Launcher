@@ -11,12 +11,12 @@ public final class MouseDownTrigger implements IAnimationTrigger {
 
     private final int button;
 
-    private MouseDownTrigger(int button) {
+    private MouseDownTrigger(final int button) {
         this.button = button;
     }
 
     @Override
-    public boolean isTriggered(float gx, float gy, float width, float height) {
+    public boolean isTriggered(final float gx, final float gy, final float width, final float height) {
         return ImGui.isMouseDown(button) && ImGui.isMouseHoveringRect(gx, gy, gx + width, gy + height);
     }
 

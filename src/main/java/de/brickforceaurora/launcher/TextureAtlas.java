@@ -33,7 +33,7 @@ public final class TextureAtlas {
         public final int id, width, height;
         public final float aspect;
 
-        private ImTexture(String name, int id, int width, int height) {
+        private ImTexture(final String name, final int id, final int width, final int height) {
             this.name = name;
             this.id = id;
             this.width = width;
@@ -42,8 +42,9 @@ public final class TextureAtlas {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            return obj == this || (obj instanceof ImTexture tex && id == tex.id) || (obj instanceof Number num && id == num.intValue());
+        public boolean equals(final Object obj) {
+            return obj == this || obj instanceof final ImTexture tex && id == tex.id
+                || obj instanceof final Number num && id == num.intValue();
         }
 
     }
@@ -53,7 +54,7 @@ public final class TextureAtlas {
         public final String name;
         public final ReferenceList<ImTexture> textures;
 
-        private ImTextureBundle(String name, ReferenceList<ImTexture> textures) {
+        private ImTextureBundle(final String name, final ReferenceList<ImTexture> textures) {
             this.name = name;
             this.textures = textures;
         }
@@ -64,35 +65,35 @@ public final class TextureAtlas {
         throw new UnsupportedOperationException();
     }
 
-    static void load(SnowFrame<LauncherApp> frame) {
-        for (Field field : TextureAtlas.class.getDeclaredFields()) {
-            Texture textureInfo = field.getDeclaredAnnotation(Texture.class);
+    static void load(final SnowFrame<LauncherApp> frame) {
+        for (final Field field : TextureAtlas.class.getDeclaredFields()) {
+            final Texture textureInfo = field.getDeclaredAnnotation(Texture.class);
             if (textureInfo == null) {
                 continue;
             }
-            Class<?> type = field.getType();
+            final Class<?> type = field.getType();
             boolean bundle = false;
             if (!type.equals(ImTexture.class) && !(bundle = type.equals(ImTextureBundle.class))) {
                 frame.logger().error("Invalid field type for texture '{0}'", textureInfo.path());
                 continue;
             }
             try {
-                IDataSource source = frame.externalResource("jar://image/%s".formatted(textureInfo.path()),
+                final IDataSource source = frame.externalResource("jar://image/%s".formatted(textureInfo.path()),
                     "data://resources/image/%s".formatted(textureInfo.path()), true);
                 if (!source.exists()) {
                     frame.logger().error("Couldn't find texture '{0}'", textureInfo.path());
                     continue;
                 }
                 if (bundle) {
-                    IDataSource[] contents = source.getContents();
-                    ReferenceList<ImTexture> textures = new ReferenceArrayList<>(contents.length);
-                    for (IDataSource content : contents) {
+                    final IDataSource[] contents = source.getContents();
+                    final ReferenceList<ImTexture> textures = new ReferenceArrayList<>(contents.length);
+                    for (final IDataSource content : contents) {
                         if (content.isContainer()) {
                             continue;
                         }
                         try (MemoryStack stack = MemoryStack.stackPush()) {
                             textures.add(loadTexture(stack, source.name() + '/' + content.name(), content));
-                        } catch (Throwable thr) {
+                        } catch (final Throwable thr) {
                             frame.logger().error("Failed to load texture '{0}'", thr, textureInfo.path() + '/' + content.name());
                         }
                     }
@@ -103,24 +104,24 @@ public final class TextureAtlas {
                 try (MemoryStack stack = MemoryStack.stackPush()) {
                     field.set(null, loadTexture(stack, source.name(), source));
                 }
-            } catch (Throwable thr) {
+            } catch (final Throwable thr) {
                 frame.logger().error("Failed to load texture '{0}'", thr, textureInfo.path());
             }
         }
     }
 
-    private static ImTexture loadTexture(MemoryStack stack, String name, IDataSource source) throws IOException {
-        IntBuffer channelsBuf = stack.mallocInt(1);
-        IntBuffer widthBuf = stack.mallocInt(1);
-        IntBuffer heightBuf = stack.mallocInt(1);
-        ByteBuffer image = STBImage.stbi_load(IOUtil.asPath(source).toAbsolutePath().toString(), widthBuf, heightBuf, channelsBuf, 4);
+    private static ImTexture loadTexture(final MemoryStack stack, final String name, final IDataSource source) throws IOException {
+        final IntBuffer channelsBuf = stack.mallocInt(1);
+        final IntBuffer widthBuf = stack.mallocInt(1);
+        final IntBuffer heightBuf = stack.mallocInt(1);
+        final ByteBuffer image = STBImage.stbi_load(IOUtil.asPath(source).toAbsolutePath().toString(), widthBuf, heightBuf, channelsBuf, 4);
         if (image == null) {
             throw new IOException("Unable to load image from resource");
         }
-        int width = widthBuf.get();
-        int height = heightBuf.get();
+        final int width = widthBuf.get();
+        final int height = heightBuf.get();
 
-        int id = GL11.glGenTextures();
+        final int id = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);

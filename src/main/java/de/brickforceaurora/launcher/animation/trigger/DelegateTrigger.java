@@ -10,12 +10,12 @@ public final class DelegateTrigger implements IAnimationTrigger {
         this.active = new PropBool(false);
     }
 
-    public DelegateTrigger(PropBool active) {
+    public DelegateTrigger(final PropBool active) {
         this.active = active;
     }
 
     @Override
-    public boolean isTriggered(float gx, float gy, float width, float height) {
+    public boolean isTriggered(final float gx, final float gy, final float width, final float height) {
         return active.get();
     }
 

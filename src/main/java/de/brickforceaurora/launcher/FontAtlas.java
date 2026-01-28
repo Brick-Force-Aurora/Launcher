@@ -27,25 +27,25 @@ public final class FontAtlas {
         throw new UnsupportedOperationException();
     }
 
-    static void load(SnowFrame<LauncherApp> frame) {
-        ImFontAtlas atlas = ImGui.getIO().getFonts();
-        for (Field field : FontAtlas.class.getDeclaredFields()) {
-            Font fontInfo = field.getDeclaredAnnotation(Font.class);
+    static void load(final SnowFrame<LauncherApp> frame) {
+        final ImFontAtlas atlas = ImGui.getIO().getFonts();
+        for (final Field field : FontAtlas.class.getDeclaredFields()) {
+            final Font fontInfo = field.getDeclaredAnnotation(Font.class);
             if (fontInfo == null) {
                 continue;
             }
             try {
-                IDataSource source = frame.externalResource("jar://fonts/%s".formatted(fontInfo.path()),
+                final IDataSource source = frame.externalResource("jar://fonts/%s".formatted(fontInfo.path()),
                     "data://resources/fonts/%s".formatted(fontInfo.path()));
                 if (!source.exists()) {
                     frame.logger().error("Couldn't find font '{0}'", fontInfo.path());
                     continue;
                 }
-                ImFontConfig config = new ImFontConfig();
+                final ImFontConfig config = new ImFontConfig();
                 config.setName(field.getName());
-                ImFont font = atlas.addFontFromFileTTF(IOUtil.asPath(source).toString(), fontInfo.defaultSize(), config);
+                final ImFont font = atlas.addFontFromFileTTF(IOUtil.asPath(source).toString(), fontInfo.defaultSize(), config);
                 field.set(null, font);
-            } catch (Throwable thr) {
+            } catch (final Throwable thr) {
                 frame.logger().error("Failed to load font '{0}'", thr, fontInfo.path());
             }
         }

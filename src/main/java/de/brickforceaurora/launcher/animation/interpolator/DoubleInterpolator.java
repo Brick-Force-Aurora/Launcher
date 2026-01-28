@@ -11,7 +11,7 @@ public final class DoubleInterpolator implements IAnimationInterpolator<Double> 
     }
 
     @Override
-    public void manipulate(Double start, Double end, double progress) {
+    public void manipulate(final Double start, final Double end, final double progress) {
         value.set(start.doubleValue() * (1 - progress) + end.doubleValue() * progress);
     }
 

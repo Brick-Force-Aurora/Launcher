@@ -17,7 +17,7 @@ public final class BoolInterpolator implements IAnimationInterpolator<Boolean> {
     }
 
     @Override
-    public void manipulate(Boolean start, Boolean end, double progress) {
+    public void manipulate(final Boolean start, final Boolean end, final double progress) {
         value.set(progress >= threshold ? end : start);
     }
 

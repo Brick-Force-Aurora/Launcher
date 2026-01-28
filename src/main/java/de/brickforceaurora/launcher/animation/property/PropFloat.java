@@ -1,7 +1,7 @@
 package de.brickforceaurora.launcher.animation.property;
 
 public final class PropFloat {
-    
+
     private final float min, max;
 
     private volatile float value;
@@ -10,15 +10,15 @@ public final class PropFloat {
         this(0);
     }
 
-    public PropFloat(float value) {
+    public PropFloat(final float value) {
         this(value, Float.MIN_VALUE, Float.MAX_VALUE);
     }
 
-    public PropFloat(float min, float max) {
+    public PropFloat(final float min, final float max) {
         this(0, min, max);
     }
 
-    public PropFloat(float value, float min, float max) {
+    public PropFloat(final float value, final float min, final float max) {
         this.min = min;
         this.max = max;
         this.value = clamp(value);
@@ -28,14 +28,15 @@ public final class PropFloat {
         return value;
     }
 
-    public void set(float value) {
+    public void set(final float value) {
         this.value = clamp(value);
     }
 
-    public float clamp(float value) {
+    public float clamp(final float value) {
         if (value < min) {
             return min;
-        } else if (value > max) {
+        }
+        if (value > max) {
             return max;
         }
         return value;

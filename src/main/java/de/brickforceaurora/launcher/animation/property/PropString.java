@@ -8,7 +8,7 @@ public final class PropString {
 
     public PropString() {}
 
-    public PropString(String value) {
+    public PropString(final String value) {
         this.value = Objects.requireNonNull(value);
     }
 
@@ -16,7 +16,7 @@ public final class PropString {
         return value;
     }
 
-    public void set(String value) {
+    public void set(final String value) {
         this.value = Objects.requireNonNull(value);
     }
 

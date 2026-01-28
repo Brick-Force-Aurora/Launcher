@@ -23,22 +23,22 @@ public final class GithubUpdater implements IUpdater {
     private static final String GITHUB_TAGS = "https://api.github.com/repos/%s/tags";
 
     @Override
-    public void checkForUpdate(UpdaterConfig config, ISimpleLogger logger, Version current, ObjectList<IUpdate> updates)
-        throws IOException {
-        GithubAuthenticator authenticator = new GithubAuthenticator(config);
-        boolean allowPreReleases = config.experimental();
+    public void checkForUpdate(final UpdaterConfig config, final ISimpleLogger logger, final Version current,
+        final ObjectList<IUpdate> updates) throws IOException {
+        final GithubAuthenticator authenticator = new GithubAuthenticator(config);
+        final boolean allowPreReleases = config.experimental();
 
-        String repository = config.githubRepository();
-        String releaseUrl = GITHUB_RELEASE.formatted(repository, "%s");
-        String tagsUrl = GITHUB_TAGS.formatted(repository);
+        final String repository = config.githubRepository();
+        final String releaseUrl = GITHUB_RELEASE.formatted(repository, "%s");
+        final String tagsUrl = GITHUB_TAGS.formatted(repository);
 
-        HttpRequest request = new HttpRequest().url(tagsUrl).authenticator(authenticator);
-        HttpRequest assetRequest = new HttpRequest().authenticator(authenticator);
+        final HttpRequest request = new HttpRequest().url(tagsUrl).authenticator(authenticator);
+        final HttpRequest assetRequest = new HttpRequest().authenticator(authenticator);
 
         int page = 1;
         loop:
         while (true) {
-            HttpResponse<IJson<?>> response = callGithub(
+            final HttpResponse<IJson<?>> response = callGithub(
                 request.clearParameters().readTimeout(5000).param("per_page", 40).param("page", page++), HttpContentType.JSON);
             if (response == null || response.code() == HttpCode.NOT_FOUND) {
                 break;
@@ -46,43 +46,44 @@ public final class GithubUpdater implements IUpdater {
             if (logger.isDebug()) {
                 logger.debug(IOUtil.asString(response.data().value()));
             }
-            JsonArray array = response.data().value().asJsonArray();
+            final JsonArray array = response.data().value().asJsonArray();
             if (array.isEmpty()) {
                 break;
             }
-            for (IJson<?> arrayValue : array) {
+            for (final IJson<?> arrayValue : array) {
                 if (!arrayValue.isObject()) {
                     continue;
                 }
-                JsonObject object = arrayValue.asJsonObject();
-                String tagName = object.getAsString("name");
+                final JsonObject object = arrayValue.asJsonObject();
+                final String tagName = object.getAsString("name");
                 if (tagName == null) {
                     continue;
                 }
-                Version version = Version.parse(tagName);
+                final Version version = Version.parse(tagName);
                 if (current.compareTo(version) >= 0) {
                     break loop;
                 }
-                HttpResponse<IJson<?>> assetResponse = callGithub(assetRequest.url(releaseUrl.formatted(tagName)), HttpContentType.JSON);
+                final HttpResponse<IJson<?>> assetResponse = callGithub(assetRequest.url(releaseUrl.formatted(tagName)),
+                    HttpContentType.JSON);
                 if (assetResponse == null || assetResponse.code() == HttpCode.NOT_FOUND) {
                     continue;
                 }
-                IJson<?> releaseValue = assetResponse.data().value();
+                final IJson<?> releaseValue = assetResponse.data().value();
                 if (!releaseValue.isObject()) {
                     continue;
                 }
-                JsonObject releaseObject = releaseValue.asJsonObject();
-                if (releaseObject.getAsBoolean("draft") || (!allowPreReleases && releaseObject.getAsBoolean("prerelease"))) {
+                final JsonObject releaseObject = releaseValue.asJsonObject();
+                if (releaseObject.getAsBoolean("draft") || !allowPreReleases && releaseObject.getAsBoolean("prerelease")) {
                     continue;
                 }
-                for (IJson<?> value : releaseObject.getAsArray("assets")) {
+                for (final IJson<?> value : releaseObject.getAsArray("assets")) {
                     if (!value.isObject()) {
                         continue;
                     }
-                    JsonObject assetObject = value.asJsonObject();
-                    String assetName = assetObject.getAsString("name");
+                    final JsonObject assetObject = value.asJsonObject();
+                    final String assetName = assetObject.getAsString("name");
                     if (assetName != null && assetName.endsWith(".zip")) {
-                        String downloadUrl = assetObject.getAsString("browser_download_url");
+                        final String downloadUrl = assetObject.getAsString("browser_download_url");
                         if (downloadUrl == null || downloadUrl.isBlank()) {
                             continue;
                         }
@@ -98,8 +99,8 @@ public final class GithubUpdater implements IUpdater {
         }
     }
 
-    static <T> HttpResponse<T> callGithub(HttpRequest request, HttpContentType<T> responseType) throws IOException {
-        HttpResponse<T> response = request.call(responseType);
+    static <T> HttpResponse<T> callGithub(final HttpRequest request, final HttpContentType<T> responseType) throws IOException {
+        final HttpResponse<T> response = request.call(responseType);
         if (response.code() == HttpCode.UNAUTHORIZED) {
             throw new IOException("Invalid github authentication token");
         }

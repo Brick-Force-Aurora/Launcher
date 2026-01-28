@@ -9,9 +9,9 @@ public final class PropFont {
     public ImFont get() {
         return font;
     }
-    
-    public void set(ImFont font) {
+
+    public void set(final ImFont font) {
         this.font = font;
     }
-    
+
 }

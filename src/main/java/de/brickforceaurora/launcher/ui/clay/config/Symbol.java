@@ -7,21 +7,21 @@ import me.lauriichan.clay4j.RenderCommand;
 import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public record Symbol(SymbolType type, SimpleColor color, float thickness) implements IElementConfig {
-    
-    public Symbol(SymbolType type, SimpleColor color) {
+
+    public Symbol(final SymbolType type, final SimpleColor color) {
         this(type, color, 1f);
     }
 
     public static enum SymbolType {
-        
+
         ARROW,
         CROSS;
-        
+
     }
-    
+
     @Override
-    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(final ElementContext context, final Element element, final IElementConfig elementConfig) {
         context.push(new RenderCommand("symbol", element, context.boundingBox(), this));
     }
-    
+
 }

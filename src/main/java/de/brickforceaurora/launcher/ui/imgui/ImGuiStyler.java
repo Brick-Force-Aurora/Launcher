@@ -9,14 +9,14 @@ public final class ImGuiStyler {
     private ImGuiStyler() {
         throw new UnsupportedOperationException();
     }
-    
+
     public static void apply() {
-        ImGuiStyle style = ImGui.getStyle();
+        final ImGuiStyle style = ImGui.getStyle();
         applyColors(style);
         applySizes(style);
     }
-    
-    private static void applyColors(ImGuiStyle style) {
+
+    private static void applyColors(final ImGuiStyle style) {
         style.setColor(ImGuiCol.Text, 1.00f, 1.00f, 1.00f, 1.00f);
         style.setColor(ImGuiCol.TextDisabled, 0.50f, 0.50f, 0.50f, 1.00f);
         style.setColor(ImGuiCol.WindowBg, 0.00f, 0.00f, 0.00f, 0.00f);
@@ -73,8 +73,8 @@ public final class ImGuiStyler {
         style.setColor(ImGuiCol.NavWindowingDimBg, 0.80f, 0.80f, 0.80f, 0.20f);
         style.setColor(ImGuiCol.ModalWindowDimBg, 0.80f, 0.80f, 0.80f, 0.35f);
     }
-    
-    private static void applySizes(ImGuiStyle style) {
+
+    private static void applySizes(final ImGuiStyle style) {
         style.setFrameRounding(0);
         style.setFramePadding(0, 0);
         style.setWindowPadding(0, 0);
@@ -88,5 +88,5 @@ public final class ImGuiStyler {
         style.setDisplayWindowPadding(0, 0);
         style.setDisplaySafeAreaPadding(0, 0);
     }
-    
+
 }

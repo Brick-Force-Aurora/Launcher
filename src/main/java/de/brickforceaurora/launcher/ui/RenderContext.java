@@ -16,7 +16,7 @@ import me.lauriichan.snowframe.ImGUIModule;
 public final class RenderContext {
 
     @FunctionalInterface
-    public static interface IAction {
+    public interface IAction {
 
         void run(LayoutContext context, Element element, float deltaTime);
 
@@ -27,7 +27,7 @@ public final class RenderContext {
         private final Element element;
         private final ObjectArrayList<IAction> list;
 
-        public Actions(RenderContext ctx, Element element) {
+        public Actions(final RenderContext ctx, final Element element) {
             this.element = element;
             ObjectArrayList<IAction> list = ctx.actions.get(element);
             if (list == null) {
@@ -37,12 +37,12 @@ public final class RenderContext {
             this.list = list;
         }
 
-        public Actions action(IAction action) {
+        public Actions action(final IAction action) {
             list.add(Objects.requireNonNull(action));
             return this;
         }
 
-        public Actions click(Runnable runnable) {
+        public Actions click(final Runnable runnable) {
             if (runnable == null) {
                 return this;
             }
@@ -54,7 +54,7 @@ public final class RenderContext {
             return this;
         }
 
-        public Actions hovered(BooleanConsumer consumer) {
+        public Actions hovered(final BooleanConsumer consumer) {
             if (consumer == null) {
                 return this;
             }
@@ -62,7 +62,7 @@ public final class RenderContext {
             return this;
         }
 
-        public Actions hoveredDown(BooleanConsumer consumer) {
+        public Actions hoveredDown(final BooleanConsumer consumer) {
             if (consumer == null) {
                 return this;
             }
@@ -82,15 +82,15 @@ public final class RenderContext {
 
     private final Object2ObjectArrayMap<Element, ObjectArrayList<IAction>> actions = new Object2ObjectArrayMap<>();
     private final ObjectList<Animation> animations = ObjectLists.synchronize(new ObjectArrayList<>());
-    
+
     public void tickAnimations() {
-        double deltaSecond = ImGUIModule.DELTA_TIME.get() / AbstractUserInterface.SECOND_RATIO;
-        for (Animation animation : animations) {
+        final double deltaSecond = ImGUIModule.DELTA_TIME.get() / AbstractUserInterface.SECOND_RATIO;
+        for (final Animation animation : animations) {
             animation.update(deltaSecond);
         }
     }
 
-    public void update(LayoutContext layout, float deltaTime) {
+    public void update(final LayoutContext layout, final float deltaTime) {
         if (layout.rootAmount() == 0) {
             actions.clear();
             return;
@@ -105,22 +105,22 @@ public final class RenderContext {
         animations.forEach(Animation::trigger);
     }
 
-    public Animation add(Animation animation) {
+    public Animation add(final Animation animation) {
         if (!animations.contains(animation)) {
             animations.add(animation);
         }
         return animation;
     }
 
-    public void remove(Animation animation) {
+    public void remove(final Animation animation) {
         animations.remove(animation);
     }
 
-    public Actions actions(Element element) {
+    public Actions actions(final Element element) {
         return new Actions(this, element);
     }
 
-    public Actions actions(Element.Builder builder) {
+    public Actions actions(final Element.Builder builder) {
         return new Actions(this, builder.build());
     }
 

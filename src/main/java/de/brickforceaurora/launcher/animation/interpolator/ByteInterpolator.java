@@ -11,7 +11,7 @@ public final class ByteInterpolator implements IAnimationInterpolator<Byte> {
     }
 
     @Override
-    public void manipulate(Byte start, Byte end, double progress) {
+    public void manipulate(final Byte start, final Byte end, final double progress) {
         value.set((byte) (start.byteValue() * (1 - progress) + end.byteValue() * progress));
     }
 

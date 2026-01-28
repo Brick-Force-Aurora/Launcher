@@ -11,7 +11,7 @@ public final class ShortInterpolator implements IAnimationInterpolator<Short> {
     }
 
     @Override
-    public void manipulate(Short start, Short end, double progress) {
+    public void manipulate(final Short start, final Short end, final double progress) {
         value.set((short) (start.shortValue() * (1 - progress) + end.shortValue() * progress));
     }
 

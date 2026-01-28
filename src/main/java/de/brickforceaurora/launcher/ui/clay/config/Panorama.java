@@ -9,7 +9,7 @@ import me.lauriichan.clay4j.RenderCommand;
 public record Panorama(ImTextureBundle bundle, int previous, int current, float progress) implements IElementConfig {
 
     @Override
-    public void buildOpenCommands(ElementContext context, Element element, IElementConfig elementConfig) {
+    public void buildOpenCommands(final ElementContext context, final Element element, final IElementConfig elementConfig) {
         context.push(new RenderCommand("panorama", element, context.boundingBox(), this));
     }
 

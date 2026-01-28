@@ -11,7 +11,7 @@ public final class FloatInterpolator implements IAnimationInterpolator<Float> {
     }
 
     @Override
-    public void manipulate(Float start, Float end, double progress) {
+    public void manipulate(final Float start, final Float end, final double progress) {
         value.set((float) (start.floatValue() * (1 - progress) + end.floatValue() * progress));
     }
 

@@ -17,9 +17,10 @@ public class PanoramaRenderer extends ElementRenderer<Panorama> {
     }
 
     @Override
-    public void render(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Panorama data) {
-        float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
-        float aspect = boundingBox.width() / boundingBox.height();
+    public void render(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Panorama data) {
+        final float x = offset.x + boundingBox.x(), y = offset.y + boundingBox.y();
+        final float aspect = boundingBox.width() / boundingBox.height();
         RenderUtil.renderImage(drawList, x, y, boundingBox.width(), boundingBox.height(), aspect,
             data.bundle().textures.get(data.previous()), SimpleColor.sRGB(1f, 1f, 1f, 1f - data.progress()));
         if (data.previous() != data.current()) {

@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.objects.ObjectLists;
 
 public class Metrics {
 
-    private static record Entry(long timestamp, int value) {};
+    private static record Entry(long timestamp, int value) {}
 
     private final ObjectList<Entry> list = ObjectLists.synchronize(new ObjectArrayList<>());
     private final long maxLength;
@@ -19,12 +19,12 @@ public class Metrics {
         this(1, TimeUnit.MINUTES);
     }
 
-    public Metrics(long maxLength, TimeUnit unit) {
+    public Metrics(final long maxLength, final TimeUnit unit) {
         this.maxLength = unit.toNanos(maxLength);
     }
 
-    public void push(int value) {
-        long timestamp = System.nanoTime();
+    public void push(final int value) {
+        final long timestamp = System.nanoTime();
         list.add(new Entry(timestamp, value));
         if (oldestTimestamp == -1) {
             oldestTimestamp = timestamp;
@@ -45,12 +45,12 @@ public class Metrics {
         }
     }
 
-    public float averageFor(long length, TimeUnit unit) {
+    public float averageFor(long length, final TimeUnit unit) {
         length = unit.toNanos(length);
-        long timestamp = System.nanoTime();
+        final long timestamp = System.nanoTime();
         long value = 0;
         int count = 0;
-        for (Entry entry : list) {
+        for (final Entry entry : list) {
             if (timestamp - entry.timestamp() <= length) {
                 value += entry.value();
                 count++;

@@ -17,30 +17,31 @@ import me.lauriichan.snowframe.resource.source.PathDataSource;
 public final class IOUtil {
 
     private static final JsonWriter TECHNICAL_JSON = new JsonWriter().setPretty(false);
-    
+
     private IOUtil() {
         throw new UnsupportedOperationException();
     }
-    
-    public static String asString(IJson<?> json) {
+
+    public static String asString(final IJson<?> json) {
         try {
             return TECHNICAL_JSON.toString(json);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return "";
         }
     }
 
-    public static Path asPath(IDataSource source) {
+    public static Path asPath(final IDataSource source) {
         Objects.requireNonNull(source, "IDataSource can't be null");
-        if (source instanceof FileDataSource fileSource) {
+        if (source instanceof final FileDataSource fileSource) {
             return fileSource.getSource().toPath();
-        } else if (source instanceof PathDataSource pathSource) {
+        }
+        if (source instanceof final PathDataSource pathSource) {
             return pathSource.getSource();
         }
         throw new IllegalArgumentException("Can't convert IDataSource of type '%s' to Path".formatted(source.getClass().getSimpleName()));
     }
 
-    public static void delete(Path path) throws IOException {
+    public static void delete(final Path path) throws IOException {
         if (!Files.exists(path)) {
             return;
         }
@@ -48,21 +49,21 @@ public final class IOUtil {
             Files.delete(path);
             return;
         }
-        Iterator<Path> iter = list(path);
+        final Iterator<Path> iter = list(path);
         while (iter.hasNext()) {
             delete(iter.next());
         }
         Files.delete(path);
     }
 
-    public static Iterator<Path> list(Path path) throws IOException {
+    public static Iterator<Path> list(final Path path) throws IOException {
         final Iterator<Path> delegate = Files.newDirectoryStream(path).iterator();
         return new Iterator<>() {
             @Override
             public boolean hasNext() {
                 try {
                     return delegate.hasNext();
-                } catch (DirectoryIteratorException e) {
+                } catch (final DirectoryIteratorException e) {
                     throw new UncheckedIOException(e.getCause());
                 }
             }
@@ -71,7 +72,7 @@ public final class IOUtil {
             public Path next() {
                 try {
                     return delegate.next();
-                } catch (DirectoryIteratorException e) {
+                } catch (final DirectoryIteratorException e) {
                     throw new UncheckedIOException(e.getCause());
                 }
             }

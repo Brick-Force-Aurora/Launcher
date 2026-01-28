@@ -21,15 +21,15 @@ public abstract class AbstractUserInterface {
 
     protected final ImGUIModule guiModule;
 
-    public AbstractUserInterface(LauncherApp app) {
+    public AbstractUserInterface(final LauncherApp app) {
         this.renderManager = app.renderManager();
         this.guiModule = app.snowFrame().module(ImGUIModule.class);
     }
 
     public void render() {
-        float deltaTime = ImGUIModule.DELTA_TIME.get() / ((float) SECOND_RATIO);
+        final float deltaTime = ImGUIModule.DELTA_TIME.get() / (float) SECOND_RATIO;
 
-        ImGuiViewport viewport = ImGui.getMainViewport();
+        final ImGuiViewport viewport = ImGui.getMainViewport();
 
         ImGui.getMousePos(cursorPos);
         viewport.getWorkPos(windowPos);

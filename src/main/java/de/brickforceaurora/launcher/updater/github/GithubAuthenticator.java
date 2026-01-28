@@ -14,7 +14,7 @@ final class GithubAuthenticator implements IHttpAuthenticator {
     }
 
     @Override
-    public void authenticate(HttpURLConnection connection) {
+    public void authenticate(final HttpURLConnection connection) {
         if (config.githubAuthToken() == null || config.githubAuthToken().isBlank()) {
             return;
         }

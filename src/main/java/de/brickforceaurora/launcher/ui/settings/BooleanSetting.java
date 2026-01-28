@@ -19,7 +19,7 @@ public class BooleanSetting extends Setting {
 
     private boolean value = false;
 
-    public BooleanSetting(BooleanSupplier getter, BooleanConsumer setter) {
+    public BooleanSetting(final BooleanSupplier getter, final BooleanConsumer setter) {
         super(1);
         this.getter = getter;
         this.setter = setter;
@@ -37,17 +37,15 @@ public class BooleanSetting extends Setting {
     }
 
     @Override
-    protected void create(RenderContext context, Element parent) {
+    protected void create(final RenderContext context, final Element parent) {
         Element.Builder builder = parent.newElement();
-        builder.layout().width(ISizing.percentage(1f)).height(ISizing.percentage(1f))
-            .addConfigs(UserInterface.ONE_TO_ONE)
+        builder.layout().width(ISizing.percentage(1f)).height(ISizing.percentage(1f)).addConfigs(UserInterface.ONE_TO_ONE)
             .addConfigs(Rectangle.hollow(Constant.TEXT_COLOR, 5f));
         try (Element element = builder.build()) {
             context.actions(element).click(() -> this.value = !this.value);
             if (value) {
                 builder = element.newElement();
-                builder.layout().width(ISizing.percentage(1f)).height(ISizing.percentage(1f))
-                    .addConfigs(UserInterface.ONE_TO_ONE)
+                builder.layout().width(ISizing.percentage(1f)).height(ISizing.percentage(1f)).addConfigs(UserInterface.ONE_TO_ONE)
                     .addConfigs(new Symbol(SymbolType.CROSS, Constant.TEXT_COLOR, 1f));
                 builder.build().close();
             }

@@ -16,7 +16,8 @@ public class ClippingEndRenderer extends ElementRenderer<Object> {
     }
 
     @Override
-    public void render(ImDrawList drawList, ImVec2 offset, Element element, BoundingBox boundingBox, Object data) {
+    public void render(final ImDrawList drawList, final ImVec2 offset, final Element element, final BoundingBox boundingBox,
+        final Object data) {
         drawList.popClipRect();
     }
 

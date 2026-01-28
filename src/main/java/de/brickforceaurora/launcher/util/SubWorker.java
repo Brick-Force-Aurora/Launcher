@@ -11,7 +11,7 @@ public class SubWorker {
     private final int totalSubWork;
     private volatile int subWork;
 
-    public SubWorker(Task task, int totalWork, int totalSubWork) {
+    public SubWorker(final Task task, final int totalWork, final int totalSubWork) {
         this.task = task;
         this.totalWork = totalWork;
         this.totalSubWork = totalSubWork;
@@ -25,7 +25,7 @@ public class SubWorker {
             }
         }
         subWork += work;
-        currentWork = (int) ((subWork / (float) totalSubWork) * totalWork);
+        currentWork = (int) (subWork / (float) totalSubWork * totalWork);
         if (currentWork != allocatedWork) {
             task.work(currentWork - allocatedWork);
             allocatedWork = currentWork;

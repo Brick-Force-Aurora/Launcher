@@ -8,6 +8,7 @@ import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.Main;
+import de.brickforceaurora.launcher.TextureAtlas;
 import de.brickforceaurora.launcher.animation.Animation;
 import de.brickforceaurora.launcher.animation.animator.IAnimationAnimator;
 import de.brickforceaurora.launcher.animation.function.IAnimationFunction;
@@ -29,10 +30,6 @@ import de.brickforceaurora.launcher.ui.clay.config.Symbol.SymbolType;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
 import de.brickforceaurora.launcher.ui.settings.SettingsInterface;
-import de.brickforceaurora.launcher.TextureAtlas;
-import me.lauriichan.clay4j.LayoutContext;
-import me.lauriichan.snowframe.ImGUIModule;
-import me.lauriichan.snowframe.util.color.SimpleColor;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig.AspectRatio;
 import me.lauriichan.clay4j.IElementConfig.Text;
@@ -42,6 +39,9 @@ import me.lauriichan.clay4j.Layout.HAlignment;
 import me.lauriichan.clay4j.Layout.LayoutDirection;
 import me.lauriichan.clay4j.Layout.Padding;
 import me.lauriichan.clay4j.Layout.VAlignment;
+import me.lauriichan.clay4j.LayoutContext;
+import me.lauriichan.snowframe.ImGUIModule;
+import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public class UserInterface extends AbstractUserInterface {
 
@@ -74,11 +74,12 @@ public class UserInterface extends AbstractUserInterface {
     public final PropBool newVersionAvailable = new PropBool(false);
     public final PropString newVersionText = new PropString("");
     public final PropFloat mainProgress = new PropFloat(0f);
-    public final PropString mainText = new PropString("Checking for updates...");
+    public final PropString mainText = new PropString("");
 
     private final Button startButton = Button.builder().padding(Padding.builder().top(4).right(4).left(28).bottom(8).build())
         .action(UIActionHelper::startGame).build();
-    private final Button updateButton = Button.builder().width(ISizing.percentage(0.185f)).padding(NO_PADDING).action(() -> LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(false, true))).build();
+    private final Button updateButton = Button.builder().width(ISizing.percentage(0.185f)).padding(NO_PADDING)
+        .action(() -> LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(false, true))).build();
     private final Button settingsButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(showSettings::toggle).build();
     private final Button quitButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(Main::shutdown).build();
 
@@ -87,7 +88,7 @@ public class UserInterface extends AbstractUserInterface {
     private volatile float dragX, dragY;
     private volatile boolean dragging = false;
 
-    public UserInterface(LauncherApp app) {
+    public UserInterface(final LauncherApp app) {
         super(app);
         this.guiModule = app.snowFrame().module(ImGUIModule.class);
         renderContext.add(Animation.builder().trigger(new DelegateTrigger(switchPanorama)).repeating(true)
@@ -97,7 +98,7 @@ public class UserInterface extends AbstractUserInterface {
                 if (regressing) {
                     return;
                 }
-                int current = currentPanoramaTexture;
+                final int current = currentPanoramaTexture;
                 if (current + 1 == TextureAtlas.PANORAMA.textures.size()) {
                     currentPanoramaTexture = 0;
                 } else {
@@ -128,7 +129,7 @@ public class UserInterface extends AbstractUserInterface {
     }
 
     @Override
-    protected void updateState(LayoutContext layout, float deltaTime) {
+    protected void updateState(final LayoutContext layout, final float deltaTime) {
         renderContext.tickAnimations();
         if (showSettings.get()) {
             settingsInterface.updateState(layout, deltaTime);
@@ -137,7 +138,7 @@ public class UserInterface extends AbstractUserInterface {
     }
 
     @Override
-    protected void createLayout(LayoutContext layout, float deltaTime) {
+    protected void createLayout(final LayoutContext layout, final float deltaTime) {
         Element.Builder builder = layout.newRoot();
         builder.layout().childGap(4).layoutDirection(LayoutDirection.TOP_TO_BOTTOM).padding(NO_PADDING).width(ISizing.fixed(layout.width()))
             .height(ISizing.fixed(layout.height())).childGap(0);
@@ -157,14 +158,14 @@ public class UserInterface extends AbstractUserInterface {
                         return;
                     }
                     dragging = true;
-                    double[] cursorX = new double[1], cursorY = new double[1];
+                    final double[] cursorX = new double[1], cursorY = new double[1];
                     GLFW.glfwGetCursorPos(guiModule.windowPointer(), cursorX, cursorY);
                     if (ctx.pointerState().hasJustHappened()) {
                         dragX = (float) cursorX[0];
                         dragY = (float) cursorY[0];
                         return;
                     }
-                    int[] x = new int[1], y = new int[1];
+                    final int[] x = new int[1], y = new int[1];
                     GLFW.glfwGetWindowPos(guiModule.windowPointer(), x, y);
                     GLFW.glfwSetWindowPos(guiModule.windowPointer(), x[0] - (int) (dragX - cursorX[0]), y[0] - (int) (dragY - cursorY[0]));
                 });
@@ -226,16 +227,17 @@ public class UserInterface extends AbstractUserInterface {
                 if (newVersionAvailable.get() && !showSettings.get()) {
                     builder = panorama.newElement();
                     builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).childGap(8)
-                        .padding(Padding.builder().left(8).right(8).top(4).bottom(4).build())
-                        .childHorizontalAlignment(HAlignment.LEFT).childVerticalAlignment(VAlignment.CENTER)
+                        .padding(Padding.builder().left(8).right(8).top(4).bottom(4).build()).childHorizontalAlignment(HAlignment.LEFT)
+                        .childVerticalAlignment(VAlignment.CENTER)
                         .addConfigs(Rectangle.bg(Constant.WINDOW_BACKGROUND_COLOR.duplicate().alpha(0.6f), 0f));
                     try (Element updateInfo = builder.build()) {
                         builder = updateInfo.newElement();
-                        builder.layout().width(ISizing.percentage(0.815f)).height(ISizing.fixed(28f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                        builder.layout().width(ISizing.percentage(0.815f)).height(ISizing.fixed(28f))
+                            .layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
                             .addConfigs(Text.builder().text(newVersionText.get()).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD))
                                 .alignment(HAlignment.LEFT).wrapMode(WrapMode.WRAP_NONE).fontSize(18).lineHeight(24).build());
                         builder.build().close();
-                        
+
                         try (Element updateBtn = updateButton.build(renderContext, updateInfo)) {
                             builder = updateBtn.newElement();
                             builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)

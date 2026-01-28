@@ -10,21 +10,21 @@ public final class PropByte {
         this((byte) 0);
     }
 
-    public PropByte(byte value) {
+    public PropByte(final byte value) {
         this(value, Byte.MIN_VALUE, Byte.MAX_VALUE);
     }
 
-    public PropByte(byte min, byte max) {
+    public PropByte(final byte min, final byte max) {
         this((byte) 0, min, max);
     }
 
-    public PropByte(byte value, byte min, byte max) {
+    public PropByte(final byte value, final byte min, final byte max) {
         this.min = min;
         this.max = max;
         this.value = clamp(value);
     }
 
-    public void flag(byte flag, boolean state) {
+    public void flag(final byte flag, final boolean state) {
         if (state) {
             value |= flag;
             return;
@@ -32,7 +32,7 @@ public final class PropByte {
         value &= ~flag;
     }
 
-    public boolean flag(byte flag) {
+    public boolean flag(final byte flag) {
         return (value & flag) == flag;
     }
 
@@ -40,14 +40,15 @@ public final class PropByte {
         return value;
     }
 
-    public void set(byte value) {
+    public void set(final byte value) {
         this.value = clamp(value);
     }
 
-    public byte clamp(byte value) {
+    public byte clamp(final byte value) {
         if (value < min) {
             return min;
-        } else if (value > max) {
+        }
+        if (value > max) {
             return max;
         }
         return value;
