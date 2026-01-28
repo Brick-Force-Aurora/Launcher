@@ -22,15 +22,10 @@
     <summary><h3 style="display: inline-block">Table of Contents</h3></summary>
     <ol>
         <li><a href="#what-is-the-birckforce-aurora-launcher-">What is the BrickForce Aurora Launcher?</a></li>
-        <li>
-            <a href="#getting-started">Getting Started</a>
-            <ul>
-                <li><a href="#installation">Installation</a></li>
-                <li><a href="#features">Features</a></li>
-            </ul>
-        </li>
-        <li><a href="#contributing">Contributing</a></li>
-        <li><a href="#license">License</a></li>
+        <li><a href="#installation-">Installation</a></li>
+        <li><a href="#features-">Features</a></li>
+        <li><a href="#contributing-">Contributing</a></li>
+        <li><a href="#license-">License</a></li>
     </ol>
 </details>
 
