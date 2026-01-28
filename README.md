@@ -87,5 +87,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [issues-url]: https://github.com/Brick-Force-Aurora/Launcher/issues
 [discord-shield]: https://img.shields.io/discord/777075012032004107?style=flat-square&logo=discord&logoColor=%235865f2&label=Discord&labelColor=%231D1F22&color=%23404eed
 [discord-url]: https://discord.com/invite/npqB9f6xXZ
-
-![Discord]()
