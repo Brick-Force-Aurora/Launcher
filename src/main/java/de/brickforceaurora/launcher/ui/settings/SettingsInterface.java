@@ -2,6 +2,8 @@ package de.brickforceaurora.launcher.ui.settings;
 
 import static de.brickforceaurora.launcher.ui.UserInterface.NO_PADDING;
 
+import java.awt.Desktop;
+import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
 import de.brickforceaurora.launcher.Constant;
@@ -39,7 +41,7 @@ public final class SettingsInterface {
     private final ConfigManager configManager;
     private final UpdaterConfig updaterConfig;
 
-    private final Button saveButton;
+    private final Button saveButton, openFolderButton;
 
     public SettingsInterface(final RenderContext renderContext) {
         this.renderContext = renderContext;
@@ -53,6 +55,11 @@ public final class SettingsInterface {
                 }
             }
             configManager.save();
+        }).width(ISizing.grow()).build().setup(renderContext);
+        this.openFolderButton = Button.builder().action(() -> {
+            try {
+                Desktop.getDesktop().open(LauncherApp.get().appDirectory().toFile());
+            } catch (IOException _) {}
         }).width(ISizing.grow()).build().setup(renderContext);
     }
 
@@ -132,6 +139,14 @@ public final class SettingsInterface {
                 builder = root.newElement();
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING);
                 try (Element buttonRow = builder.build()) {
+                    try (Element folderBtn = openFolderButton.build(renderContext, buttonRow)) {
+                        builder = folderBtn.newElement();
+                        builder
+                            .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("OPEN FOLDER")
+                                .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(20).build())
+                            .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                        builder.build().close();
+                    }
                     try (Element saveBtn = saveButton.build(renderContext, buttonRow)) {
                         builder = saveBtn.newElement();
                         builder
