@@ -21,6 +21,8 @@ public final class GithubUpdater implements IUpdater {
 
     private static final String GITHUB_RELEASE = "https://api.github.com/repos/%s/releases/tags/%s";
     private static final String GITHUB_TAGS = "https://api.github.com/repos/%s/tags";
+    
+    private static final int ITEMS_PER_PAGE_COUNT = 40;
 
     @Override
     public void checkForUpdate(final UpdaterConfig config, final ISimpleLogger logger, final Version current,
@@ -39,7 +41,7 @@ public final class GithubUpdater implements IUpdater {
         loop:
         while (true) {
             final HttpResponse<IJson<?>> response = callGithub(
-                request.clearParameters().readTimeout(5000).param("per_page", 40).param("page", page++), HttpContentType.JSON);
+                request.clearParameters().readTimeout(5000).param("per_page", ITEMS_PER_PAGE_COUNT).param("page", page++), HttpContentType.JSON);
             if (response == null || response.code() == HttpCode.NOT_FOUND) {
                 break;
             }
@@ -61,6 +63,9 @@ public final class GithubUpdater implements IUpdater {
                 }
                 final Version version = Version.parse(tagName);
                 if (current.compareTo(version) >= 0) {
+                    if (isSamePatchline(current, version)) {
+                        continue;
+                    }
                     break loop;
                 }
                 final HttpResponse<IJson<?>> assetResponse = callGithub(assetRequest.url(releaseUrl.formatted(tagName)),
@@ -93,10 +98,14 @@ public final class GithubUpdater implements IUpdater {
                 }
             }
             // We can stop early if the array has less than 40 entries
-            if (array.size() < 40) {
+            if (array.size() < ITEMS_PER_PAGE_COUNT) {
                 break;
             }
         }
+    }
+
+    private static boolean isSamePatchline(Version a, Version b) {
+        return a.major == b.major && a.minor == b.minor && a.patch == b.patch;
     }
 
     static <T> HttpResponse<T> callGithub(final HttpRequest request, final HttpContentType<T> responseType) throws IOException {

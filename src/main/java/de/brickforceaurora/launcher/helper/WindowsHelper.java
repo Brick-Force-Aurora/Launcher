@@ -1,5 +1,6 @@
 package de.brickforceaurora.launcher.helper;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import de.brickforceaurora.launcher.LauncherApp;
@@ -25,7 +26,9 @@ public final class WindowsHelper {
                 "/c",
                 checkAuthorizationCommand
             });
-            process.waitFor();
+            if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                process.destroy();
+            }
             final String result = process.inputReader().lines().collect(Collectors.joining("\n"));
             final String error = process.errorReader().lines().collect(Collectors.joining("\n"));
             if (!error.isBlank()) {
@@ -83,7 +86,9 @@ public final class WindowsHelper {
                 "-Command",
                 "Start-Process -FilePath $Env:ComSpec -Verb runAs -Wait -PassThru -ArgumentList '/c','\"%s\"'".formatted(authorizeCommand)
             });
-            process.waitFor();
+            if (!process.waitFor(3, TimeUnit.SECONDS)) {
+                process.destroy();
+            }
             final String result = process.inputReader().lines().collect(Collectors.joining("\n"));
             final String error = process.errorReader().lines().collect(Collectors.joining("\n"));
             return new ProgramResult(true, result, error);
@@ -100,7 +105,9 @@ public final class WindowsHelper {
                 "/c",
                 "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfVoice_h2155129175 /t REG_DWORD /d 00000001 /f"
             });
-            process.waitFor();
+            if (!process.waitFor(3, TimeUnit.SECONDS)) {
+                process.destroy();
+            }
             final String result = process.inputReader().lines().collect(Collectors.joining());
             final String error = process.errorReader().lines().collect(Collectors.joining());
             return new ProgramResult(true, result, error);
