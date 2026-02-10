@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher.ui.clay;
 
 import java.util.concurrent.TimeUnit;
 
+import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
@@ -17,7 +18,7 @@ public abstract class AbstractUserInterface {
     private final LayoutContext layout = new LayoutContext();
     private final RenderManager renderManager;
 
-    private final ImVec2 cursorPos = new ImVec2(), windowPos = new ImVec2(), windowSize = new ImVec2();
+    protected final ImVec2 cursorPos = new ImVec2(), windowPos = new ImVec2(), windowSize = new ImVec2();
 
     protected final ImGUIModule guiModule;
 
@@ -35,29 +36,41 @@ public abstract class AbstractUserInterface {
         viewport.getWorkPos(windowPos);
         viewport.getWorkSize(windowSize);
 
-        ImGui.setNextWindowPos(0, 0);
-        ImGui.setNextWindowBgAlpha(0f);
-        ImGui.setNextWindowSize(windowSize);
-        ImGui.begin("Launcher", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoSavedSettings);
+        ImGui.pushFont(FontAtlas.CONSOLE_FONT);
         try {
-            updateState(layout, deltaTime);
+            ImGui.setNextWindowPos(windowPos);
+            ImGui.setNextWindowBgAlpha(0f);
+            ImGui.setNextWindowSize(windowSize);
+            ImGui.setNextWindowContentSize(windowSize);
+            ImGui.setNextWindowViewport(viewport.getID());
+            ImGui.begin("Launcher", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoSavedSettings);
+            try {
+                updateState(layout, deltaTime);
 
-            layout.setDimensions(windowSize.x, windowSize.y);
+                layout.setDimensions(windowSize.x, windowSize.y);
 
-            layout.reset();
-            createLayout(layout, deltaTime);
-            layout.calculateLayout();
-            layout.setPointer(cursorPos.x, cursorPos.y, ImGui.isMouseDown(0));
-            layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
+                layout.reset();
+                createLayout(layout, deltaTime);
+                layout.calculateLayout();
+                layout.setPointer(cursorPos.x - windowPos.x, cursorPos.y - windowPos.y, ImGui.isMouseDown(0));
+                layout.updateScrollContainers(false, guiModule.scrollDeltaX(), guiModule.scrollDeltaY(), deltaTime);
 
-            renderManager.render(layout, windowPos, ImGui.getWindowDrawList());
+                renderManager.render(layout, windowPos, ImGui.getWindowDrawList());
+            } finally {
+                ImGui.end();
+            }
+            
+            additionalRender(deltaTime);
         } finally {
-            ImGui.end();
+            ImGui.popFont();
         }
+        
     }
 
     protected abstract void updateState(LayoutContext layout, float deltaTime);
 
     protected abstract void createLayout(LayoutContext layout, float deltaTime);
+    
+    protected void additionalRender(float deltaTime) {}
 
 }

@@ -7,16 +7,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import de.brickforceaurora.launcher.command.HelpCommand;
+import de.brickforceaurora.launcher.command.api.ConsoleActor;
+import de.brickforceaurora.launcher.command.api.ICommand;
 import de.brickforceaurora.launcher.data.DataStore;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.ui.clay.RenderManager;
+import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole.LogHistory;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
+import de.brickforceaurora.launcher.util.ConsoleDelegateLogger;
 import de.brickforceaurora.launcher.util.IOUtil;
 import imgui.ImGui;
+import imgui.flag.ImGuiConfigFlags;
+import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.snowframe.ConfigModule;
 import me.lauriichan.snowframe.ISnowFrameApp;
@@ -33,7 +40,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1,
         Thread.ofPlatform().daemon(true).name("Scheduler").factory());
 
+    public static final LogHistory LOG_HISTORY = new LogHistory();
+
     private static SnowFrame<LauncherApp> snowFrame;
+    private static ConsoleActor actor;
 
     static SnowFrame<LauncherApp> init(final String[] args) {
         if (snowFrame != null) {
@@ -41,14 +51,20 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }
 
         // TODO: Do actual command line parsing
-        final ISimpleLogger logger = new FileLogger(new File("../logs"));
+        final ISimpleLogger logger = new FileLogger(new File("../logs"), new ConsoleDelegateLogger(LOG_HISTORY));
         logger.setDebug(Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase));
 
-        return snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
+        snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
+        actor = new ConsoleActor(snowFrame);
+        return snowFrame;
     }
 
     public static LauncherApp get() {
         return snowFrame.app();
+    }
+
+    public static ConsoleActor actor() {
+        return actor;
     }
 
     public static ISimpleLogger logger() {
@@ -57,6 +73,8 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     private Path appDirectory, gameDirectory, tempDirectory;
     private DataStore launcherData, gameData;
+
+    private CommandManager commandManager;
 
     private UpdateManager updateManager;
     private RenderManager renderManager;
@@ -92,6 +110,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             gameData = new DataStore(frame.resource("game://launcher_data.dat"));
             GameData.init();
 
+            commandManager = new CommandManager();
+            frame.extension(ICommand.class, false).callClasses(commandManager::register);
+            HelpCommand.doHelp(actor, commandManager);
+
             updateManager = new UpdateManager(frame.logger(), new GithubUpdater());
 
             renderManager = new RenderManager(frame);
@@ -106,7 +128,9 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
                 logger.close();
             }
         });
-        lifecycle.chainOrThrow(ImGUIModule.STARTUP_CHAIN).register("setup", Stage.POST, frame -> {
+        lifecycle.chainOrThrow(ImGUIModule.STARTUP_CHAIN).register("setup", Stage.POST, _ -> {
+            ImGui.getIO().addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+        }).register("init", Stage.POST, frame -> {
             frame.module(ImGUIModule.class)
                 .setWindowIcon(frame.externalResource("jar://image/logo.png", "data://resources/image/logo.png"));
             FontAtlas.load(frame);
@@ -157,6 +181,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     public SignalManager signalManager() {
         return signalManager;
+    }
+
+    public CommandManager commandManager() {
+        return commandManager;
     }
 
     public UpdateManager updateManager() {

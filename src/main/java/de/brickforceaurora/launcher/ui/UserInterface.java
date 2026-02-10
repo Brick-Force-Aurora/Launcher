@@ -17,6 +17,7 @@ import de.brickforceaurora.launcher.animation.property.PropBool;
 import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.property.PropString;
 import de.brickforceaurora.launcher.animation.trigger.DelegateTrigger;
+import de.brickforceaurora.launcher.command.api.CommandHandler;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.clay.AbstractUserInterface;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
@@ -29,7 +30,11 @@ import de.brickforceaurora.launcher.ui.clay.config.Symbol;
 import de.brickforceaurora.launcher.ui.clay.config.Symbol.SymbolType;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
+import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole;
 import de.brickforceaurora.launcher.ui.settings.SettingsInterface;
+import imgui.ImGui;
+import imgui.flag.ImGuiKey;
+import imgui.flag.ImGuiWindowFlags;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig.AspectRatio;
 import me.lauriichan.clay4j.IElementConfig.Text;
@@ -65,6 +70,7 @@ public class UserInterface extends AbstractUserInterface {
     private final PropBool exitHovered = new PropBool(false);
 
     private final PropBool showSettings = new PropBool(false);
+    private final PropBool showConsole = new PropBool(false);
 
     private final PropBool transitionActive = new PropBool(false);
     private final PropFloat panoramaProgress = new PropFloat(0f);
@@ -84,6 +90,7 @@ public class UserInterface extends AbstractUserInterface {
     private final Button quitButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(Main::shutdown).build();
 
     private final SettingsInterface settingsInterface = new SettingsInterface(renderContext);
+    private final ImGuiConsole console = new ImGuiConsole();
 
     private volatile float dragX, dragY;
     private volatile boolean dragging = false;
@@ -126,6 +133,10 @@ public class UserInterface extends AbstractUserInterface {
         updateButton.setup(renderContext);
         settingsButton.setup(renderContext);
         quitButton.setup(renderContext);
+
+        console.font(FontAtlas.CONSOLE_FONT);
+        console.logHistory(LauncherApp.LOG_HISTORY);
+        console.commandHandler(CommandHandler.HANDLER);
     }
 
     @Override
@@ -135,6 +146,10 @@ public class UserInterface extends AbstractUserInterface {
             settingsInterface.updateState(layout, deltaTime);
         }
         renderContext.update(layout, deltaTime);
+
+        if (ImGui.isKeyPressed(ImGuiKey.F1, false)) {
+            showConsole.set(!showConsole.get());
+        }
     }
 
     @Override
@@ -186,8 +201,14 @@ public class UserInterface extends AbstractUserInterface {
                 }
                 builder = titleBar.newElement();
                 builder.layout().width(ISizing.percentage(0.2f)).height(ISizing.percentage(1f)).padding(NO_PADDING)
-                    .childVerticalAlignment(VAlignment.CENTER).childHorizontalAlignment(HAlignment.RIGHT);
+                    .childVerticalAlignment(VAlignment.CENTER).childHorizontalAlignment(HAlignment.RIGHT).childGap(8);
                 try (Element rightBar = builder.elementId("titleBar_right").build()) {
+                    builder = rightBar.newElement();
+                    builder.layout().height(ISizing.percentage(0.6f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                        .addConfigs(Text.builder().text("v" + Main.version().toString()).fontSize(16).wrapMode(WrapMode.WRAP_NONE)
+                            .font(FontWrapper.of(FontAtlas.NOTO_SANS_NORMAL)).build());
+                    builder.build().close();
+
                     builder = rightBar.newElement();
                     builder.layout().height(ISizing.percentage(0.5f)).addConfigs(ONE_TO_ONE)
                         .addConfigs(new Symbol(SymbolType.CROSS, exitColor, 2f));
@@ -340,6 +361,16 @@ public class UserInterface extends AbstractUserInterface {
 
         if (showSettings.get()) {
             settingsInterface.createLayout(layout, deltaTime);
+        }
+    }
+
+    @Override
+    protected void additionalRender(float deltaTime) {
+        if (showConsole.get()) {
+            ImGui.setNextWindowSize(windowSize.x, windowSize.y);
+            ImGui.begin("Launcher Console", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoResize);
+            console.render();
+            ImGui.end();
         }
     }
 

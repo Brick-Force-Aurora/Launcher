@@ -50,7 +50,12 @@ public class Metrics {
         final long timestamp = System.nanoTime();
         long value = 0;
         int count = 0;
-        for (final Entry entry : list) {
+        Entry entry;
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (i >= list.size()) {
+                continue;
+            }
+            entry = list.get(i);
             if (timestamp - entry.timestamp() <= length) {
                 value += entry.value();
                 count++;

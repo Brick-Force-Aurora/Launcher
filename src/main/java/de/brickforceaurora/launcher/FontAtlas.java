@@ -67,5 +67,9 @@ public final class FontAtlas {
     public static ImFont NOTO_SANS_BOLD;
     @Font(path = "NotoSans/NotoSans-ExtraBold.ttf")
     public static ImFont NOTO_SANS_EXTRA_BOLD;
+    
+    
+    @Font(path = "Consolas/consola.ttf", defaultSize = 16f)
+    public static ImFont CONSOLE_FONT;
 
 }

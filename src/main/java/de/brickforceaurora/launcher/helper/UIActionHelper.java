@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.Main;
-import de.brickforceaurora.launcher.helper.WindowsHelper.ProgramResult;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.UpdaterConfig;
@@ -35,16 +34,8 @@ public final class UIActionHelper {
         final String gamePath = app.gameDirectory().resolve("BrickForce.exe").toString();
         final ISimpleLogger logger = app.snowFrame().logger();
         logger.info("Launching game '{0}'", gamePath);
-        ProgramResult result;
         if (!WindowsHelper.isAuthorized("BrickForce", gamePath)) {
-            result = WindowsHelper.authorizeProgram("BrickForce", gamePath);
-            if (!result.success() || result.success() && logger.isDebug()) {
-                logger.debug("Firewall Result: \n{0}\nFirewall Error: \n{1}", result.result(), result.error());
-            }
-        }
-        result = WindowsHelper.applyRegistryLanguageFix();
-        if (!result.success() || result.success() && logger.isDebug()) {
-            logger.debug("Registry Result: \n{0}\nRegistry Error: \n{1}", result.result(), result.error());
+            WindowsHelper.authorizeProgram("BrickForce", gamePath);
         }
 
         try {

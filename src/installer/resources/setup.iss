@@ -57,7 +57,9 @@ Source: "..\..\..\jdk\{#JDK}"; DestDir: "{app}"; Flags: ignoreversion dontcopy
 ; Flags: ignoreversion dontcopy; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
+Name: "{app}\{#MyAppName} (Debug)"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}"" --debug";
 Name: "{app}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}""";
+Name: "{group}\{#MyAppName} (Debug)"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}"" --debug";
 Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}""";
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Parameters: "--java-home=""{#JDK_PATH}"""; Tasks: desktopicon
 
