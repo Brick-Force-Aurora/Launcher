@@ -84,7 +84,40 @@ public final class WindowsHelper {
         ProcessUtil.run(new String[] {
             "cmd.exe",
             "/c",
-            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfVoice_h2155129175 /t REG_DWORD /d 00000001 /f"
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfVoice_h2155129175 /t REG_DWORD /d 1 /f"
+        });
+    }
+
+    public static void applyWindowedFix() {
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfFullScreen_h3939460542  /t REG_DWORD /d 0 /f"
+        });
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfScreenHeight_h1769511314  /t REG_DWORD /d 720 /f"
+        });
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v BfScreenWidth_h596610443  /t REG_DWORD /d 1280 /f"
+        });
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v \"Screenmanager Is Fullscreen mode_h3981298716\" /t REG_DWORD /d 0 /f"
+        });
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v \"Screenmanager Resolution Height_h2627697771\" /t REG_DWORD /d 720 /f"
+        });
+        ProcessUtil.run(new String[] {
+            "cmd.exe",
+            "/c",
+            "reg add \"HKEY_CURRENT_USER\\SOFTWARE\\EXE Games\\BrickForce\" /v \"Screenmanager Resolution Width_h182942802\" /t REG_DWORD /d 1280 /f"
         });
     }
 

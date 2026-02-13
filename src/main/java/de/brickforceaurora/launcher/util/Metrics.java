@@ -44,12 +44,11 @@ public class Metrics {
             break;
         }
     }
-
-    public float averageFor(long length, final TimeUnit unit) {
+    
+    public float accumulatedValueFor(long length, final TimeUnit unit) {
         length = unit.toNanos(length);
         final long timestamp = System.nanoTime();
         long value = 0;
-        int count = 0;
         Entry entry;
         for (int i = list.size() - 1; i >= 0; i--) {
             if (i >= list.size()) {
@@ -58,12 +57,11 @@ public class Metrics {
             entry = list.get(i);
             if (timestamp - entry.timestamp() <= length) {
                 value += entry.value();
-                count++;
                 continue;
             }
             break;
         }
-        return value / (float) count;
+        return value;
     }
 
 }

@@ -173,14 +173,14 @@ public class HelpCommand implements ICommand {
         printFormatted(actor, BOX_START, APP_NAME + " " + getVersion(APP_NAME.length() + 1, writeableWidth, 1), BOX_END, BOX_FILL, 0, writeableWidth);
         printFormatted(actor, BOX_START, "", BOX_END, BOX_FILL, 0, writeableWidth);
         printFormatted(actor, BOX_START, "", BOX_END, BOX_FILL, 0, writeableWidth);
-        printFormatted(actor, BOX_START, "Type '/help' to see this again!", BOX_END, BOX_FILL, 0, writeableWidth);
+        printFormatted(actor, BOX_START, "Type 'help' to see this again!", BOX_END, BOX_FILL, 0, writeableWidth);
         printFormatted(actor, BOX_START, "", BOX_END, BOX_FILL, 0, writeableWidth);
         printFilled(actor, BOX_OUTLINE, consoleWidth);
         printFormatted(actor, BOX_START, "", BOX_END, BOX_FILL, 0, writeableWidth);
         List<NodeCommand> commands = commandManager.getCommands();
         for (NodeCommand command : commands) {
             StringBuilder builder = new StringBuilder();
-            builder.append("||  /").append(command.getName());
+            builder.append("||  ").append(command.getName());
             int nameLen = 4 + command.getName().length();
             StringBuilder nameSpace = new StringBuilder();
             for (int l = 0; l < nameLen; l++) {

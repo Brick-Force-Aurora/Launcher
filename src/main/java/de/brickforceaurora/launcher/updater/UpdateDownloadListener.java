@@ -42,7 +42,7 @@ public class UpdateDownloadListener implements IHttpProgressListener {
     }
 
     private String formatMetrics() {
-        final int bytes = Math.round(metrics.averageFor(1, TimeUnit.SECONDS));
+        final int bytes = Math.round(metrics.accumulatedValueFor(1, TimeUnit.SECONDS));
         final float kBytes = bytes / 1024f;
         final float mBytes = kBytes / 1024f;
         if (mBytes > 1) {

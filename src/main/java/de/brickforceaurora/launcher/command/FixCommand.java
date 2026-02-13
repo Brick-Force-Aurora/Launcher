@@ -21,4 +21,11 @@ public class FixCommand implements ICommand {
         actor.sendMessage("Applied registry language fix.");
     }
 
+    @Action("windowed")
+    @Description("Sets BrickForce to windowed mode which can fix the Overlay or if the game doesn't open properly in fullscreen.")
+    public void windowedFix(Actor<SnowFrame<LauncherApp>> actor) {
+        WindowsHelper.applyWindowedFix();
+        actor.sendMessage("Applied registry windowed fix.");
+    }
+
 }
