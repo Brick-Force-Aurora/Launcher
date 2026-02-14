@@ -7,9 +7,9 @@ import java.nio.file.Path;
 import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.Main;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.updater.UpdateManager;
-import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.launcher.LauncherUpdater;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import me.lauriichan.laylib.logger.ISimpleLogger;
@@ -17,6 +17,8 @@ import me.lauriichan.snowframe.ConfigModule;
 import me.lauriichan.snowframe.util.Version;
 
 public final class UIActionHelper {
+
+    public static volatile boolean START_AS_ADMIN = false;
 
     private UIActionHelper() {
         throw new UnsupportedOperationException();
@@ -39,7 +41,7 @@ public final class UIActionHelper {
         }
 
         try {
-            new ProcessBuilder("cmd.exe", "/c", "start", "BrickForce.exe").directory(app.gameDirectory().toFile()).start();
+            WindowsHelper.startProgram(START_AS_ADMIN, app.gameDirectory().resolve("BrickForce.exe").toFile());
         } catch (final IOException e) {
             logger.error("Failed to launch game", e);
         }

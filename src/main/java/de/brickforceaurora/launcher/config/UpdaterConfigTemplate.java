@@ -1,4 +1,4 @@
-package de.brickforceaurora.launcher.updater;
+package de.brickforceaurora.launcher.config;
 
 import me.lauriichan.snowframe.config.Config;
 import me.lauriichan.snowframe.config.ConfigValue;

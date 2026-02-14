@@ -14,7 +14,7 @@ public final class ProcessUtil {
         throw new UnsupportedOperationException();
     }
 
-    public static ProgramResult run(String[] command) {
+    public static ProgramResult runAndRead(String[] command) {
         ISimpleLogger logger = LauncherApp.logger();
         try {
             final Process process = new ProcessBuilder(command).start();

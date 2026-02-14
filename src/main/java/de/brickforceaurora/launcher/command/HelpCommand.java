@@ -51,9 +51,6 @@ public class HelpCommand implements ICommand {
         for (int i = 0; i < depth; i++) {
             builder.append("  ");
         }
-        if (depth == 0) {
-            builder.append("/");
-        }
         builder.append(node.getName());
         NodeAction action = node.getAction();
         if (action != null) {
@@ -181,7 +178,7 @@ public class HelpCommand implements ICommand {
         for (NodeCommand command : commands) {
             StringBuilder builder = new StringBuilder();
             builder.append("||  ").append(command.getName());
-            int nameLen = 4 + command.getName().length();
+            int nameLen = 3 + command.getName().length();
             StringBuilder nameSpace = new StringBuilder();
             for (int l = 0; l < nameLen; l++) {
                 nameSpace.append(' ');

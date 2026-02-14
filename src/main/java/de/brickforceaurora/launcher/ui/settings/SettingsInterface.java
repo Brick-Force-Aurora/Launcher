@@ -9,12 +9,12 @@ import java.util.function.BooleanSupplier;
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.ui.RenderContext;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
 import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
-import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.lauriichan.clay4j.Element;
@@ -41,7 +41,7 @@ public final class SettingsInterface {
     private final ConfigManager configManager;
     private final UpdaterConfig updaterConfig;
 
-    private final Button saveButton, openFolderButton;
+    private final Button saveButton, openFolderButton, checkForUpdates;
 
     public SettingsInterface(final RenderContext renderContext) {
         this.renderContext = renderContext;
@@ -59,7 +59,11 @@ public final class SettingsInterface {
         this.openFolderButton = Button.builder().action(() -> {
             try {
                 Desktop.getDesktop().open(LauncherApp.get().appDirectory().toFile());
-            } catch (IOException _) {}
+            } catch (IOException _) {
+            }
+        }).width(ISizing.grow()).build().setup(renderContext);
+        this.checkForUpdates = Button.builder().action(() -> {
+            LauncherApp.get().checkForUpdates();
         }).width(ISizing.grow()).build().setup(renderContext);
     }
 
@@ -138,8 +142,20 @@ public final class SettingsInterface {
                 }
                 builder = root.newElement();
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING);
-                try (Element buttonRow = builder.build()) {
-                    try (Element folderBtn = openFolderButton.build(renderContext, buttonRow)) {
+                try (Element buttonRow1 = builder.build()) {
+                    try (Element updatesBtn = checkForUpdates.build(renderContext, buttonRow1)) {
+                        builder = updatesBtn.newElement();
+                        builder
+                            .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("CHECK FOR UPDATES")
+                                .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(20).build())
+                            .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                        builder.build().close();
+                    }
+                }
+                builder = root.newElement();
+                builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).padding(NO_PADDING);
+                try (Element buttonRow2 = builder.build()) {
+                    try (Element folderBtn = openFolderButton.build(renderContext, buttonRow2)) {
                         builder = folderBtn.newElement();
                         builder
                             .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("OPEN FOLDER")
@@ -147,7 +163,7 @@ public final class SettingsInterface {
                             .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
                         builder.build().close();
                     }
-                    try (Element saveBtn = saveButton.build(renderContext, buttonRow)) {
+                    try (Element saveBtn = saveButton.build(renderContext, buttonRow2)) {
                         builder = saveBtn.newElement();
                         builder
                             .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("APPLY & SAVE")

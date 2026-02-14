@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import de.brickforceaurora.launcher.LauncherApp;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import de.brickforceaurora.launcher.util.TaskTracker.Task;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

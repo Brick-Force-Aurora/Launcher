@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import de.brickforceaurora.launcher.command.HelpCommand;
 import de.brickforceaurora.launcher.command.api.ConsoleActor;
 import de.brickforceaurora.launcher.command.api.ICommand;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.data.DataStore;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.UserInterface;
@@ -17,7 +18,6 @@ import de.brickforceaurora.launcher.ui.clay.RenderManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole.LogHistory;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
 import de.brickforceaurora.launcher.updater.UpdateManager;
-import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
 import de.brickforceaurora.launcher.util.ConsoleDelegateLogger;
 import de.brickforceaurora.launcher.util.IOUtil;
@@ -153,6 +153,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             frame.lifecycle().execute(SnowFrame.LIFECYCLE_CHAIN_SHUTDOWN);
         });
         lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> userInterface.render());
+    }
+    
+    public void checkForUpdates() {
+        SCHEDULER.submit((Runnable) this::updateLauncherOrCheckForGameUpdates);
     }
 
     private void updateLauncherOrCheckForGameUpdates() {

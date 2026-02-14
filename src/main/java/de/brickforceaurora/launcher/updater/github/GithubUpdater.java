@@ -2,9 +2,9 @@ package de.brickforceaurora.launcher.updater.github;
 
 import java.io.IOException;
 
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.IUpdate;
 import de.brickforceaurora.launcher.updater.IUpdater;
-import de.brickforceaurora.launcher.updater.UpdaterConfig;
 import de.brickforceaurora.launcher.util.IOUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import me.lauriichan.laylib.json.IJson;

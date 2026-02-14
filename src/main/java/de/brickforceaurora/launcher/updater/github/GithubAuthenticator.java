@@ -2,7 +2,7 @@ package de.brickforceaurora.launcher.updater.github;
 
 import java.net.HttpURLConnection;
 
-import de.brickforceaurora.launcher.updater.UpdaterConfig;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import me.lauriichan.snowframe.util.http.IHttpAuthenticator;
 
 final class GithubAuthenticator implements IHttpAuthenticator {

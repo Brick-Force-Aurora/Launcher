@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher.updater;
 
 import java.io.IOException;
 
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.snowframe.util.Version;
