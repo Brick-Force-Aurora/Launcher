@@ -245,7 +245,7 @@ public class UserInterface extends AbstractUserInterface {
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.grow());
                 builder.build().close();
 
-                if (newVersionAvailable.get() && !showSettings.get()) {
+                if (newVersionAvailable.get()) {
                     builder = panorama.newElement();
                     builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(32f)).childGap(8)
                         .padding(Padding.builder().left(8).right(8).top(4).bottom(4).build()).childHorizontalAlignment(HAlignment.LEFT)
@@ -259,13 +259,15 @@ public class UserInterface extends AbstractUserInterface {
                                 .alignment(HAlignment.LEFT).wrapMode(WrapMode.WRAP_NONE).fontSize(18).lineHeight(24).build());
                         builder.build().close();
 
-                        try (Element updateBtn = updateButton.build(renderContext, updateInfo)) {
-                            builder = updateBtn.newElement();
-                            builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                                .addConfigs(Text.builder().text("UPDATE").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
-                                    .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
-                                .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
-                            builder.build().close();
+                        if (!showSettings.get()) {
+                            try (Element updateBtn = updateButton.build(renderContext, updateInfo)) {
+                                builder = updateBtn.newElement();
+                                builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                                    .addConfigs(Text.builder().text("UPDATE").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
+                                        .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
+                                    .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                                builder.build().close();
+                            }
                         }
                     }
                 }
