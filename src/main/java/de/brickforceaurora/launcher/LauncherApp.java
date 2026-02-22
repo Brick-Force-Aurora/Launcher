@@ -143,7 +143,12 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             TextureAtlas.load(frame);
 
             userInterface = new UserInterface(this);
-            SCHEDULER.schedule((Runnable) this::updateLauncherOrCheckForGameUpdates, 1, TimeUnit.SECONDS);
+            SCHEDULER.schedule(() -> {
+                if (UIActionHelper.updateLauncher()) {
+                    return;
+                }
+                UIActionHelper.runUpdate(true, false);
+            }, 1, TimeUnit.SECONDS);
         }).register("start", Stage.POST, frame -> {
             // We call Main.shutdown(), this will notify the GLFW to close.
             // However we already know it should close since this lambda is called.
@@ -156,14 +161,12 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     }
     
     public void checkForUpdates() {
-        SCHEDULER.submit((Runnable) this::updateLauncherOrCheckForGameUpdates);
-    }
-
-    private void updateLauncherOrCheckForGameUpdates() {
-        if (UIActionHelper.updateLauncher()) {
-            return;
-        }
-        UIActionHelper.runUpdate(true, false);
+        SCHEDULER.submit(() -> {
+            if (UIActionHelper.updateLauncher()) {
+                return;
+            }
+            UIActionHelper.runUpdate(true, true);
+        });
     }
 
     @Override
