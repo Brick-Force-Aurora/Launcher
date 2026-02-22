@@ -159,15 +159,6 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         });
         lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> userInterface.render());
     }
-    
-    public void checkForUpdates() {
-        SCHEDULER.submit(() -> {
-            if (UIActionHelper.updateLauncher()) {
-                return;
-            }
-            UIActionHelper.runUpdate(true, true);
-        });
-    }
 
     @Override
     public SnowFrame<LauncherApp> snowFrame() {

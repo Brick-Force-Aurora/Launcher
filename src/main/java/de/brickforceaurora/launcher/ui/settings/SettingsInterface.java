@@ -10,6 +10,7 @@ import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
+import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.RenderContext;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
@@ -63,7 +64,12 @@ public final class SettingsInterface {
             }
         }).width(ISizing.grow()).build().setup(renderContext);
         this.checkForUpdates = Button.builder().action(() -> {
-            LauncherApp.get().checkForUpdates();
+            LauncherApp.SCHEDULER.submit(() -> {
+                if (UIActionHelper.updateLauncher()) {
+                    return;
+                }
+                UIActionHelper.runUpdate(false, false);
+            });
         }).width(ISizing.grow()).build().setup(renderContext);
     }
 
