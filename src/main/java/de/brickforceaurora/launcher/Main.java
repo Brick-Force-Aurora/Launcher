@@ -25,7 +25,7 @@ public final class Main {
         snowFrame = LauncherApp.init(args);
 
         // DO UPDATES BEFORE STARTUP CHAIN
-        final IDataSource source = snowFrame.resource("META-INF/maven/de.brickforce-aurora/launcher/pom.properties");
+        final IDataSource source = snowFrame.resource("META-INF/maven/de.brickforceaurora.launcher/launcher/pom.properties");
         if (source.exists()) {
             final Properties properties = new Properties();
             try (BufferedReader reader = source.openReader()) {
