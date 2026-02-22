@@ -87,7 +87,11 @@ public final class WindowsHelper {
         File directory = file.getAbsoluteFile().getParentFile();
         String program = file.getName();
         if (!asAdmin) {
-            new ProcessBuilder("cmd.exe", "/c", "start", program).directory(directory).start();
+            new ProcessBuilder(new String[] {
+                "powershell.exe",
+                "-Command",
+                "Start-Process -FilePath %s".formatted(program)
+            }).directory(directory).start();
             return;
         }
         new ProcessBuilder(new String[] {
