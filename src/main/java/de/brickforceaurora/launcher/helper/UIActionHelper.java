@@ -132,7 +132,7 @@ public final class UIActionHelper {
         }
 
         userInterface.mainProgress.set(0.1f);
-        if (confirmed && !forceInstall && !config.automaticUpdate()) {
+        if (!confirmed && !forceInstall && !config.automaticUpdate()) {
             userInterface.newVersionText.set("There is %s new update(s) available, please update to %s."
                 .formatted(updateManager.updateCount(), updateManager.latestUpdate().get()));
             userInterface.newVersionAvailable.set(true);
