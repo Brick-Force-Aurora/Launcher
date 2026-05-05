@@ -6,19 +6,14 @@ import java.nio.file.Path;
 
 import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
-import de.brickforceaurora.launcher.Main;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.updater.UpdateManager;
-import de.brickforceaurora.launcher.updater.launcher.LauncherUpdater;
 import de.brickforceaurora.launcher.util.TaskTracker;
-import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.snowframe.ConfigModule;
 import me.lauriichan.snowframe.util.Version;
 
 public final class UIActionHelper {
-
-    public static volatile boolean START_AS_ADMIN = false;
 
     private UIActionHelper() {
         throw new UnsupportedOperationException();
@@ -33,55 +28,7 @@ public final class UIActionHelper {
         if (userInterface.mainProgress.get() != 1f) {
             return;
         }
-        final String gamePath = app.gameDirectory().resolve("BrickForce.exe").toString();
-        final ISimpleLogger logger = app.snowFrame().logger();
-        logger.info("Launching game '{0}'", gamePath);
-        if (!WindowsHelper.isAuthorized("BrickForce", gamePath)) {
-            WindowsHelper.authorizeProgram("BrickForce", gamePath);
-        }
-
-        try {
-            WindowsHelper.startProgram(START_AS_ADMIN, app.gameDirectory().resolve("BrickForce.exe").toFile());
-        } catch (final IOException e) {
-            logger.error("Failed to launch game", e);
-        }
-    }
-
-    public static boolean updateLauncher() {
-        final LauncherApp app = LauncherApp.get();
-
-        final UpdaterConfig config = app.snowFrame().module(ConfigModule.class).manager().config(UpdaterConfig.class);
-        final UserInterface userInterface = app.userInterface();
-
-        userInterface.newVersionAvailable.set(false);
-        userInterface.newVersionText.set("");
-
-        userInterface.mainText.set("Checking for launcher updates...");
-        userInterface.mainProgress.set(0.00f);
-
-        final UpdateManager updateManager = new UpdateManager(app.snowFrame().logger(), new LauncherUpdater());
-        try {
-            Files.deleteIfExists(app.tempDirectory().resolve("BrickForceAurora-Update-%s.exe".formatted(Main.version().toString())));
-        } catch (final IOException _) {
-            // We can ignore if this fails
-        }
-        if (!updateManager.checkForUpdates(config, Main.version()) || !updateManager.hasUpdates()) {
-            return false;
-        }
-        Version newVersion;
-        if ((newVersion = updateManager.applyUpdates(new TaskTracker(userInterface.mainText, userInterface.mainProgress, 1f, 100),
-            app.appDirectory())) != null) {
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    new ProcessBuilder("cmd.exe", "/c", "start", "BrickForceAurora-Update-%s.exe".formatted(newVersion.toString()),
-                        "/verysilent").directory(app.tempDirectory().toFile()).start();
-                } catch (final IOException _) {
-                }
-            }));
-            Main.shutdown();
-            return true;
-        }
-        return false;
+        app.platform().startGame();
     }
 
     public static void runUpdate(final boolean startup, final boolean confirmed) {
@@ -103,6 +50,10 @@ public final class UIActionHelper {
             userInterface.mainText.set("Ready to play (%s)".formatted(currentVersion));
             userInterface.mainProgress.set(1);
             return;
+        }
+        
+        if (currentVersion == null) {
+            app.platform().doPlatformSetup(userInterface.mainText, userInterface.mainProgress);
         }
 
         userInterface.mainText.set("Checking for game updates...");

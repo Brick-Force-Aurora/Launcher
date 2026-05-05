@@ -26,6 +26,14 @@ public abstract class AbstractUserInterface {
         this.renderManager = app.renderManager();
         this.guiModule = app.snowFrame().module(ImGUIModule.class);
     }
+    
+    public LayoutContext layout() {
+        return layout;
+    }
+    
+    public RenderManager renderManager() {
+        return renderManager;
+    }
 
     public void render() {
         final float deltaTime = ImGUIModule.DELTA_TIME.get() / (float) SECOND_RATIO;
@@ -59,7 +67,7 @@ public abstract class AbstractUserInterface {
             } finally {
                 ImGui.end();
             }
-            
+
             additionalRender(deltaTime);
         } finally {
             ImGui.popFont();

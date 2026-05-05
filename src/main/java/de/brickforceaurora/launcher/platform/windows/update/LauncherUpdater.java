@@ -1,4 +1,4 @@
-package de.brickforceaurora.launcher.updater.launcher;
+package de.brickforceaurora.launcher.platform.windows.update;
 
 import java.io.IOException;
 

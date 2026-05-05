@@ -2,7 +2,7 @@ package de.brickforceaurora.launcher.command;
 
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.command.api.ICommand;
-import de.brickforceaurora.launcher.helper.WindowsHelper;
+import de.brickforceaurora.launcher.platform.windows.WindowsHelper;
 import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.annotation.Action;
 import me.lauriichan.laylib.command.annotation.Command;

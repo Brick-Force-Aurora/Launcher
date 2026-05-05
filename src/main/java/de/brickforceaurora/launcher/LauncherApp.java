@@ -2,7 +2,6 @@ package de.brickforceaurora.launcher;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,14 +12,17 @@ import de.brickforceaurora.launcher.command.api.ICommand;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.data.DataStore;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
+import de.brickforceaurora.launcher.platform.Platform;
 import de.brickforceaurora.launcher.ui.UserInterface;
 import de.brickforceaurora.launcher.ui.clay.RenderManager;
+import de.brickforceaurora.launcher.ui.dialog.DialogManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole.LogHistory;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
 import de.brickforceaurora.launcher.util.ConsoleDelegateLogger;
 import de.brickforceaurora.launcher.util.IOUtil;
+import de.brickforceaurora.launcher.util.OSType;
 import imgui.ImGui;
 import imgui.flag.ImGuiConfigFlags;
 import me.lauriichan.laylib.command.CommandManager;
@@ -30,6 +32,7 @@ import me.lauriichan.snowframe.ISnowFrameApp;
 import me.lauriichan.snowframe.ImGUIModule;
 import me.lauriichan.snowframe.SignalModule;
 import me.lauriichan.snowframe.SnowFrame;
+import me.lauriichan.snowframe.extension.IConditionMap;
 import me.lauriichan.snowframe.lifecycle.Lifecycle;
 import me.lauriichan.snowframe.lifecycle.LifecyclePhase.Stage;
 import me.lauriichan.snowframe.signal.SignalManager;
@@ -52,7 +55,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
         // TODO: Do actual command line parsing
         final ISimpleLogger logger = new FileLogger(new File("../logs"), new ConsoleDelegateLogger(LOG_HISTORY));
-        logger.setDebug(Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase));
+        logger.setDebug(true);
 
         snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
         actor = new ConsoleActor(snowFrame);
@@ -74,6 +77,8 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     private Path appDirectory, gameDirectory, tempDirectory;
     private DataStore launcherData, gameData;
 
+    private Platform platform;
+
     private CommandManager commandManager;
 
     private UpdateManager updateManager;
@@ -81,7 +86,15 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     private SignalManager signalManager;
 
+    private DialogManager dialogManager;
     private UserInterface userInterface;
+
+    @Override
+    public void setupConditionMap(IConditionMap conditionMap) {
+        conditionMap.value(CondConstant.PROP_IS_LINUX_OS, CondConstant.OS == OSType.LINUX);
+        conditionMap.value(CondConstant.PROP_IS_WIN_OS, CondConstant.OS == OSType.WINDOWS);
+        conditionMap.value(CondConstant.PROP_IS_MAC_OS, CondConstant.OS == OSType.MAC);
+    }
 
     @Override
     public void registerLifecycle(final Lifecycle<LauncherApp> lifecycle) {
@@ -98,8 +111,9 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             frame.resourceManager().register("user", appPath.resolve("user"));
             frame.resourceManager().register("data", appPath.resolve("data"));
         }).register("ready", Stage.MAIN, frame -> {
-            gameDirectory = IOUtil
-                .asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory()));
+            this.platform = Platform.createPlatform();
+            gameDirectory = platform.resolveGameDir(IOUtil
+                .asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory())));
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
 
             frame.resourceManager().register("game", gameDirectory);
@@ -142,9 +156,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }).register("start", Stage.PRE, frame -> {
             TextureAtlas.load(frame);
 
+            dialogManager = new DialogManager();
             userInterface = new UserInterface(this);
             SCHEDULER.schedule(() -> {
-                if (UIActionHelper.updateLauncher()) {
+                if (platform.updateLauncher()) {
                     return;
                 }
                 UIActionHelper.runUpdate(true, false);
@@ -157,7 +172,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             Main.shutdown();
             frame.lifecycle().execute(SnowFrame.LIFECYCLE_CHAIN_SHUTDOWN);
         });
-        lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> userInterface.render());
+        lifecycle.chainOrThrow(ImGUIModule.RENDER_CHAIN).register("render", Stage.MAIN, _ -> {
+            userInterface.render();
+            dialogManager.render();
+        });
     }
 
     @Override
@@ -177,6 +195,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         return tempDirectory;
     }
 
+    public Platform platform() {
+        return platform;
+    }
+
     public SignalManager signalManager() {
         return signalManager;
     }
@@ -191,6 +213,10 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
     public RenderManager renderManager() {
         return renderManager;
+    }
+
+    public DialogManager dialogManager() {
+        return dialogManager;
     }
 
     public UserInterface userInterface() {

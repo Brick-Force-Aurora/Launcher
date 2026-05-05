@@ -1,4 +1,4 @@
-package de.brickforceaurora.launcher.helper;
+package de.brickforceaurora.launcher.platform.windows;
 
 import java.io.File;
 import java.io.IOException;

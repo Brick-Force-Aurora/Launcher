@@ -46,7 +46,8 @@ public final class SettingsInterface {
 
     public SettingsInterface(final RenderContext renderContext) {
         this.renderContext = renderContext;
-        this.configManager = LauncherApp.get().snowFrame().module(ConfigModule.class).manager();
+        LauncherApp app = LauncherApp.get();
+        this.configManager = app.snowFrame().module(ConfigModule.class).manager();
         this.updaterConfig = configManager.config(UpdaterConfig.class);
         createSettings();
         this.saveButton = Button.builder().action(() -> {
@@ -65,7 +66,7 @@ public final class SettingsInterface {
         }).width(ISizing.grow()).build().setup(renderContext);
         this.checkForUpdates = Button.builder().action(() -> {
             LauncherApp.SCHEDULER.submit(() -> {
-                if (UIActionHelper.updateLauncher()) {
+                if (app.platform().updateLauncher()) {
                     return;
                 }
                 UIActionHelper.runUpdate(false, false);
