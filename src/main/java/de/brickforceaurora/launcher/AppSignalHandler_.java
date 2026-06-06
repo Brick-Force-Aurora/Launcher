@@ -11,7 +11,7 @@ import me.lauriichan.snowframe.signal.SignalHandler;
 import me.lauriichan.snowframe.util.tick.TimeSync;
 
 @Extension
-public final class AppSignalHandlerTemplate implements ISignalHandler {
+public final class AppSignalHandler_ implements ISignalHandler {
 
     @SignalHandler
     public void onWindowConfig(final SignalContext<WindowConfiguration.Signal> context) {

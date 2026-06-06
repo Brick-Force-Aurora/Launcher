@@ -69,7 +69,7 @@ public final class FontAtlas {
     public static ImFont NOTO_SANS_EXTRA_BOLD;
     
     
-    @Font(path = "Consolas/consola.ttf", defaultSize = 16f)
+    @Font(path = "Consolas/consola.ttf")
     public static ImFont CONSOLE_FONT;
 
 }

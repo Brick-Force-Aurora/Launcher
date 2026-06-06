@@ -4,22 +4,28 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import de.brickforceaurora.launcher.LauncherApp;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
+import me.lauriichan.snowframe.SnowFrame;
 import me.lauriichan.snowframe.resource.source.IDataSource;
 import me.lauriichan.snowframe.util.Tuple;
 import me.lauriichan.snowframe.util.nbt.CompoundTag;
 
 public final class DataStore {
 
-    private final IDataSource source;
     private final Object2ObjectMap<String, StoredData<?>> stored = Object2ObjectMaps.synchronize(new Object2ObjectArrayMap<>());
 
+    private final SnowFrame<LauncherApp> snowFrame;
+    private final String sourcePath;
+
+    private volatile IDataSource source;
     private volatile CompoundTag root;
 
-    public DataStore(final IDataSource source) {
-        this.source = source;
+    public DataStore(final SnowFrame<LauncherApp> snowFrame, final String sourcePath) {
+        this.snowFrame = snowFrame;
+        this.sourcePath = sourcePath;
     }
 
     public <T> StoredData<T> register(final String key, final StorageHandler<T> handler) {
@@ -41,8 +47,18 @@ public final class DataStore {
         return data;
     }
 
+    private IDataSource source() {
+        IDataSource source = this.source;
+        if (source != null) {
+            return source;
+        }
+        this.source = source = snowFrame.resource(sourcePath);
+        return source;
+    }
+
     public void load() throws IOException {
         try {
+            IDataSource source = source();
             if (!source.exists()) {
                 clearInternal();
                 return;
@@ -72,7 +88,7 @@ public final class DataStore {
         for (final StoredData<?> data : stored.values()) {
             data.write(root);
         }
-        try (DataOutputStream data = new DataOutputStream(source.openWritableStream())) {
+        try (DataOutputStream data = new DataOutputStream(source().openWritableStream())) {
             root.writeNamed(data, "root");
         }
     }

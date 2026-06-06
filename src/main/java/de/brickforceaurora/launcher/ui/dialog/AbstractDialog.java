@@ -52,7 +52,7 @@ public abstract class AbstractDialog<V> extends AbstractUserInterface {
         ImGui.getMousePos(cursorPos);
         LayoutContext layout = layout();
 
-        ImGui.pushFont(FontAtlas.CONSOLE_FONT);
+        ImGui.pushFont(FontAtlas.CONSOLE_FONT, 18f);
         try {
             ImGui.setNextWindowPos(windowPos);
             ImGui.setNextWindowBgAlpha(0f);

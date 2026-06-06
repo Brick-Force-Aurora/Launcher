@@ -12,7 +12,6 @@ import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.platform.Platform;
 import de.brickforceaurora.launcher.platform.windows.update.LauncherUpdater;
 import de.brickforceaurora.launcher.ui.UserInterface;
-import de.brickforceaurora.launcher.ui.dialog.TestDialog;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import me.lauriichan.laylib.logger.ISimpleLogger;

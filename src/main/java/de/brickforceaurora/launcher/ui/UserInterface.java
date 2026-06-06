@@ -1,5 +1,7 @@
 package de.brickforceaurora.launcher.ui;
 
+import static de.brickforceaurora.launcher.ui.UIConstant.*;
+
 import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.glfw.GLFW;
@@ -21,14 +23,12 @@ import de.brickforceaurora.launcher.command.api.CommandHandler;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.clay.AbstractUserInterface;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
-import de.brickforceaurora.launcher.ui.clay.config.BackgroundRectangle;
 import de.brickforceaurora.launcher.ui.clay.config.Image;
 import de.brickforceaurora.launcher.ui.clay.config.Panorama;
 import de.brickforceaurora.launcher.ui.clay.config.ProgressClip;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
 import de.brickforceaurora.launcher.ui.clay.config.Symbol;
 import de.brickforceaurora.launcher.ui.clay.config.Symbol.SymbolType;
-import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole;
 import de.brickforceaurora.launcher.ui.settings.SettingsInterface;
@@ -36,7 +36,6 @@ import imgui.ImGui;
 import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiWindowFlags;
 import me.lauriichan.clay4j.Element;
-import me.lauriichan.clay4j.IElementConfig.AspectRatio;
 import me.lauriichan.clay4j.IElementConfig.Text;
 import me.lauriichan.clay4j.IElementConfig.Text.WrapMode;
 import me.lauriichan.clay4j.ISizing;
@@ -49,17 +48,6 @@ import me.lauriichan.snowframe.ImGUIModule;
 import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public class UserInterface extends AbstractUserInterface {
-
-    public static final Padding NO_PADDING = new Padding(0);
-    public static final BackgroundRectangle WINDOW_BG = Rectangle.bg(Constant.WINDOW_BACKGROUND_COLOR);
-
-    public static final AspectRatio ONE_TO_ONE = new AspectRatio(1f);
-
-    public static final float CTRL_PANEL_OPACITY = 0.85f;
-    public static final BackgroundRectangle CTRL_PANEL_LEFT = Rectangle
-        .bg(Constant.PROGRESS_BACKGROUND_COLOR.duplicate().alpha(CTRL_PANEL_OPACITY));
-    public static final BackgroundRectangle CTRL_PANEL_RIGHT = Rectangle
-        .bg(Constant.BUTTON_PANEL_BACKGROUND_COLOR.duplicate().alpha(CTRL_PANEL_OPACITY));
 
     public final PropBool switchPanorama = new PropBool(true);
 
@@ -82,8 +70,7 @@ public class UserInterface extends AbstractUserInterface {
     public final PropFloat mainProgress = new PropFloat(0f);
     public final PropString mainText = new PropString("");
 
-    private final Button startButton = Button.builder().padding(Padding.builder().top(4).right(4).left(28).bottom(8).build())
-        .action(UIActionHelper::startGame).build();
+    private final Button startButton = Button.builder().action(UIActionHelper::startGame).padding(Padding.builder().all(4).left(8).build()).build();
     private final Button updateButton = Button.builder().width(ISizing.percentage(0.185f)).padding(NO_PADDING)
         .action(() -> LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(false, true))).build();
     private final Button settingsButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).action(showSettings::toggle).build();
@@ -193,9 +180,10 @@ public class UserInterface extends AbstractUserInterface {
                     builder.build().close();
 
                     builder = leftBar.newElement();
-                    builder.layout().height(ISizing.percentage(1f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                        .addConfigs(Text.builder().text("Brick-Force").fontSize(28).wrapMode(WrapMode.WRAP_NONE)
-                            .font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD)).build());
+                    builder
+                        .layout().height(ISizing.percentage(1f)).addConfigs(Text.builder().text("Brick-Force").fontSize(28)
+                            .wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD)).build())
+                        .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                     builder.build().close();
 
                 }
@@ -204,9 +192,10 @@ public class UserInterface extends AbstractUserInterface {
                     .childVerticalAlignment(VAlignment.CENTER).childHorizontalAlignment(HAlignment.RIGHT).childGap(8);
                 try (Element rightBar = builder.elementId("titleBar_right").build()) {
                     builder = rightBar.newElement();
-                    builder.layout().height(ISizing.percentage(0.6f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                        .addConfigs(Text.builder().text("v" + Main.version().toString()).fontSize(16).wrapMode(WrapMode.WRAP_NONE)
-                            .font(FontWrapper.of(FontAtlas.NOTO_SANS_NORMAL)).build());
+                    builder
+                        .layout().height(ISizing.percentage(0.6f)).addConfigs(Text.builder().text("v" + Main.version().toString())
+                            .fontSize(16).wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_NORMAL)).build())
+                        .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                     builder.build().close();
 
                     builder = rightBar.newElement();
@@ -254,18 +243,18 @@ public class UserInterface extends AbstractUserInterface {
                     try (Element updateInfo = builder.build()) {
                         builder = updateInfo.newElement();
                         builder.layout().width(ISizing.percentage(0.815f)).height(ISizing.fixed(28f))
-                            .layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
                             .addConfigs(Text.builder().text(newVersionText.get()).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD))
-                                .alignment(HAlignment.LEFT).wrapMode(WrapMode.WRAP_NONE).fontSize(18).lineHeight(24).build());
+                                .alignment(HAlignment.LEFT).wrapMode(WrapMode.WRAP_NONE).fontSize(18).lineHeight(24).build())
+                            .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                         builder.build().close();
 
                         if (!showSettings.get()) {
                             try (Element updateBtn = updateButton.build(renderContext, updateInfo)) {
                                 builder = updateBtn.newElement();
-                                builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                                builder.layout()
                                     .addConfigs(Text.builder().text("UPDATE").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
                                         .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
-                                    .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                                    .addConfigs(BUTTON_TXT_COLOR).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                                 builder.build().close();
                             }
                         }
@@ -277,14 +266,15 @@ public class UserInterface extends AbstractUserInterface {
                 try (Element controlBar = builder.elementId("controlBar").build()) {
                     builder = controlBar.newElement();
                     builder.layout().width(ISizing.percentage(0.6f)).height(ISizing.percentage(1f))
-                        .layoutDirection(LayoutDirection.TOP_TO_BOTTOM).childHorizontalAlignment(HAlignment.CENTER)
-                        .addConfigs(CTRL_PANEL_LEFT).padding(new Padding(8)).childGap(4);
+                        .layoutDirection(LayoutDirection.TOP_TO_BOTTOM).childHorizontalAlignment(HAlignment.CENTER).addConfigs(PANEL_LIGHT)
+                        .padding(new Padding(8)).childGap(4);
                     try (Element progress = builder.elementId("progressBar").build()) {
 
                         builder = progress.newElement();
-                        builder.layout().height(ISizing.percentage(0.35f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                        builder.layout().height(ISizing.percentage(0.35f))
                             .addConfigs(Text.builder().text(mainText.get()).font(FontWrapper.of(FontAtlas.NOTO_SANS_NORMAL))
-                                .alignment(HAlignment.CENTER).wrapMode(WrapMode.WRAP_NONE).fontSize(18).build());
+                                .alignment(HAlignment.CENTER).wrapMode(WrapMode.WRAP_NONE).fontSize(18).build())
+                            .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                         builder.build().close();
 
                         builder = progress.newElement();
@@ -304,18 +294,16 @@ public class UserInterface extends AbstractUserInterface {
                     }
 
                     builder = controlBar.newElement();
-                    builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f)).addConfigs(CTRL_PANEL_RIGHT)
-                        .padding(new Padding(8));
+                    builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f)).addConfigs(PANEL_DARK).padding(new Padding(8));
                     try (Element start = builder.elementId("start").build()) {
                         try (Element startBtn = startButton.build(renderContext, start, btnBuilder -> {
                             btnBuilder.layout().childGap(6).childVerticalAlignment(VAlignment.CENTER);
                         })) {
-
                             builder = startBtn.newElement();
-                            builder.layout().width(ISizing.percentage(0.6f)).layoutDirection(LayoutDirection.LEFT_TO_RIGHT)
+                            builder.layout().width(ISizing.percentage(0.7f)).height(ISizing.percentage(0.675f))
                                 .addConfigs(Text.builder().text("START").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
-                                    .alignment(HAlignment.RIGHT).wrapMode(WrapMode.WRAP_NONE).fontSize(36).build())
-                                .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                                    .alignment(HAlignment.CENTER).wrapMode(WrapMode.WRAP_NONE).fontSize(36).build())
+                                .addConfigs(BUTTON_TXT_COLOR).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                             builder.build().close();
 
                             builder = startBtn.newElement();
@@ -325,31 +313,31 @@ public class UserInterface extends AbstractUserInterface {
                             try (Element symbolParent = builder.build()) {
                                 builder = symbolParent.newElement();
                                 builder.layout().height(ISizing.percentage(1f)).width(ISizing.percentage(1f))
-                                    .addConfigs(new Symbol(Symbol.SymbolType.ARROW, Constant.BUTTON_TEXT_COLOR));
+                                    .addConfigs(new Symbol(Symbol.SymbolType.ARROW, Constant.BUTTON_TEXT_COLOR))
+                                    .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                                 builder.build().close();
                             }
-
                         }
                     }
 
                     builder = controlBar.newElement();
                     builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                        .addConfigs(CTRL_PANEL_RIGHT).padding(new Padding(8)).childGap(8);
+                        .addConfigs(PANEL_DARK).padding(new Padding(8)).childGap(8);
                     try (Element settingsQuit = builder.elementId("settingsQuit").build()) {
                         try (Element settingsBtn = settingsButton.build(renderContext, settingsQuit)) {
                             builder = settingsBtn.newElement();
-                            builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                            builder.layout()
                                 .addConfigs(Text.builder().text("SETTINGS").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
                                     .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
-                                .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                                .addConfigs(BUTTON_TXT_COLOR).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                             builder.build().close();
                         }
                         try (Element quitBtn = quitButton.build(renderContext, settingsQuit)) {
                             builder = quitBtn.newElement();
-                            builder.layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                            builder.layout()
                                 .addConfigs(Text.builder().text("QUIT").font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD))
                                     .wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
-                                .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                                .addConfigs(BUTTON_TXT_COLOR).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                             builder.build().close();
                         }
                     }

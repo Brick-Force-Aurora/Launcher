@@ -1,12 +1,10 @@
 package de.brickforceaurora.launcher.ui.dialog;
 
-import de.brickforceaurora.launcher.Constant;
+import static de.brickforceaurora.launcher.ui.UIConstant.*;
+
 import de.brickforceaurora.launcher.FontAtlas;
 import de.brickforceaurora.launcher.ui.RenderContext;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
-import de.brickforceaurora.launcher.ui.clay.config.BackgroundRectangle;
-import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
-import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.IElementConfig.Text;
@@ -17,9 +15,6 @@ import me.lauriichan.clay4j.Layout.Padding;
 import me.lauriichan.clay4j.LayoutContext;
 
 public class TestDialog extends AbstractDialog<Void> {
-
-    public static final Padding NO_PADDING = new Padding(0);
-    public static final BackgroundRectangle WINDOW_BG = Rectangle.bg(Constant.WINDOW_BACKGROUND_COLOR);
 
     private final Button startButton = Button.builder().padding(Padding.builder().top(4).right(4).left(28).bottom(8).build())
         .action(this::close).build();
@@ -47,7 +42,7 @@ public class TestDialog extends AbstractDialog<Void> {
                 builder
                     .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("UPDATE")
                         .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(24).build())
-                    .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                    .addConfigs(BUTTON_TXT_COLOR);
                 builder.build().close();
             }
         }

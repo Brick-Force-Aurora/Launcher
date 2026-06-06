@@ -10,5 +10,7 @@ import me.lauriichan.snowframe.util.Version;
 public interface IUpdater {
 
     void checkForUpdate(UpdaterConfig config, ISimpleLogger logger, Version current, ObjectList<IUpdate> updates) throws IOException;
+    
+    boolean bunbledUpdates();
 
 }

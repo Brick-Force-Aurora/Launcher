@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.brickforceaurora.launcher.command.HelpCommand;
 import de.brickforceaurora.launcher.command.api.ConsoleActor;
@@ -18,11 +19,14 @@ import de.brickforceaurora.launcher.ui.clay.RenderManager;
 import de.brickforceaurora.launcher.ui.dialog.DialogManager;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiConsole.LogHistory;
 import de.brickforceaurora.launcher.ui.imgui.ImGuiStyler;
+import de.brickforceaurora.launcher.updater.IUpdater;
 import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
+import de.brickforceaurora.launcher.updater.shiningstar.ShiningStarUpdater;
 import de.brickforceaurora.launcher.util.ConsoleDelegateLogger;
 import de.brickforceaurora.launcher.util.IOUtil;
 import de.brickforceaurora.launcher.util.OSType;
+import de.brickforceaurora.launcher.util.console.Console;
 import imgui.ImGui;
 import imgui.flag.ImGuiConfigFlags;
 import me.lauriichan.laylib.command.CommandManager;
@@ -37,6 +41,7 @@ import me.lauriichan.snowframe.lifecycle.Lifecycle;
 import me.lauriichan.snowframe.lifecycle.LifecyclePhase.Stage;
 import me.lauriichan.snowframe.signal.SignalManager;
 import me.lauriichan.snowframe.util.logger.FileLogger;
+import me.lauriichan.snowframe.util.logger.IDelegateLogger;
 
 public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
@@ -54,7 +59,8 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }
 
         // TODO: Do actual command line parsing
-        final ISimpleLogger logger = new FileLogger(new File("../logs"), new ConsoleDelegateLogger(LOG_HISTORY));
+        final ISimpleLogger logger = new FileLogger(new File("../logs"),
+            IDelegateLogger.combined(new ConsoleDelegateLogger(LOG_HISTORY), Console.INSTANCE));
         logger.setDebug(true);
 
         snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
@@ -74,7 +80,8 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         return snowFrame.logger();
     }
 
-    private Path appDirectory, gameDirectory, tempDirectory;
+    private AtomicReference<Path> gameDirectory;
+    private Path appDirectory, tempDirectory;
     private DataStore launcherData, gameData;
 
     private Platform platform;
@@ -112,23 +119,32 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
             frame.resourceManager().register("data", appPath.resolve("data"));
         }).register("ready", Stage.MAIN, frame -> {
             this.platform = Platform.createPlatform();
-            gameDirectory = platform.resolveGameDir(IOUtil
-                .asPath(frame.resource("app://" + frame.module(ConfigModule.class).manager().config(UpdaterConfig.class).directory())));
+            UpdaterConfig updaterConfig = frame.module(ConfigModule.class).manager().config(UpdaterConfig.class);
+            gameDirectory = updaterConfig.gameDirectory;
             tempDirectory = IOUtil.asPath(frame.resource("data://temp"));
 
-            frame.resourceManager().register("game", gameDirectory);
             frame.resourceManager().register("tmp", tempDirectory);
 
-            launcherData = new DataStore(frame.resource("data://launcher.dat"));
+            launcherData = new DataStore(frame, "data://launcher.dat");
             LauncherData.init();
-            gameData = new DataStore(frame.resource("game://launcher_data.dat"));
+            gameData = new DataStore(frame, "game://launcher_data.dat");
             GameData.init();
 
             commandManager = new CommandManager();
             frame.extension(ICommand.class, false).callClasses(commandManager::register);
             HelpCommand.doHelp(actor, commandManager);
 
-            updateManager = new UpdateManager(frame.logger(), new GithubUpdater());
+            IUpdater updater;
+            switch (updaterConfig.updaterType()) {
+            case GITHUB:
+                updater = new GithubUpdater();
+                break;
+            default:
+            case SHINING_STAR:
+                updater = new ShiningStarUpdater(frame);
+                break;
+            }
+            updateManager = new UpdateManager(frame.logger(), updater);
 
             renderManager = new RenderManager(frame);
 
@@ -188,7 +204,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     }
 
     public Path gameDirectory() {
-        return gameDirectory;
+        return gameDirectory.get();
     }
 
     public Path tempDirectory() {

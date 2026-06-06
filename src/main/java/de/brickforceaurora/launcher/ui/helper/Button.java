@@ -13,6 +13,7 @@ import de.brickforceaurora.launcher.animation.property.PropBool;
 import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.trigger.DelegateTrigger;
 import de.brickforceaurora.launcher.ui.RenderContext;
+import de.brickforceaurora.launcher.ui.UIConstant;
 import de.brickforceaurora.launcher.ui.clay.config.BFButton;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.ISizing;
@@ -85,8 +86,7 @@ public class Button {
         builder.layout().width(width).height(height)
             .padding(Padding.builder().left(padding.left() + (int) paddingTopLeft.get()).top(padding.top() + (int) paddingTopLeft.get())
                 .right(padding.right() - (int) paddingTopLeft.get()).bottom(padding.bottom() - (int) paddingTopLeft.get()).build())
-            .layoutDirection(LayoutDirection.LEFT_TO_RIGHT).childVerticalAlignment(VAlignment.TOP)
-            .childHorizontalAlignment(HAlignment.CENTER)
+            .layoutDirection(LayoutDirection.LEFT_TO_RIGHT).childHorizontalAlignment(HAlignment.CENTER)
             .addConfigs(new BFButton(paddingTopLeft.get(), shadowSize, rounding, buttonColor, shadow));
         if (styler != null) {
             styler.accept(builder);

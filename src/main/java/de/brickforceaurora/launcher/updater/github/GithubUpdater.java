@@ -103,6 +103,11 @@ public final class GithubUpdater implements IUpdater {
             }
         }
     }
+    
+    @Override
+    public boolean bunbledUpdates() {
+        return false;
+    }
 
     private static boolean isSamePatchline(Version a, Version b) {
         return a.major == b.major && a.minor == b.minor && a.patch == b.patch;

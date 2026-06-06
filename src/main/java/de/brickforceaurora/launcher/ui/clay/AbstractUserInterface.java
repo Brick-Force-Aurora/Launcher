@@ -44,7 +44,7 @@ public abstract class AbstractUserInterface {
         viewport.getWorkPos(windowPos);
         viewport.getWorkSize(windowSize);
 
-        ImGui.pushFont(FontAtlas.CONSOLE_FONT);
+        ImGui.pushFont(FontAtlas.CONSOLE_FONT, 16f);
         try {
             ImGui.setNextWindowPos(windowPos);
             ImGui.setNextWindowBgAlpha(0f);

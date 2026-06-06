@@ -16,6 +16,10 @@ public class SubWorker {
         this.totalWork = totalWork;
         this.totalSubWork = totalSubWork;
     }
+    
+    public void finish() {
+        work(totalSubWork - subWork);
+    }
 
     public void work(int work) {
         if (subWork + work > totalSubWork) {

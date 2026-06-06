@@ -44,24 +44,26 @@ public final class UIActionHelper {
         if (!Files.exists(gameDirectory) || !Files.isDirectory(gameDirectory)) {
             GameData.GAME_VERSION.value(null);
         }
-        Version currentVersion = GameData.GAME_VERSION.rawValue();
-        final boolean forceInstall = currentVersion == null;
-        if (!forceInstall && startup && !config.checkForUpdates()) {
+        Version currentVersion = GameData.GAME_VERSION.value();
+        boolean firstInstall = GameData.GAME_VERSION.rawValue() == null;
+        if (!firstInstall && startup && !config.checkForUpdates()) {
             userInterface.mainText.set("Ready to play (%s)".formatted(currentVersion));
             userInterface.mainProgress.set(1);
             return;
         }
-        
+
+        /*
         if (currentVersion == null) {
             app.platform().doPlatformSetup(userInterface.mainText, userInterface.mainProgress);
         }
+        */
 
         userInterface.mainText.set("Checking for game updates...");
         userInterface.mainProgress.set(0.05f);
 
         final UpdateManager updateManager = app.updateManager();
         if (!updateManager.checkForUpdates(config, GameData.GAME_VERSION.value())) {
-            if (currentVersion == null) {
+            if (firstInstall) {
                 userInterface.mainText.set("Couldn't check for game updates");
                 userInterface.mainProgress.set(0);
                 return;
@@ -72,7 +74,7 @@ public final class UIActionHelper {
         }
 
         if (!updateManager.hasUpdates()) {
-            if (currentVersion == null) {
+            if (firstInstall) {
                 userInterface.mainText.set("Couldn't find any game update");
                 userInterface.mainProgress.set(0);
                 return;
@@ -83,7 +85,8 @@ public final class UIActionHelper {
         }
 
         userInterface.mainProgress.set(0.1f);
-        if (!confirmed && !forceInstall && !config.automaticUpdate()) {
+        // We force first install to be made manually so that the install location can be changed before installation
+        if ((firstInstall && startup) || (!confirmed && !config.automaticUpdate())) {
             userInterface.newVersionText.set("There is %s new update(s) available, please update to %s."
                 .formatted(updateManager.updateCount(), updateManager.latestUpdate().get()));
             userInterface.newVersionAvailable.set(true);
@@ -94,7 +97,7 @@ public final class UIActionHelper {
 
         final Version newVersion = updateManager.applyUpdates(new TaskTracker(userInterface.mainText, userInterface.mainProgress, 0.9f),
             app.gameDirectory());
-        if (newVersion == null && currentVersion == null) {
+        if (newVersion == null && firstInstall) {
             userInterface.mainText.set("Couldn't apply any game update");
             userInterface.mainProgress.set(0);
             return;

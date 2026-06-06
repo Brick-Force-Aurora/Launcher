@@ -213,6 +213,7 @@ public final class ImGuiConsole {
     private volatile BiConsumer<ImGuiConsole, String> commandHandler;
 
     private volatile ImFont font;
+    private volatile float fontSize = 16f;
 
     /* ImGui Text buffer */
     private ImString text;
@@ -243,6 +244,14 @@ public final class ImGuiConsole {
 
     public void font(ImFont font) {
         this.font = font;
+    }
+
+    public float fontSize() {
+        return fontSize;
+    }
+
+    public void fontSize(float fontSize) {
+        this.fontSize = fontSize;
     }
 
     public boolean editable() {
@@ -342,12 +351,14 @@ public final class ImGuiConsole {
         ImVec2 regMin = ImGui.getWindowContentRegionMin();
         ImVec2 regMax = ImGui.getWindowContentRegionMax();
         ImFont font = this.font;
+        float fontSize = this.fontSize;
         if (font != null) {
-            ImGui.pushFont(font);
+            ImGui.pushFont(font, fontSize);
         } else {
             font = ImGui.getFont();
+            fontSize = ImGui.getFontSize();
         }
-        float commandHeight = font.getFontSize() + 8f;
+        float commandHeight = fontSize * 1.5f;
         float width = regMax.x - regMin.x, height = regMax.y - regMin.y - commandHeight;
 
         ImGuiStyle style = ImGui.getStyle();
@@ -383,7 +394,7 @@ public final class ImGuiConsole {
             ImGui.setScrollY(max);
         }
         if (max == 0) {
-            float entryHeight = font.getFontSize() + padding * 2;
+            float entryHeight = fontSize + padding * 2;
             float offset = lastY; // We add one padding
             int amount = (int) Math.ceil(height / entryHeight);
             while (i < amount) {
@@ -394,7 +405,7 @@ public final class ImGuiConsole {
         prevMax = max;
         ImGui.endChild();
         ImGui.separator();
-        ImGui.beginChild("ConsoleCommand", width, font.getFontSize() + 8f);
+        ImGui.beginChild("ConsoleCommand", width, fontSize + 8f);
         ImGui.pushItemWidth(-1f);
         ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 0);
         ImGui.pushStyleColor(ImGuiCol.FrameBg, bgColor);

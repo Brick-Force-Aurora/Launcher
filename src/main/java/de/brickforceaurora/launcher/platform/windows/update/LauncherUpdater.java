@@ -34,5 +34,10 @@ public class LauncherUpdater implements IUpdater {
         }
         updates.add(new LauncherUpdate(version, url));
     }
+    
+    @Override
+    public boolean bunbledUpdates() {
+        return true;
+    }
 
 }

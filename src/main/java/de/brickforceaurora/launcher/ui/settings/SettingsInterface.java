@@ -1,10 +1,13 @@
 package de.brickforceaurora.launcher.ui.settings;
 
-import static de.brickforceaurora.launcher.ui.UserInterface.NO_PADDING;
+import static de.brickforceaurora.launcher.ui.UIConstant.*;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
@@ -14,7 +17,6 @@ import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.RenderContext;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
 import de.brickforceaurora.launcher.ui.clay.config.Rectangle;
-import de.brickforceaurora.launcher.ui.clay.config.TextColor;
 import de.brickforceaurora.launcher.ui.helper.Button;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -79,6 +81,9 @@ public final class SettingsInterface {
         checkbox("Check for updates?", updaterConfig::checkForUpdates, updaterConfig::checkForUpdates);
         checkbox("Get experimental updates", updaterConfig::experimental, updaterConfig::experimental);
         checkbox("Automatically install updates", updaterConfig::automaticUpdate, updaterConfig::automaticUpdate);
+        group("Game");
+        dirBrowser("Location", updaterConfig.gameDirectory::get, updaterConfig::gameDirectory);
+
     }
 
     /*
@@ -91,6 +96,10 @@ public final class SettingsInterface {
 
     private void checkbox(final String name, final BooleanSupplier getter, final BooleanConsumer setter) {
         entries.add(new Entry(name, new BooleanSetting(getter, setter)));
+    }
+
+    private void dirBrowser(final String name, final Supplier<Path> getter, final Consumer<Path> setter) {
+        entries.add(new Entry(name, new PathSetting(renderContext, true, getter, setter)));
     }
 
     /*
@@ -107,19 +116,21 @@ public final class SettingsInterface {
         try (Element window = builder.elementId("settings_root").build()) {
             builder = window.newElement();
             builder.layout().childGap(4).width(ISizing.percentage(1f)).height(ISizing.percentage(1f))
-                .layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                .layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Clip.builder().vertical(true).build())
                 .addConfigs(Rectangle.bg(Constant.PROGRESS_BACKGROUND_COLOR.duplicate().alpha(0.85f), 12.5f))
                 .addConfigs(Rectangle.hollow(Constant.BUTTON_PANEL_BACKGROUND_COLOR.duplicate().alpha(0.85f), 12.5f, 2.5f));
             try (Element root = builder.build()) {
                 builder = root.newElement();
                 builder.layout().width(ISizing.percentage(1f)).height(ISizing.grow()).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                    .padding(NO_PADDING).addConfigs(Clip.builder().vertical(true).build());
+                    .padding(NO_PADDING);
                 try (Element tableParent = builder.build()) {
                     for (final Entry entry : entries) {
+                        boolean belowLabel = entry.setting() != null && entry.setting().belowLabel();
+                        float entrySize = 6f * (entry.setting() == null ? 4f : entry.setting().size());
                         builder = tableParent.newElement();
-                        builder.layout().width(ISizing.percentage(1f))
-                            .height(ISizing.fixed(24f * (entry.setting() == null ? 1 : entry.setting().size())))
-                            .childVerticalAlignment(VAlignment.CENTER);
+                        builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(belowLabel ? entrySize + 20f : entrySize))
+                            .childVerticalAlignment(VAlignment.CENTER)
+                            .layoutDirection(belowLabel ? LayoutDirection.TOP_TO_BOTTOM : LayoutDirection.LEFT_TO_RIGHT);
                         try (Element entryParent = builder.build()) {
                             if (entry.setting() == null) {
                                 builder = entryParent.newElement();
@@ -131,16 +142,20 @@ public final class SettingsInterface {
                                 continue;
                             }
                             builder = entryParent.newElement();
-                            builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f))
-                                .layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
-                                .addConfigs(
-                                    Text.builder().text(entry.name()).font(FontWrapper.of(FontAtlas.NOTO_SANS_MEDIUM)).fontSize(18).build())
-                                .childVerticalAlignment(VAlignment.CENTER);
+                            builder.layout().width(ISizing.grow()).height(ISizing.fixed(20f)).layoutDirection(LayoutDirection.TOP_TO_BOTTOM)
+                                .addConfigs(Text.builder().text(entry.name()).font(FontWrapper.of(FontAtlas.NOTO_SANS_MEDIUM)).fontSize(18)
+                                    .build());
                             builder.build().close();
 
-                            builder = entryParent.newElement();
-                            builder.layout().width(ISizing.grow()).height(ISizing.percentage(1f)).padding(NO_PADDING)
-                                .childHorizontalAlignment(HAlignment.RIGHT);
+                            if (belowLabel) {
+                                builder = entryParent.newElement();
+                                builder.layout().width(ISizing.percentage(1f)).height(ISizing.fixed(entrySize)).padding(NO_PADDING)
+                                    .childHorizontalAlignment(HAlignment.LEFT).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
+                            } else {
+                                builder = entryParent.newElement();
+                                builder.layout().width(ISizing.grow()).height(ISizing.fixed(entrySize)).padding(NO_PADDING)
+                                    .childHorizontalAlignment(HAlignment.RIGHT).layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
+                            }
                             try (Element element = builder.build()) {
                                 entry.setting().create(renderContext, element);
                             }
@@ -155,7 +170,7 @@ public final class SettingsInterface {
                         builder
                             .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("CHECK FOR UPDATES")
                                 .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(20).build())
-                            .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                            .addConfigs(BUTTON_TXT_COLOR);
                         builder.build().close();
                     }
                 }
@@ -167,7 +182,7 @@ public final class SettingsInterface {
                         builder
                             .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("OPEN FOLDER")
                                 .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(20).build())
-                            .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                            .addConfigs(BUTTON_TXT_COLOR);
                         builder.build().close();
                     }
                     try (Element saveBtn = saveButton.build(renderContext, buttonRow2)) {
@@ -175,7 +190,7 @@ public final class SettingsInterface {
                         builder
                             .layout().layoutDirection(LayoutDirection.TOP_TO_BOTTOM).addConfigs(Text.builder().text("APPLY & SAVE")
                                 .font(FontWrapper.of(FontAtlas.NOTO_SANS_EXTRA_BOLD)).wrapMode(WrapMode.WRAP_NONE).fontSize(20).build())
-                            .addConfigs(new TextColor(Constant.BUTTON_TEXT_COLOR));
+                            .addConfigs(BUTTON_TXT_COLOR);
                         builder.build().close();
                     }
                 }

@@ -38,7 +38,7 @@ public final class FontWrapper implements IFont {
     }
 
     @Override
-    public void calculateSize(final String text, final int fontSize, final float[] size) {
+    public void calculateSize(final String text, final float fontSize, final float[] size) {
         font.calcTextSizeA(this.size, fontSize, Float.MAX_VALUE, 0.0f, text);
         size[0] = this.size.x;
         size[1] = this.size.y;

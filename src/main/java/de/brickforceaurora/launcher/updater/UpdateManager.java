@@ -52,18 +52,49 @@ public final class UpdateManager {
         }
     }
 
-    public Version applyUpdates(final TaskTracker tracker, final Path updateTargetDir) {
+    public Version applyUpdates(final TaskTracker tracker, final Path updateTargetDir, final Version targetVersion) {
         if (updates.isEmpty()) {
             return null;
         }
+
+        int targetCount = updates.size();
+        for (int index = 0; index < updates.size(); index++) {
+            IUpdate update = updates.get(index);
+            if (update.getVersion().isSame(targetVersion)) {
+                targetCount = index + 1;
+                break;
+            }
+            if (update.getVersion().isHigher(targetVersion)) {
+                targetCount = index;
+                break;
+            }
+        }
+
         final LauncherApp app = LauncherApp.get();
-        final Path temporaryDirectory = app.tempDirectory();
+        final Path temporaryDirectory = app.tempDirectory().resolve("update_work");
+
         Version lastUpdate = null;
-        final int updateCount = updates.size();
+
+        if (updater.bunbledUpdates()) {
+            IUpdate update = updates.get(targetCount - 1);
+            tracker.budget(100);
+            final Task task = tracker.allocate("Applying bundled update '%s'".formatted(update.getVersion()), 100);
+            try {
+                update.applyUpdate(logger, task, updateTargetDir, temporaryDirectory);
+                lastUpdate = update.getVersion();
+            } catch (final Throwable exp) {
+                logger.error("Failed to apply bundled update '{0}'", exp, update.getVersion());
+                return lastUpdate;
+            }
+            task.done();
+            return targetVersion;
+        }
+
         int updateNum = 0;
-        tracker.budget(updateCount * 100);
-        for (final IUpdate update : updates) {
-            final Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, updateCount),
+        tracker.budget(targetCount * 100);
+        for (int i = 0; i < targetCount; i++) {
+            IUpdate update = updates.get(i);
+            final Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, targetCount),
                 100);
             try {
                 update.applyUpdate(logger, task, updateTargetDir, temporaryDirectory);
@@ -75,6 +106,13 @@ public final class UpdateManager {
             task.done();
         }
         return lastUpdate;
+    }
+
+    public Version applyUpdates(final TaskTracker tracker, final Path updateTargetDir) {
+        if (updates.isEmpty()) {
+            return null;
+        }
+        return applyUpdates(tracker, updateTargetDir, updates.get(updates.size() - 1).getVersion());
     }
 
 }
