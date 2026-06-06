@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -62,7 +63,7 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }
 
         // TODO: Do actual command line parsing
-        LOGGER.setDebug(true);
+        LOGGER.setDebug(Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase));
 
         snowFrame = SnowFrame.builder(new LauncherApp()).logger(LOGGER).build();
         actor = new ConsoleActor(snowFrame);
