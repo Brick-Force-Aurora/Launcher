@@ -64,7 +64,7 @@ public final class WindowsHelper {
             }
             return enabled && action && path;
         } catch (final Throwable thr) {
-            LauncherApp.logger().warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
+            LauncherApp.LOGGER.warning("Failed to authorize firewall of '{0}' at '{1}'", thr, name, filePath);
             return false;
         }
     }

@@ -20,7 +20,7 @@ public final class GameData {
         try {
             STORE.load();
         } catch (final IOException e) {
-            LauncherApp.logger().error("Failed to initialize game data", e);
+            LauncherApp.LOGGER.error("Failed to initialize game data", e);
         }
     }
 

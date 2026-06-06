@@ -16,7 +16,7 @@ public final class LauncherData {
         try {
             STORE.load();
         } catch (final IOException e) {
-            LauncherApp.logger().error("Failed to initialize launcher data", e);
+            LauncherApp.LOGGER.error("Failed to initialize launcher data", e);
         }
     }
 

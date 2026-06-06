@@ -15,7 +15,6 @@ public final class ProcessUtil {
     }
 
     public static ProgramResult runAndRead(String[] command) {
-        ISimpleLogger logger = LauncherApp.logger();
         try {
             final Process process = new ProcessBuilder(command).start();
             BufferedReader inputReader = process.inputReader(), errorReader = process.inputReader();
@@ -47,8 +46,8 @@ public final class ProcessUtil {
                 code = process.exitValue();
             }
             String result = resultBuilder.toString(), error = errorBuilder.toString();
-            if (logger.isDebug()) {
-                logger.debug("""
+            if (LauncherApp.LOGGER.isDebug()) {
+                LauncherApp.LOGGER.debug("""
                     Execution of '{3}' success
                     ==========================
                     Code: {0}
@@ -58,8 +57,8 @@ public final class ProcessUtil {
             }
             return new ProgramResult(null, code, result, error);
         } catch (IOException | InterruptedException e) {
-            if (logger.isDebug()) {
-                logger.debug("Execution of '{0}' failed", e, String.join(" ", command));
+            if (LauncherApp.LOGGER.isDebug()) {
+                LauncherApp.LOGGER.debug("Execution of '{0}' failed", e, String.join(" ", command));
             }
             return new ProgramResult(e, -1, "", "");
         }

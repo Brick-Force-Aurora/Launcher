@@ -59,7 +59,7 @@ public final class StoredData<T> {
             value = handler.read(root, key);
         } catch (final Exception exp) {
             value = null;
-            LauncherApp.logger().warning("Failed to read value '{0}'", exp, key);
+            LauncherApp.LOGGER.warning("Failed to read value '{0}'", exp, key);
         }
     }
 
@@ -71,7 +71,7 @@ public final class StoredData<T> {
         try {
             handler.write(root, key, value);
         } catch (final Exception exp) {
-            LauncherApp.logger().warning("Failed to write value '{0}'", exp, key);
+            LauncherApp.LOGGER.warning("Failed to write value '{0}'", exp, key);
         }
     }
 

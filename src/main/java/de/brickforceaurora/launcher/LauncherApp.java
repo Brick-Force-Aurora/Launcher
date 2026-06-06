@@ -77,10 +77,6 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         return actor;
     }
 
-    public static ISimpleLogger logger() {
-        return snowFrame.logger();
-    }
-
     private AtomicReference<Path> gameDirectory;
     private Path appDirectory, tempDirectory;
     private DataStore launcherData, gameData;
