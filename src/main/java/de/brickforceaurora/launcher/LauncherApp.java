@@ -24,6 +24,7 @@ import de.brickforceaurora.launcher.updater.UpdateManager;
 import de.brickforceaurora.launcher.updater.github.GithubUpdater;
 import de.brickforceaurora.launcher.updater.shiningstar.ShiningStarUpdater;
 import de.brickforceaurora.launcher.util.ConsoleDelegateLogger;
+import de.brickforceaurora.launcher.util.ExceptionCatchingExecutorService;
 import de.brickforceaurora.launcher.util.IOUtil;
 import de.brickforceaurora.launcher.util.OSType;
 import de.brickforceaurora.launcher.util.console.Console;
@@ -45,10 +46,12 @@ import me.lauriichan.snowframe.util.logger.IDelegateLogger;
 
 public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
 
-    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1,
-        Thread.ofPlatform().daemon(true).name("Scheduler").factory());
-
     public static final LogHistory LOG_HISTORY = new LogHistory();
+    public static final ISimpleLogger LOGGER = new FileLogger(new File("../logs"),
+        IDelegateLogger.combined(new ConsoleDelegateLogger(LOG_HISTORY), Console.INSTANCE));
+
+    public static final ScheduledExecutorService SCHEDULER = new ExceptionCatchingExecutorService(
+        Executors.newScheduledThreadPool(1, Thread.ofPlatform().daemon(true).name("Scheduler").factory()), LOGGER);
 
     private static SnowFrame<LauncherApp> snowFrame;
     private static ConsoleActor actor;
@@ -59,11 +62,9 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
         }
 
         // TODO: Do actual command line parsing
-        final ISimpleLogger logger = new FileLogger(new File("../logs"),
-            IDelegateLogger.combined(new ConsoleDelegateLogger(LOG_HISTORY), Console.INSTANCE));
-        logger.setDebug(true);
+        LOGGER.setDebug(true);
 
-        snowFrame = SnowFrame.builder(new LauncherApp()).logger(logger).build();
+        snowFrame = SnowFrame.builder(new LauncherApp()).logger(LOGGER).build();
         actor = new ConsoleActor(snowFrame);
         return snowFrame;
     }

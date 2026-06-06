@@ -5,5 +5,5 @@ import me.lauriichan.snowframe.extension.IExtension;
 
 @ExtensionPoint
 public interface IUpdateCommand extends IExtension {
-    
+
 }

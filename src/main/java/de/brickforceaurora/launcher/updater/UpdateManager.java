@@ -46,7 +46,7 @@ public final class UpdateManager {
             updater.checkForUpdate(config, logger, version, updates);
             updates.sort(Comparator.comparing(IUpdate::getVersion));
             return true;
-        } catch (final IOException exp) {
+        } catch (final RuntimeException | IOException exp) {
             logger.error("Failed to check for updates", exp);
             return false;
         }

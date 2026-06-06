@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import de.brickforceaurora.launcher.LauncherApp;
+import de.brickforceaurora.launcher.command.argument.LoggerArgument;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.updater.IUpdate;
 import de.brickforceaurora.launcher.updater.IUpdater;
@@ -13,6 +14,7 @@ import de.brickforceaurora.launcher.updater.shiningstar.command.api.UpdateActor;
 import de.brickforceaurora.launcher.util.CLIUtil;
 import de.brickforceaurora.launcher.util.StringReader;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.command.CommandProcess;
 import me.lauriichan.laylib.command.Node;
@@ -56,9 +58,12 @@ public final class ShiningStarUpdater implements IUpdater {
         logger.debug("Received unexpected response from updater service: " + info);
     }
 
-    private final CommandManager commandManager = new CommandManager();
+    private final CommandManager commandManager;
 
     public ShiningStarUpdater(SnowFrame<LauncherApp> snowFrame) {
+        commandManager = new CommandManager(snowFrame.logger());
+        ArgumentRegistry registry = commandManager.getRegistry();
+        registry.setProvider(new LoggerArgument(snowFrame.logger()));
         snowFrame.extension(IUpdateCommand.class, false).callClasses(commandManager::register);
     }
 
@@ -76,7 +81,7 @@ public final class ShiningStarUpdater implements IUpdater {
         HttpRequest request = new HttpRequest().url(config.shiningStarUrl("update/list")).param("product_id", productId);
         int maxPage = 0, page = 0;
         while (page <= maxPage) {
-            response = request.param("page", page).call(HttpContentType.JSON);
+            response = request.param("page", page++).call(HttpContentType.JSON);
             if (response.code() != HttpCode.OK) {
                 logJsonResponse(logger, response);
                 throw new IOException("Unexpected response from updater service: " + response.code().code());
@@ -105,7 +110,7 @@ public final class ShiningStarUpdater implements IUpdater {
         String label = args[0];
         args = Arrays.copyOfRange(args, 1, args.length);
         final Triple<NodeCommand, Node, String> triple = commandManager.findNode(label, args);
-        if (triple == null) {
+        if (triple == null || triple.getB().getAction() == null) {
             throw new IncompleteInstructionException("Unknown instruction '%s' for '%s'".formatted(label, instruction));
         }
         final CommandProcess process = new CommandProcess(triple.getC(), triple.getB().getAction(), triple.getA().getInstance());
