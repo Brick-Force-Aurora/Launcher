@@ -3,7 +3,7 @@ package de.brickforceaurora.launcher.util;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 public final class CLIUtil {
-    
+
     private CLIUtil() {
         throw new UnsupportedOperationException();
     }
@@ -57,6 +57,33 @@ public final class CLIUtil {
             }
         }
         return count;
+    }
+
+    public static String recombine(String label, String[] args) {
+        final int space = CLIUtil.countSpace(label);
+        int argIdx = 0;
+        for (int index = 0; index < space; index++) {
+            while (args[argIdx++].isEmpty()) {
+            }
+        }
+        final StringBuilder string = new StringBuilder();
+        for (int index = argIdx; index < args.length; index++) {
+            appendSafe(string, args[index]);
+            if (index + 1 != args.length) {
+                string.append(' ');
+            }
+        }
+        return string.toString();
+    }
+
+    public static void appendSafe(StringBuilder builder, String str) {
+        if (!str.isBlank() && str.chars().allMatch(ch -> StringReader.isUnquotedCharacter((char) ch))) {
+            builder.append(str);
+        } else {
+            builder.append('"');
+            builder.append(str.replace("\"", "\\\""));
+            builder.append('"');
+        }
     }
 
 }

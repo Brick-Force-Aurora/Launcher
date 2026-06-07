@@ -29,8 +29,8 @@ public class SubWorker {
             }
         }
         subWork += work;
-        currentWork = (int) (subWork / (float) totalSubWork * totalWork);
-        if (currentWork != allocatedWork) {
+        currentWork = (int) ((subWork / (float) totalSubWork) * totalWork);
+        if (currentWork != allocatedWork && (currentWork - allocatedWork) > 0) {
             task.work(currentWork - allocatedWork);
             allocatedWork = currentWork;
         }

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import de.brickforceaurora.launcher.LauncherApp;
-import me.lauriichan.laylib.logger.ISimpleLogger;
 
 public final class ProcessUtil {
 

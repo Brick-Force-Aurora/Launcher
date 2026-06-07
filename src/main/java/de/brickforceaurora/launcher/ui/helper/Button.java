@@ -13,14 +13,12 @@ import de.brickforceaurora.launcher.animation.property.PropBool;
 import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.trigger.DelegateTrigger;
 import de.brickforceaurora.launcher.ui.RenderContext;
-import de.brickforceaurora.launcher.ui.UIConstant;
 import de.brickforceaurora.launcher.ui.clay.config.BFButton;
 import me.lauriichan.clay4j.Element;
 import me.lauriichan.clay4j.ISizing;
 import me.lauriichan.clay4j.Layout.HAlignment;
 import me.lauriichan.clay4j.Layout.LayoutDirection;
 import me.lauriichan.clay4j.Layout.Padding;
-import me.lauriichan.clay4j.Layout.VAlignment;
 import me.lauriichan.snowframe.util.color.SimpleColor;
 
 public class Button {

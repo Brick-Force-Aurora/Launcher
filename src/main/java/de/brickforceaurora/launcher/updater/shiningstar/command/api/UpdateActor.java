@@ -46,7 +46,9 @@ public final class UpdateActor extends Actor<IDataSource> {
     }
 
     public IDataSource target(String path) {
-        if (path.contains("..")) {
+        if (path == null || path.isBlank()) {
+            path = "";
+        } else if (path.contains("..")) {
             path = path.replace("../", "");
             if (path.contains("..")) {
                 path = path.replace("..", "");

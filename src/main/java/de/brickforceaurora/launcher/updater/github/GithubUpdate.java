@@ -46,61 +46,56 @@ final class GithubUpdate implements IUpdate {
         if (response == null || response.code() != HttpCode.OK) {
             throw new IOException("Couldn't download update");
         }
-        Files.createDirectories(tempDirectory);
-        try {
-            try (ZipInputStream zip = new ZipInputStream(new FastByteArrayInputStream(response.data().value()))) {
-                ZipEntry entry;
-                Path path, parent;
-                while ((entry = zip.getNextEntry()) != null) {
-                    if (entry.isDirectory()) {
-                        path = tempDirectory.resolve(entry.getName());
-                        if (!Files.exists(path)) {
-                            Files.createDirectories(path);
-                        }
-                        continue;
-                    }
+        try (ZipInputStream zip = new ZipInputStream(new FastByteArrayInputStream(response.data().value()))) {
+            ZipEntry entry;
+            Path path, parent;
+            while ((entry = zip.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
                     path = tempDirectory.resolve(entry.getName());
-                    if (!Files.exists(parent = path.getParent())) {
-                        Files.createDirectories(parent);
+                    if (!Files.exists(path)) {
+                        Files.createDirectories(path);
                     }
-                    Files.copy(zip, path, StandardCopyOption.REPLACE_EXISTING);
+                    continue;
                 }
-            }
-            final Path infoFile = tempDirectory.resolve("info");
-            if (!Files.exists(infoFile)) {
-                logger.warning("Found invalid update zip for version {0}: no info file available", version);
-                return;
-            }
-            final ObjectArraySet<String> deletePaths = new ObjectArraySet<>();
-            final Object2ObjectArrayMap<String, String> paths = new Object2ObjectArrayMap<>();
-            try (BufferedReader reader = Files.newBufferedReader(infoFile)) {
-                String line;
-                String[] parts;
-                while ((line = reader.readLine()) != null) {
-                    if (!line.contains("=")) {
-                        continue;
-                    }
-                    parts = line.split("=");
-                    // Don't allow target to be outside of the target folder, generally we don't need '..'
-                    if ((parts.length > 2) || parts[1].contains("..")) {
-                        continue;
-                    }
-                    if ("delete".equalsIgnoreCase(parts[0])) {
-                        deletePaths.add(parts[1]);
-                        continue;
-                    }
-                    paths.put(parts[0], parts[1]);
+                path = tempDirectory.resolve(entry.getName());
+                if (!Files.exists(parent = path.getParent())) {
+                    Files.createDirectories(parent);
                 }
+                Files.copy(zip, path, StandardCopyOption.REPLACE_EXISTING);
             }
-            final SubWorker worker = new SubWorker(task, 50, deletePaths.size() + paths.size());
-            applyPatch(task, worker, tempDirectory, paths, updateTargetDir, "");
-            for (final String deletePath : deletePaths) {
-                task.task("Deleting '" + deletePath + "'");
-                IOUtil.delete(updateTargetDir.resolve(deletePath));
-                worker.work(1);
+        }
+        final Path infoFile = tempDirectory.resolve("info");
+        if (!Files.exists(infoFile)) {
+            logger.warning("Found invalid update zip for version {0}: no info file available", version);
+            return;
+        }
+        final ObjectArraySet<String> deletePaths = new ObjectArraySet<>();
+        final Object2ObjectArrayMap<String, String> paths = new Object2ObjectArrayMap<>();
+        try (BufferedReader reader = Files.newBufferedReader(infoFile)) {
+            String line;
+            String[] parts;
+            while ((line = reader.readLine()) != null) {
+                if (!line.contains("=")) {
+                    continue;
+                }
+                parts = line.split("=");
+                // Don't allow target to be outside of the target folder, generally we don't need '..'
+                if ((parts.length > 2) || parts[1].contains("..")) {
+                    continue;
+                }
+                if ("delete".equalsIgnoreCase(parts[0])) {
+                    deletePaths.add(parts[1]);
+                    continue;
+                }
+                paths.put(parts[0], parts[1]);
             }
-        } finally {
-            IOUtil.delete(tempDirectory);
+        }
+        final SubWorker worker = new SubWorker(task, 50, deletePaths.size() + paths.size());
+        applyPatch(task, worker, tempDirectory, paths, updateTargetDir, "");
+        for (final String deletePath : deletePaths) {
+            task.task("Deleting '" + deletePath + "'");
+            IOUtil.delete(updateTargetDir.resolve(deletePath));
+            worker.work(1);
         }
     }
 

@@ -7,10 +7,12 @@ import java.util.Optional;
 
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
+import de.brickforceaurora.launcher.util.IOUtil;
 import de.brickforceaurora.launcher.util.TaskTracker;
 import de.brickforceaurora.launcher.util.TaskTracker.Task;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import me.lauriichan.snowframe.resource.source.IDataSource;
 import me.lauriichan.snowframe.util.Version;
 
 public final class UpdateManager {
@@ -71,7 +73,8 @@ public final class UpdateManager {
         }
 
         final LauncherApp app = LauncherApp.get();
-        final Path temporaryDirectory = app.tempDirectory().resolve("update_work");
+        final IDataSource temporaryDirectory = app.snowFrame().resource("update_work");
+        final Path tempDirPath = IOUtil.asPath(temporaryDirectory);
 
         Version lastUpdate = null;
 
@@ -80,8 +83,13 @@ public final class UpdateManager {
             tracker.budget(100);
             final Task task = tracker.allocate("Applying bundled update '%s'".formatted(update.getVersion()), 100);
             try {
-                update.applyUpdate(logger, task, updateTargetDir, temporaryDirectory);
-                lastUpdate = update.getVersion();
+                try {
+                    temporaryDirectory.createAsContainer();
+                    update.applyUpdate(logger, task, updateTargetDir, tempDirPath);
+                    lastUpdate = update.getVersion();
+                } finally {
+                    temporaryDirectory.delete();
+                }
             } catch (final Throwable exp) {
                 logger.error("Failed to apply bundled update '{0}'", exp, update.getVersion());
                 return lastUpdate;
@@ -97,8 +105,13 @@ public final class UpdateManager {
             final Task task = tracker.allocate("Applying update '%s' (%s / %s)".formatted(update.getVersion(), ++updateNum, targetCount),
                 100);
             try {
-                update.applyUpdate(logger, task, updateTargetDir, temporaryDirectory);
-                lastUpdate = update.getVersion();
+                try {
+                    temporaryDirectory.createAsContainer();
+                    update.applyUpdate(logger, task, updateTargetDir, tempDirPath);
+                    lastUpdate = update.getVersion();
+                } finally {
+                    temporaryDirectory.delete();
+                }
             } catch (final Throwable exp) {
                 logger.error("Failed to apply update '{0}'", exp, update.getVersion());
                 return lastUpdate;

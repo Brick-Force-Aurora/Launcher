@@ -52,11 +52,10 @@ public final class ShiningStarUpdate implements IUpdate {
                 HttpContentType.BINARY.restrict("application/zip")));
         if (response.code() != HttpCode.OK) {
             ShiningStarUpdater.logFormResponse(logger, response);
-            return;
+            throw new IOException("Failed to download bundled update");
         }
         MultiFormData data = response.data().value();
         String[] instructions = data.get("instructions", String.class).split("\n");
-        Files.createDirectories(tempDirectory);
         FastByteArrayInputStream byteInput = new FastByteArrayInputStream(data.get("zip", byte[].class));
         SubWorker worker = new SubWorker(task, 20, byteInput.length);
         int lastPos = 0, newPos = 0;

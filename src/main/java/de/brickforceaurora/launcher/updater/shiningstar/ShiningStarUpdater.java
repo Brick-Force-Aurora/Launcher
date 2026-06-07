@@ -91,7 +91,7 @@ public final class ShiningStarUpdater implements IUpdater {
             JsonArray versionArray = object.getAsArray("versions");
             for (IJson<?> versionRaw : versionArray) {
                 Version version = Version.parse(versionRaw.asString());
-                if (version.isLower(current)) {
+                if (!version.isHigher(current)) {
                     continue;
                 }
                 updates.add(new ShiningStarUpdate(this, config, productId, current, version));
@@ -118,20 +118,7 @@ public final class ShiningStarUpdater implements IUpdater {
         if (argument == null) {
             return process;
         }
-        final int space = CLIUtil.countSpace(triple.getC());
-        int argIdx = 0;
-        for (int index = 0; index < space; index++) {
-            while (args[argIdx++].isEmpty()) {
-            }
-        }
-        final StringBuilder string = new StringBuilder();
-        for (int index = argIdx; index < args.length; index++) {
-            string.append(args[index]);
-            if (index + 1 != args.length) {
-                string.append(' ');
-            }
-        }
-        final StringReader reader = new StringReader(string.toString());
+        final StringReader reader = new StringReader(CLIUtil.recombine(label, args));
         String data;
         while (argument != null) {
             if (!reader.skipWhitespace().hasNext()) {
