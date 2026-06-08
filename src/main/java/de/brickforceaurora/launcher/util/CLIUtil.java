@@ -23,6 +23,8 @@ public final class CLIUtil {
                 if (!buffer.isEmpty()) {
                     arguments.add(buffer.toString());
                     buffer = new StringBuilder();
+                } else {
+                    arguments.add("");
                 }
                 if (!reader.hasNext()) {
                     break;
@@ -60,14 +62,9 @@ public final class CLIUtil {
     }
 
     public static String recombine(String label, String[] args) {
-        final int space = CLIUtil.countSpace(label);
-        int argIdx = 0;
-        for (int index = 0; index < space; index++) {
-            while (args[argIdx++].isEmpty()) {
-            }
-        }
+        final int space = countSpace(label);
         final StringBuilder string = new StringBuilder();
-        for (int index = argIdx; index < args.length; index++) {
+        for (int index = space; index < args.length; index++) {
             appendSafe(string, args[index]);
             if (index + 1 != args.length) {
                 string.append(' ');

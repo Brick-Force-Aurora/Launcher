@@ -92,7 +92,14 @@ public class UpdaterConfig_ implements ISingleConfigExtension {
 
     private void shiningStarDirectory(String string) {}
 
-    public void gameDirectory(Path path) {
+    public boolean gameDirectory(Path path) {
+        if (gameDirectory.get().equals(path)) {
+            return false;
+        }
+        try {
+            path = snowFrame.app().appDirectory().relativize(path);
+        } catch (RuntimeException _) {
+        }
         switch (productType) {
         case AURORA:
             auroraDirectory(path.toString());
@@ -101,6 +108,7 @@ public class UpdaterConfig_ implements ISingleConfigExtension {
             shiningStarDirectory(path.toString());
         }
         updateGameDirectory();
+        return true;
     }
 
     private void updateGameDirectory() {

@@ -17,7 +17,7 @@ public class CopyCommand implements IUpdateCommand {
 
     @Action("")
     public void apply(ISimpleLogger logger, UpdateActor actor, @Argument(name = "source path", index = 0) String sourcePath,
-        @Argument(name = "target path", index = 1, optional = true) String targetPath) throws IOException {
+        @Argument(name = "target path", index = 1) String targetPath) throws IOException {
         IDataSource src = actor.source(sourcePath);
         if (!src.exists()) {
             logger.warning("Source of copy instruction doesn't exist, skipping");

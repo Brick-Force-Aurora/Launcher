@@ -82,8 +82,12 @@ public final class SettingsInterface {
         checkbox("Get experimental updates", updaterConfig::experimental, updaterConfig::experimental);
         checkbox("Automatically install updates", updaterConfig::automaticUpdate, updaterConfig::automaticUpdate);
         group("Game");
-        dirBrowser("Location", updaterConfig.gameDirectory::get, updaterConfig::gameDirectory);
-
+        dirBrowser("Location", updaterConfig.gameDirectory::get, (path) -> {
+            if (!updaterConfig.gameDirectory(path) || !updaterConfig.checkForUpdates()) {
+                return;
+            }
+            LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(false, false));
+        });
     }
 
     /*
