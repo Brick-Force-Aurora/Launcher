@@ -29,8 +29,7 @@ public record LauncherUpdate(Version version, String url) implements IUpdate {
             throw new IllegalStateException();
         }
         task.task("Writing installer");
-        final Path path = tempDirectory.resolve(fileName);
-        Files.createDirectories(tempDirectory);
+        final Path path = updateTargetDir.resolve(fileName);
         Files.deleteIfExists(path);
         Files.write(path, request.data().value(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         task.work(50);

@@ -56,7 +56,7 @@ public class WindowsPlatform extends Platform {
 
         final UpdateManager updateManager = new UpdateManager(app.snowFrame().logger(), new LauncherUpdater());
         try {
-            Files.deleteIfExists(app.tempDirectory().resolve("BrickForceAurora-Update-%s.exe".formatted(Main.version().toString())));
+            Files.deleteIfExists(app.appDirectory().resolve("BrickForceAurora-Update-%s.exe".formatted(Main.version().toString())));
         } catch (final IOException _) {
             // We can ignore if this fails
         }
@@ -69,7 +69,7 @@ public class WindowsPlatform extends Platform {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     new ProcessBuilder("cmd.exe", "/c", "start", "BrickForceAurora-Update-%s.exe".formatted(newVersion.toString()),
-                        "/verysilent").directory(app.tempDirectory().toFile()).start();
+                        "/verysilent").directory(app.appDirectory().toFile()).start();
                 } catch (final IOException _) {
                 }
             }));
