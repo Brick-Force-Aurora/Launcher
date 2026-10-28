@@ -156,7 +156,7 @@ public final class LinuxHelper {
         return new ProtonInstallation(name.toLowerCase(), version, path);
     }
 
-    public static boolean isPrefixSetup(Task task, Path prefix) {
+    public static boolean isPrefixSetup(Task task, Path prefix, ProtonInstance proton) {
         try (task) {
             if (!Files.isDirectory(prefix)) {
                 return false;
@@ -167,6 +167,10 @@ public final class LinuxHelper {
                     return false;
                 }
                 task.work(workPerFile);
+            }
+            String dotnetResult = proton.queryRegistry("HKLM\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v3.5", "Install");
+            if (dotnetResult == null || !dotnetResult.equals("Install REG_DWORD 0x1")) {
+                return false;
             }
             return true;
         }

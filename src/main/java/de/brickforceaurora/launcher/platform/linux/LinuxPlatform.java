@@ -89,6 +89,8 @@ public class LinuxPlatform extends Platform {
                 HttpResponse<byte[]> response = new HttpRequest().url(URL_GE_PROTON_9_27).readTimeout(2500)
                     .downloadListener(new DownloadTracker(task, 25)).call(HttpContentType.BINARY);
                 if (response == null || response.code() != HttpCode.OK) {
+                    logger.warning("Failed to install GE-Proton9-27 [HTTP: {0}]",
+                        response == null ? "N/A" : response.code().code() + " " + response.code().name());
                     mainText.set("Failed to download GE-Proton9-27, please install it manually.");
                     return false;
                 }
@@ -98,6 +100,7 @@ public class LinuxPlatform extends Platform {
                 task.task("Extracting GE-Proton9-27");
                 try {
                     if (!LinuxHelper.extractTar(protonGePath, PROTON_INSTALL_LOC)) {
+                        logger.warning("Failed to install GE-Proton9-27 [Extraction failed]");
                         mainText.set("Failed to install GE-Proton9-27, please install it manually.");
                         return false;
                     }
@@ -116,7 +119,19 @@ public class LinuxPlatform extends Platform {
         ProtonInstance proton = new ProtonInstance(protonPath, compatPath, steamPath);
         this.protonRef.set(proton);
 
-        if (!LinuxHelper.isPrefixSetup(tracker.allocate("Checking proton prefix...", 10), winePrefix)) {
+        var protonResult = proton.executeProtonAwait("version");
+        if (protonResult.exception() != null || protonResult.code() != 0) {
+            if (protonResult.exception() != null) {
+                logger.error("Failed to check proton version", protonResult.exception());
+            } else {
+                logger.error("Failed to check proton version (code: {0}): {1}", protonResult.code(), protonResult.result());
+            }
+            mainText.set("Failed to check proton version");
+            return false;
+        }
+        logger.info("Using proton '{0}'", protonResult.result());
+
+        if (!LinuxHelper.isPrefixSetup(tracker.allocate("Checking proton prefix...", 10), winePrefix, proton)) {
             try (Task task = tracker.allocate("Creating proton prefix...", 35)) {
                 task.task("Clearing old prefix");
                 if (Files.isDirectory(winePrefix)) {
@@ -138,6 +153,7 @@ public class LinuxPlatform extends Platform {
                             "which",
                             "cabextract"
                         }).code() != 0) {
+                            logger.warning("Failed to install winetricks because 'cabextract' is missing");
                             mainText.set("Can't setup winetricks, please install winetricks or cabextract and try again.");
                             return false;
                         }
@@ -148,6 +164,8 @@ public class LinuxPlatform extends Platform {
                             HttpResponse<byte[]> response = new HttpRequest().url(URL_WINETRICKS).readTimeout(2500)
                                 .downloadListener(new DownloadTracker(task, 14)).call(HttpContentType.BINARY);
                             if (response == null || response.code() != HttpCode.OK) {
+                                logger.warning("Failed to download winetricks [HTTP: {0}]",
+                                    response == null ? "N/A" : response.code().code() + " " + response.code().name());
                                 mainText.set("Failed to download winetricks, please install it manually.");
                                 return false;
                             }
@@ -166,12 +184,14 @@ public class LinuxPlatform extends Platform {
                 task.task("Creating prefix with dotnet");
                 LinuxHelper.ensureWritableDirectory(winePrefix);
                 if (proton.executeAwait(wineTricksPath, "-q", "dotnet35").code() != 0) {
+                    logger.warning("Failed to setup .net3.5 using winetricks");
                     mainText.set("Failed to setup proton prefix, please try again.");
                     return false;
                 }
             }
-            if (!LinuxHelper.isPrefixSetup(tracker.allocate("Checking proton prefix...", 10), winePrefix)) {
+            if (!LinuxHelper.isPrefixSetup(tracker.allocate("Checking proton prefix...", 10), winePrefix, proton)) {
                 // Great the setup is fucked
+                logger.warning("IDK, proton prefix is just fucked");
                 mainText.set("Failed to setup proton prefix, please try again.");
                 return false;
             }

@@ -2,6 +2,7 @@ package de.brickforceaurora.launcher.util;
 
 import java.util.Objects;
 
+import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.property.PropString;
 
@@ -30,10 +31,10 @@ public class TaskTracker {
         public void task(final String task) {
             if (task == null) {
                 this.task = new StringBuilder().append(currentWork).append(" / ").append(allocatedWork).toString();
-                tracker.text.set(new StringBuilder(title).append(" (").append(this.task).append(')').toString());
+                tracker.updateText(new StringBuilder(title).append(" (").append(this.task).append(')').toString());
                 return;
             }
-            tracker.text.set(new StringBuilder(title).append(" (").append(this.task = task).append(')').toString());
+            tracker.updateText(new StringBuilder(title).append(" (").append(this.task = task).append(')').toString());
         }
 
         public String task() {
@@ -94,6 +95,13 @@ public class TaskTracker {
         this.workBudget = workBudget;
     }
 
+    private void updateText(String text) {
+        if (LauncherApp.LOGGER.isDebug()) {
+            LauncherApp.LOGGER.debug("Updated task text: {0}", text);
+        }
+        this.text.set(text);
+    }
+    
     public void budget(final int budget) {
         if (workBudget != 0) {
             return;

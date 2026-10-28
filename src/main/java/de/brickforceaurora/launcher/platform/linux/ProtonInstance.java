@@ -25,12 +25,28 @@ public final class ProtonInstance {
         return wineTricksPath;
     }
 
+    public ProgramResult executeProtonAwait(String command, String... arguments) throws IOException, InterruptedException {
+        return executeProtonAwait(null, command, arguments);
+    }
+
+    public ProgramResult executeProtonAwait(Path directory, String command, String... arguments) throws IOException, InterruptedException {
+        return ProcessUtil.await(createProcess(directory, command, arguments));
+    }
+
+    public Process executeProton(String command, String... arguments) throws IOException {
+        return executeProton(null, command, arguments);
+    }
+
+    public Process executeProton(Path directory, String command, String... arguments) throws IOException {
+        return createProcess(directory, command, arguments).start();
+    }
+
     public ProgramResult executeAwait(String... arguments) throws IOException, InterruptedException {
         return executeAwait(null, arguments);
     }
 
     public ProgramResult executeAwait(Path directory, String... arguments) throws IOException, InterruptedException {
-        return ProcessUtil.await(createProcess(directory, arguments));
+        return ProcessUtil.await(createProcessForWindowsCommands(directory, arguments));
     }
 
     public Process execute(String... arguments) throws IOException {
@@ -38,13 +54,17 @@ public final class ProtonInstance {
     }
 
     public Process execute(Path directory, String... arguments) throws IOException {
-        return createProcess(directory, arguments).start();
+        return createProcessForWindowsCommands(directory, arguments).start();
     }
 
-    private ProcessBuilder createProcess(Path directory, String[] arguments) {
+    private ProcessBuilder createProcessForWindowsCommands(Path directory, String[] arguments) {
+        return createProcess(directory, "run", arguments);
+    }
+    
+    private ProcessBuilder createProcess(Path directory, String command, String[] arguments) {
         String[] processArgs = new String[arguments.length + 2];
         processArgs[0] = protonPath;
-        processArgs[1] = "run";
+        processArgs[1] = command;
         System.arraycopy(arguments, 0, processArgs, 2, arguments.length);
         ProcessBuilder processBuilder = new ProcessBuilder(processArgs);
         Map<String, String> environment = processBuilder.environment();
@@ -64,6 +84,17 @@ public final class ProtonInstance {
             if (LauncherApp.LOGGER.isDebug()) {
                 LauncherApp.LOGGER.debug("Failed to set registry entry '{0}' -> '{1}'", e, path, key);
             }
+        }
+    }
+    
+    public String queryRegistry(String path, String key) {
+        try {
+            return executeAwait("reg", "query", path, "/v", key).result();
+        } catch (InterruptedException | IOException e) {
+            if (LauncherApp.LOGGER.isDebug()) {
+                LauncherApp.LOGGER.debug("Failed to query registry entry '{0}' -> '{1}'", e, path, key);
+            }
+            return null;
         }
     }
 
