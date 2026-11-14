@@ -32,12 +32,23 @@ public class DownloadTracker implements IHttpProgressListener {
     public void progress(final int current, final int total) {
         metrics.push(current - lastCurrent);
         lastCurrent = current;
+        updateTask();
+        if (total <= 0) {
+            return;
+        } else if (current == total) {
+            currentWork = totalWork;
+            task.work(currentWork - allocatedWork);
+            return;
+        }
         currentWork = (int) (current / (float) total * totalWork);
         if (currentWork != allocatedWork) {
             task.work(currentWork - allocatedWork);
-            task.task(taskName + " - " + formatMetrics());
             allocatedWork = currentWork;
         }
+    }
+    
+    private void updateTask() {
+        task.task("%s (%s) - %s".formatted(taskName, formatDownloaded(), formatMetrics()));
     }
 
     private String formatMetrics() {
@@ -48,6 +59,16 @@ public class DownloadTracker implements IHttpProgressListener {
             return FORMAT.format(mBytes) + " MB/s";
         }
         return FORMAT.format(kBytes) + " KB/s";
+    }
+
+    private String formatDownloaded() {
+        final int bytes = lastCurrent;
+        final float kBytes = bytes / 1024f;
+        final float mBytes = kBytes / 1024f;
+        if (mBytes > 1) {
+            return FORMAT.format(mBytes) + " MB";
+        }
+        return FORMAT.format(kBytes) + " KB";
     }
 
 }
