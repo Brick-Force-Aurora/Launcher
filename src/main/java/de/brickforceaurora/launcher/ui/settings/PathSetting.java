@@ -64,12 +64,13 @@ public class PathSetting extends Setting {
     }
 
     @Override
-    public void apply() {
+    public boolean apply() {
         Path path = Paths.get(pathValue);
         if (!path.isAbsolute()) {
             path = appDir.resolve(pathValue).toAbsolutePath();
         }
         setter.accept(path);
+        return false;
     }
 
     private void selectPath() {

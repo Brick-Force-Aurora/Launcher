@@ -16,8 +16,8 @@ public abstract class Setting {
     }
 
     public abstract void update();
-
-    public abstract void apply();
+    
+    public abstract boolean apply();
     
     protected boolean belowLabel() {
         return false;

@@ -3,6 +3,7 @@ package de.brickforceaurora.launcher.ui.settings;
 import static de.brickforceaurora.launcher.ui.UIConstant.*;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.ui.RenderContext;
@@ -16,11 +17,18 @@ import me.lauriichan.clay4j.ISizing;
 public class BooleanSetting extends Setting {
 
     private final BooleanSupplier getter;
-    private final BooleanConsumer setter;
+    private final Function<Boolean, Boolean> setter;
 
     private boolean value = false;
 
     public BooleanSetting(final BooleanSupplier getter, final BooleanConsumer setter) {
+        this(getter, (value) -> {
+            setter.accept(value.booleanValue());
+            return false;
+        });
+    }
+
+    public BooleanSetting(final BooleanSupplier getter, final Function<Boolean, Boolean> setter) {
         super(3f);
         this.getter = getter;
         this.setter = setter;
@@ -33,8 +41,8 @@ public class BooleanSetting extends Setting {
     }
 
     @Override
-    public void apply() {
-        setter.accept(value);
+    public boolean apply() {
+        return setter.apply(value);
     }
 
     @Override

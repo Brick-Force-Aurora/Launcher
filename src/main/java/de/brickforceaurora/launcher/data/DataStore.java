@@ -99,6 +99,11 @@ public final class DataStore {
             data.read(root);
         }
     }
+    
+    public void reset() throws IOException {
+        source = null;
+        load();
+    }
 
     private void clearInternal() {
         if (root == null) {

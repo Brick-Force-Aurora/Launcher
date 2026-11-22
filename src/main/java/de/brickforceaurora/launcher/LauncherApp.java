@@ -64,8 +64,8 @@ public final class LauncherApp implements ISnowFrameApp<LauncherApp> {
     public static final ScheduledExecutorService SCHEDULER = new ExceptionCatchingExecutorService(
         Executors.newScheduledThreadPool(1, Thread.ofPlatform().daemon(true).name("Scheduler").factory()), LOGGER);
 
-    private static SnowFrame<LauncherApp> snowFrame;
     private static ConsoleActor actor;
+    static SnowFrame<LauncherApp> snowFrame;
 
     static SnowFrame<LauncherApp> init(final String[] args) {
         if (snowFrame != null) {

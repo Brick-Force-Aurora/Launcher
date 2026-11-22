@@ -111,7 +111,7 @@ public class UpdaterConfig_ implements ISingleConfigExtension {
         return true;
     }
 
-    private void updateGameDirectory() {
+    public void updateGameDirectory() {
         String gameDirPath = switch (productType) {
         case AURORA:
             yield auroraDirectory;

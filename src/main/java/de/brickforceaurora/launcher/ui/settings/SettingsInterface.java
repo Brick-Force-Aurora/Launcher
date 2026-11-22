@@ -7,12 +7,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.brickforceaurora.launcher.Constant;
 import de.brickforceaurora.launcher.FontAtlas;
+import de.brickforceaurora.launcher.GameData;
 import de.brickforceaurora.launcher.LauncherApp;
 import de.brickforceaurora.launcher.config.UpdaterConfig;
+import de.brickforceaurora.launcher.config.common.ProductType;
+import de.brickforceaurora.launcher.config.common.UpdaterType;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.RenderContext;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
@@ -55,7 +59,14 @@ public final class SettingsInterface {
         this.saveButton = Button.builder().action(() -> {
             for (final Entry entry : entries) {
                 if (entry.setting() != null) {
-                    entry.setting().apply();
+                    if (entry.setting().apply()) {
+                        for (final Entry ent : entries) {
+                            if (ent.setting() != null) {
+                                ent.setting().update();
+                            }
+                        }
+                        break;
+                    }
                 }
             }
             configManager.save();
@@ -82,12 +93,33 @@ public final class SettingsInterface {
         checkbox("Get experimental updates", updaterConfig::experimental, updaterConfig::experimental);
         checkbox("Automatically install updates", updaterConfig::automaticUpdate, updaterConfig::automaticUpdate);
         group("Game");
+        if (updaterConfig.updaterType() == UpdaterType.SHINING_STAR) {
+            checkboxFunc("Shining Star Client?", () -> updaterConfig.productType() == ProductType.SHINING_STAR, value -> {
+                ProductType newType = value ? ProductType.SHINING_STAR : ProductType.AURORA;
+                if (updaterConfig.productType() == newType) {
+                    return false;
+                }
+                try {
+                    GameData.STORE.save();
+                } catch (IOException e) {
+                }
+                updaterConfig.productType(newType);
+                updaterConfig.updateGameDirectory();
+                try {
+                    GameData.STORE.reset();
+                } catch (IOException e) {
+                }
+                LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(true, false));
+                return true;
+            });
+        }
         dirBrowser("Location", updaterConfig.gameDirectory::get, (path) -> {
             if (!updaterConfig.gameDirectory(path) || !updaterConfig.checkForUpdates()) {
                 return;
             }
             LauncherApp.SCHEDULER.submit(() -> UIActionHelper.runUpdate(false, false));
         });
+
     }
 
     /*
@@ -99,6 +131,10 @@ public final class SettingsInterface {
     }
 
     private void checkbox(final String name, final BooleanSupplier getter, final BooleanConsumer setter) {
+        entries.add(new Entry(name, new BooleanSetting(getter, setter)));
+    }
+
+    private void checkboxFunc(final String name, final BooleanSupplier getter, final Function<Boolean, Boolean> setter) {
         entries.add(new Entry(name, new BooleanSetting(getter, setter)));
     }
 

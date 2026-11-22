@@ -20,6 +20,7 @@ import de.brickforceaurora.launcher.animation.property.PropFloat;
 import de.brickforceaurora.launcher.animation.property.PropString;
 import de.brickforceaurora.launcher.animation.trigger.DelegateTrigger;
 import de.brickforceaurora.launcher.command.api.CommandHandler;
+import de.brickforceaurora.launcher.config.UpdaterConfig;
 import de.brickforceaurora.launcher.helper.UIActionHelper;
 import de.brickforceaurora.launcher.ui.clay.AbstractUserInterface;
 import de.brickforceaurora.launcher.ui.clay.FontWrapper;
@@ -44,6 +45,7 @@ import me.lauriichan.clay4j.Layout.LayoutDirection;
 import me.lauriichan.clay4j.Layout.Padding;
 import me.lauriichan.clay4j.Layout.VAlignment;
 import me.lauriichan.clay4j.LayoutContext;
+import me.lauriichan.snowframe.ConfigModule;
 import me.lauriichan.snowframe.ImGUIModule;
 import me.lauriichan.snowframe.util.color.SimpleColor;
 
@@ -70,20 +72,25 @@ public class UserInterface extends AbstractUserInterface {
     public final PropFloat mainProgress = new PropFloat(0f);
     public final PropString mainText = new PropString("");
 
-    private final Button startButton = Button.builder().action(UIActionHelper::startGame).padding(Padding.builder().all(4).left(8).build()).build();
+    private final Button startButton = Button.builder().action(UIActionHelper::startGame).padding(Padding.builder().all(4).left(8).build())
+        .build();
     private final Button updateButton = Button.builder().width(ISizing.percentage(0.185f)).padding(NO_PADDING)
         .action(() -> UIActionHelper.runUpdate(false, true)).build();
-    private final Button settingsButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).actionInUI(showSettings::toggle).build();
+    private final Button settingsButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).actionInUI(showSettings::toggle)
+        .build();
     private final Button quitButton = Button.builder().height(ISizing.grow()).padding(NO_PADDING).actionInUI(Main::shutdown).build();
 
     private final SettingsInterface settingsInterface = new SettingsInterface(renderContext);
     private final ImGuiConsole console = new ImGuiConsole();
+
+    private final UpdaterConfig updaterConfig;
 
     private volatile float dragX, dragY;
     private volatile boolean dragging = false;
 
     public UserInterface(final LauncherApp app) {
         super(app);
+        this.updaterConfig = app.snowFrame().module(ConfigModule.class).manager().config(UpdaterConfig.class);
         this.guiModule = app.snowFrame().module(ImGUIModule.class);
         renderContext.add(Animation.builder().trigger(new DelegateTrigger(switchPanorama)).repeating(true)
             .function(IAnimationFunction.fade().fadeIn(8, TimeUnit.SECONDS).fadeOut(125, TimeUnit.MILLISECONDS)).animator(IAnimationAnimator
@@ -183,6 +190,13 @@ public class UserInterface extends AbstractUserInterface {
                     builder
                         .layout().height(ISizing.percentage(1f)).addConfigs(Text.builder().text("Brick-Force").fontSize(28)
                             .wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_SEMI_BOLD)).build())
+                        .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
+                    builder.build().close();
+
+                    builder = leftBar.newElement();
+                    builder
+                        .layout().height(ISizing.percentage(1f)).addConfigs(Text.builder().text("(" + updaterConfig.productType().label() + ")").fontSize(26)
+                            .wrapMode(WrapMode.WRAP_NONE).font(FontWrapper.of(FontAtlas.NOTO_SANS_NORMAL)).build())
                         .layoutDirection(LayoutDirection.TOP_TO_BOTTOM);
                     builder.build().close();
 
